@@ -1,0 +1,3 @@
+# 忽略visual studio 中的.vs 文件
+.vs
+bin-int

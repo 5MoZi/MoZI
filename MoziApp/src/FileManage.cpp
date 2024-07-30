@@ -1,6 +1,9 @@
 #include "mopch.h"
 #include "FileManage.h"
 #include "MoIcon.h"
+#include "Log.h"
+
+
 
 namespace FileManage {
 
@@ -18,6 +21,10 @@ namespace FileManage {
         {".mp3",FileFormat_Mp3File},
         {".mp4",FileFormat_Mp4File},
     };
+
+    // 初始化FolderMap
+    std::map<std::filesystem::path, bool> FolderMap::folder_map;
+
 
     // 连接图标和汉字
     const std::string IconAndChinese(const std::string str1, const std::string str2, const int type)
@@ -105,4 +112,91 @@ namespace FileManage {
 		}
 	}
 
+
+
+    void FolderMap::AddFolder(const std::filesystem::path& current_path, const bool& tree_node_open)
+    {
+        if (folder_map.count(current_path) == 0)          // 判断map中是否有该节点,如果没有则添加进去
+        {
+            folder_map.insert({ current_path ,tree_node_open });
+            LOG_INFO("添加新文件夹至FolderMap中：{}", current_path.generic_string());
+            return;
+        }
+        LOG_WARN("无文件夹可添加");
+        return;
+    }
+
+    void FolderMap::DeleteFolder(const std::filesystem::path& current_path)
+    {
+        if (folder_map.count(current_path) == 0)          // 判断map中是否有该节点,如果没有则添加进去
+        {
+            folder_map.erase(current_path);
+            LOG_INFO("从FolderMap删除文件夹：{}", current_path.generic_string());
+            return;
+        }
+        LOG_WARN("无文件夹可删除");
+        return;
+    }
+
+    void FolderMap::LookFolderMap()
+    {
+        if (folder_map.empty())
+        {
+            LOG_INFO("FolderMap为空，无存储");
+            return;
+        }
+        else
+        {
+            LOG_INFO("查看FolderMap存储内容...");
+            for (std::map<std::filesystem::path, bool>::iterator it = folder_map.begin(); it != folder_map.end(); ++it) 
+            {
+                if (it->second == false) LOG_INFO("文件开关状态：关闭，文件路径：{}", it->first.generic_string());
+                else if(it->second == true) LOG_INFO("文件开关状态：打开，文件路径：{}", it->first.generic_string());
+            }
+            return;
+        }
+        return;
+    }
+
+    const std::filesystem::path& FolderMap::BuildFolderTree(const std::filesystem::path& current_path, const bool& tree_node_open)
+    {
+        // 初始化上一个路径
+        static std::filesystem::path last_path = STORAGE_PATH;
+        // 判断map中是否有该节点,如果没有则添加进去
+        if (folder_map.count(current_path) == 0)          
+        {
+            folder_map.insert({ current_path ,tree_node_open });
+            LOG_INFO("文件树建立__新添加文件夹：{}", current_path.generic_string());
+            return last_path;
+        }
+        // 如果该节点存在，则判断该节点上一个tree_node_open状态与当前的是否一样
+        else           
+        {
+            // 一样则说明没有进行操作，返回上一个操作的路径
+            if (folder_map.at(current_path) == tree_node_open)
+            {
+                return last_path;
+            }
+            // 其实可以用一个异或来进行判断的，但是为了区别打开和关闭的操作用了两个if
+            // 状态由0->1即文件打开
+            else if (folder_map.at(current_path) == 0 && tree_node_open == 1)   
+            {
+                last_path = current_path;                       // 刷新上一个文件夹路径
+                folder_map.at(current_path) = tree_node_open;   // 更新打开关闭节点
+                LOG_INFO("文件夹打开，抓取到当前文件夹路径为：{}", current_path.generic_string());
+                return current_path;
+            }
+            // 状态由1->0即文件打开
+            else if (folder_map.at(current_path) == 1 && tree_node_open == 0)
+            {
+                last_path = current_path;                       // 刷新上一个文件夹路径
+                folder_map.at(current_path) = tree_node_open;   // 更新打开关闭节点
+                LOG_INFO("文件夹关闭，抓取到当前文件夹路径为：{}", current_path.generic_string());
+                return current_path;
+            }
+        }
+
+        LOG_CRITICAL("文件数建立失败");
+        return last_path;
+    }
 }

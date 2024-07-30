@@ -2,7 +2,7 @@
 #include "Moui.h"
 #include "MoIcon.h"
 #include "FileManage.h"
-
+#include "Log.h"
 
 namespace Moui {
 
@@ -65,8 +65,10 @@ namespace Moui {
     void MouiInit()
     {
         // UI初始化
-        Moui::ThemeColorInit(theme_color);
         Moui::StyleInit();
+        LOG_INFO("格式初始化");
+        Moui::ThemeColorInit(theme_color);
+        LOG_INFO("主题初始化");
         //Moui::MzuiPopupStyleInit();
         //// 数据库连接
         //MzMysql::ConnectDatabase(mysql);

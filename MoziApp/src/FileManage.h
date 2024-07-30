@@ -64,7 +64,18 @@ namespace FileManage {
 	// 扫描文件夹函数，放回其下第一层的文件夹路径和文件路径
 	void ScanDirectory(std::vector<std::filesystem::path>& folder_path, std::vector<std::filesystem::path>& file_path, const std::filesystem::path& current_path);
 
+	class FolderMap
+	{
+	public:
+		void AddFolder(const std::filesystem::path& current_path, const bool& tree_node_open);
+		void DeleteFolder(const std::filesystem::path& current_path);
+		void LookFolderMap();
 
+		// 获取双击后的文件夹路径
+		const std::filesystem::path& BuildFolderTree(const std::filesystem::path& current_path, const bool& tree_node_open);
+	private:
+		static std::map<std::filesystem::path, bool> folder_map;
+	};
 
 
 

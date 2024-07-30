@@ -1,5 +1,6 @@
 #include "mopch.h"
 #include "MoziPage.h"
+#include "Log.h"
 
 
 #include "MoIcon.h"
@@ -24,7 +25,7 @@ namespace MoziPage{
 
     // 路径参数
     static std::filesystem::path double_click_current_path = STORAGE_PATH;       // 获取双击文件夹后，该文件夹的路径
-
+    static FileManage::FolderMap folder_maper;
 
 //-----------------------------------------------------------------------------
 //                                  主页
@@ -252,9 +253,8 @@ namespace MoziPage{
             ImGui::EndMenuBar();
         }
 
-        OpenFolder(STORAGE_PATH, 0, true);
-        ////// 建立文件树
-        ////BuiltTopFileTree();
+
+        OpenFolder(STORAGE_PATH, true);
 
         ////// 打开新建文件夹弹窗
         //if (add_new_folder_popup) MZUI::AddNewFolderPopup(add_new_folder_popup, prior_file_path, current_scale, big_font);
@@ -312,6 +312,84 @@ namespace MoziPage{
         }
     }
 
+    // 右击文件夹打开视窗
+    static void RightFolderPopup(const char* str_id, ImGuiPopupFlags popup_flags, const std::filesystem::path& current_path)
+    {
+        //MoZi::ObjectType path_type = MzMysql::CheckObjectType(current_path);
+
+
+        // 这里使用新函数直接一步到位
+        // ImGui::OpenPopupOnItemClick(str_idd.c_str(), popup_flags);   // 创建视窗
+        // ImGui::BeginPopup(str_idd.c_str());                          // 打开视窗
+        // 判断右击是文件还是目录，1为文件0为目录
+        //bool file_flag = std::filesystem::is_regular_file(current_path);
+
+        if (ImGui::BeginPopupContextItem(str_id, popup_flags))
+        {
+            //if (path_type == MoZi::ObjectType_IsFolder)        // 只有文件才有的操作
+            if (1)        // 只有文件才有的操作
+            {
+                if (ImGui::BeginMenu(SOURSEPAGE_FOLDER_POPUP_ADD))
+                {
+                    if (ImGui::MenuItem(SOURSEPAGE_FOLDER_POPUP_SUBADD_NEWFOLDER)) {
+                        //prior_file_path = current_path;
+                        //add_new_folder_popup = true;
+                    }
+                    if (ImGui::MenuItem(SOURSEPAGE_FOLDER_POPUP_SUBADD_NEWTEXTFILE)) {
+                        //MzFile::SelectDirectoryAndNew(STORAGE_PATH);
+                    }
+                    if (ImGui::MenuItem(SOURSEPAGE_FOLDER_POPUP_SUBADD_ADDPLAN)) {
+                        //prior_file_path = current_path;
+                        //add_new_plan_popup = true;
+                    }
+                    if (ImGui::MenuItem(SOURSEPAGE_FOLDER_POPUP_SUBADD_ADDFILE)) {
+                        //MzFile::SelectDirectoryAndNew(current_path);
+                    }
+                    ImGui::EndMenu();
+                }
+            }
+
+            if (ImGui::MenuItem(SOURSEPAGE_FOLDER_POPUP_COPY)) {
+                //prior_file_path = current_path;
+                //paste_file = true;
+            }
+            // 只有复制或剪切了粘贴才有效,并且判断接受文件是文件还是目录，如果是文件则不接收只有目录才能接收
+            //if (path_type == MoZi::ObjectType_IsFolder)          // 只有文件才有的操作
+            //{
+            //    if (ImGui::MenuItem(SOURSEPAGE_FOLDER_POPUP_PASTE, 0, false, paste_file)) {
+            //        if (std::filesystem::is_directory(prior_file_path))MzFile::CopyFolderToFolder(prior_file_path, current_path, "", !cut_file);
+            //        else if (std::filesystem::is_regular_file(prior_file_path))MzFile::CopyFileToFolder(prior_file_path, current_path);
+            //        if (cut_file)       // 剪切文件时要对复制的文件进行删除
+            //        {
+            //            MzFile::DeleteFolderOrFile(prior_file_path);
+            //            cut_file = false;
+            //        }
+            //        paste_file = false;
+            //    }
+            //}
+            if (ImGui::MenuItem(SOURSEPAGE_FOLDER_POPUP_CUT)) {
+                //prior_file_path = current_path;
+                //paste_file = true;
+                //cut_file = true;
+            }
+
+            if (ImGui::MenuItem(SOURSEPAGE_FOLDER_POPUP_DELETE)) {
+                //MzFile::DeleteFolderOrFileToBin(current_path);
+            }
+            if (ImGui::MenuItem(SOURSEPAGE_FOLDER_POPUP_RENAME)) {
+                //prior_file_path = current_path;
+                //open_rename_popup = true;
+            }
+            //if (path_type == MoZi::ObjectType_IsFolder)          // 只有文件才有的操作
+            //{
+            //    // 属性弹窗
+            //    if (ImGui::MenuItem(SOURSEPAGE_FOLDER_POPUP_PROPERTY)) {
+            //        property_open = true;
+            //    }
+            //}
+            ImGui::EndPopup();
+        }
+    }
 
     // 获取当前文件夹路径(核心代码)
     static void ReflashPath(const std::string& file_tree_name, const bool& tree_node_open, std::filesystem::path& current_path)
@@ -330,18 +408,23 @@ namespace MoziPage{
             else if (name_map.at(file_tree_name) == 0 && tree_node_open == 1)   // 转态有0->1即文件打开
             {
                 double_click_current_path = current_path;
+                std::cout << current_path << std::endl;
+                std::cout << file_tree_name << std::endl;
                 name_map.at(file_tree_name) = tree_node_open;
             }
             else if (name_map.at(file_tree_name) == 1 && tree_node_open == 0)   // 转态有0->1即文件关闭
             {
                 double_click_current_path = current_path;
+                std::cout << current_path << std::endl;
+                std::cout << file_tree_name << std::endl;
                 name_map.at(file_tree_name) = tree_node_open;
             }
-
         }
     }
+    
+    
     // 递归打开逐层文件
-    static void OpenFolder(const std::filesystem::path& parent_path, int file_layer, bool top_flag, bool bin_flag)
+    static void OpenFolder(const std::filesystem::path& parent_path, bool top_flag)
     {
         // 文件相关参数
         static ImGuiTreeNodeFlags tree_flag = ImGuiTreeNodeFlags_OpenOnArrow             // 添加文件夹树标志位
@@ -363,26 +446,20 @@ namespace MoziPage{
 
             //if (ignore_folder.count(folder_path[i].filename().generic_string()))continue;// 跳过对应文件夹
 
-            // 为了保证父目录的名字与子目录名字在相同情况下其树的id不同
-            // 只有文件夹要此操作文件就不用了因为文件没有下一级
-            std::string tree_flag_name = folder_path[i].filename().generic_u8string();
-            if (parent_path.filename() == folder_path[i].filename())
-            {
-                tree_flag_name += std::to_string(file_layer);
-                file_layer++;
-            }
 
-            bool node_open = ImGui::TreeNodeEx(tree_flag_name.c_str(), tree_flag, FileManage::TreeFileIconConnect(folder_path[i]).c_str());
-
+            // 由于文件的路径是唯一的，因此使用路径作为文件树文件的唯一标识符，即：folder_path[i].generic_string()
+            std::string folder_only_flag = folder_path[i].generic_string();
+            bool node_open = ImGui::TreeNodeEx(folder_only_flag.c_str(), tree_flag, FileManage::TreeFileIconConnect(folder_path[i]).c_str());
             //if (bin_flag == 1)RightRecycleBinPopup(tree_flag_name.c_str(), ImGuiPopupFlags_MouseButtonRight, folder_path[i]);
-            //else RightFolderPopup(tree_flag_name.c_str(), ImGuiPopupFlags_MouseButtonRight, folder_path[i]);
+            //else 
+            RightFolderPopup(folder_only_flag.c_str(), ImGuiPopupFlags_MouseButtonRight, folder_path[i]);
 
-            ReflashPath(folder_path[i].generic_string(), node_open, folder_path[i]);
+            // 双击获取当前文件夹的路径
+            double_click_current_path = folder_maper.BuildFolderTree(folder_path[i], node_open);
 
             if (node_open)
             {
-
-                OpenFolder(folder_path[i], file_layer, 0);
+                OpenFolder(folder_path[i],0);
                 ImGui::TreePop();
             }
         }
@@ -390,12 +467,26 @@ namespace MoziPage{
         for (int i = 0; i < file_path.size(); i++)
         {
             //if (ignore_extension.count(file_path[i].extension().generic_string()))continue;// 跳过mozi后缀信息文件
-            ImGui::BulletText(FileManage::TreeFileIconConnect(file_path[i]).c_str());
-            //RightFolderPopup(file_path[i].filename().generic_u8string().c_str(), ImGuiPopupFlags_MouseButtonRight, file_path[i]);
-        }
+            //ImGui::BulletText(FileManage::TreeFileIconConnect(file_path[i]).c_str());
+            //RightFolderPopup(file_path[i].filename().generic_string().c_str(), ImGuiPopupFlags_MouseButtonRight, file_path[i]);
+            std::string file_only_flag = file_path[i].generic_string();
+            bool file_node_open = ImGui::TreeNodeEx(file_only_flag.c_str(), tree_flag, FileManage::TreeFileIconConnect(file_path[i]).c_str());
+            //if (bin_flag == 1)RightRecycleBinPopup(tree_flag_name.c_str(), ImGuiPopupFlags_MouseButtonRight, folder_path[i]);
+            //else 
+            RightFolderPopup(file_only_flag.c_str(), ImGuiPopupFlags_MouseButtonRight, file_path[i]);
 
+            // 双击获取当前文件夹的路径
+            double_click_current_path = folder_maper.BuildFolderTree(file_path[i], file_node_open);
+            
+            //if (file_node_open)
+            //{
+            //    OpenFolder(file_path[i], 0);
+            //    
+            //}
+        }
+        ImGui::TreePop();
         // 只有第0层有回收站，即顶层目录
-        if (top_flag == 1)
+        if (top_flag == true)
         {
             // 设置回收站的高度（实时变动）
             float d_w_h = ImGui::GetWindowHeight();                 // 窗口动态高度
@@ -403,44 +494,28 @@ namespace MoziPage{
             if (d_w_h * 2 / 3 < d_file_y + 50)
                 ImGui::Dummy(ImVec2(0, 50));
             else
-
                 ImGui::SetCursorPos(ImVec2(0, d_w_h * 2 / 3));
-
 
             // 建立回收站树，要把回收站放在最底下
             ImGui::SeparatorEx(ImGuiSeparatorFlags_Horizontal, 5.0);
+            // 回收站存放路径
             static std::filesystem::path recycle_bin_folder = MOZI_RECYCLE_BIN_PATH;
 
-            if (!std::filesystem::exists(recycle_bin_folder))        // 回收站如果不存在则建立
+            // 回收站如果不存在则建立
+            if (!std::filesystem::exists(recycle_bin_folder))        
             {
                 std::filesystem::create_directory(recycle_bin_folder);
             }
 
-            //bool recycle_node_open = ImGui::TreeNodeEx(recycle_bin_folder.c_str(), tree_flag, FILETREE_ICON_BIN);
             bool recycle_node_open = ImGui::TreeNodeEx(u8"回收站", tree_flag, FILETREE_ICON_BIN);
-            RightRecycleBinPopup(recycle_bin_folder.filename().generic_u8string().c_str(), ImGuiPopupFlags_MouseButtonRight, recycle_bin_folder); // 右击文件夹
+            RightRecycleBinPopup(recycle_bin_folder.generic_string().c_str(), ImGuiPopupFlags_MouseButtonRight, recycle_bin_folder); // 右击文件夹
             if (recycle_node_open)
             {
-                OpenFolder(recycle_bin_folder, 1, 0, 1);
+                OpenFolder(recycle_bin_folder, 0);
                 ImGui::TreePop();
             }
         }
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 }

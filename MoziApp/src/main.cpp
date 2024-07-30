@@ -1,7 +1,7 @@
 #include "mopch.h"
 #include "MoziPage.h"
 #include "Moui.h"
-
+#include "Log.h"
 
 #define APP_NAME u8"MoZI"
 
@@ -59,8 +59,13 @@ int main()
     //-----------------------------------------------------------------------------
     //                               MOZI初始化设置
     //-----------------------------------------------------------------------------
+    // 日志初始化
+    MoLog::Log::LogInit();
     // 初始化设置
+    LOG_INFO("MOUI初始化设置开始");
     Moui::MouiInit();              // UI初始化
+    LOG_INFO("MOUI初始化设置结束");
+
 
     bool show_demo_window = true;
     ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
@@ -81,8 +86,8 @@ int main()
         //// 前面都是初始化操作与设定，下面才是程序运行部分
         ///*******************UI运行与程序部分***********************/
         MoziPage::HomePage();
-        //if (show_demo_window)
-        //    ImGui::ShowDemoWindow(&show_demo_window);
+        if (show_demo_window)
+            ImGui::ShowDemoWindow(&show_demo_window);
 
         ///********************************************************/
 

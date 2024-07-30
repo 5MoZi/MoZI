@@ -51,6 +51,9 @@
     <ClCompile Include="src\FileManage.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="src\Log.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="mzlib\IconsFontAwesome6.h">
@@ -96,6 +99,9 @@
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="src\FileManage.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Log.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>

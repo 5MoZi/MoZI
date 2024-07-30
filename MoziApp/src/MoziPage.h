@@ -23,5 +23,6 @@ namespace MoziPage {
 	static void HomePageMainMenuBarHelp();
 
 	// 文件树建立函数
-	static void OpenFolder(const std::filesystem::path& parent_path, int file_layer, bool top_flag, bool bin_flag = 0);
+	static void OpenFolder(const std::filesystem::path& parent_path, bool top_flag);
+	static void OpenFolderV2(const std::filesystem::path& parent_path, int folder_code = 1);
 }

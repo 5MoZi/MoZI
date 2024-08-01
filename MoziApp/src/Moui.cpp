@@ -1,8 +1,12 @@
 #include "mopch.h"
-#include "Moui.h"
 #include "MoIcon.h"
-#include "FileManage.h"
 #include "Log.h"
+#include "FileOperate.h"
+#include "MoObject.h"
+
+#include "Moui.h"
+#include "FileManage.h"
+
 
 namespace Moui {
 
@@ -14,13 +18,324 @@ namespace Moui {
     static float current_scale = 0.f;           // 当前规模，用于处理不同dip时不同的字体大小
     static ImFont* big_font = NULL;             // 大号字体与图标，用于标题或其他需要大号字体的地方
 
-
-
     // 主题参数
     static ThemeColor theme_color = Moui::ThemeColor_Light;                 // 页面默认色
     const static int theme_color_num = 3;                             // 主题颜色的数量
     static bool* theme_color_register = new bool[theme_color_num]();  // 主题颜色变换器：当启用某个颜色主题时，该颜色下标置为1其余为0;
 
+    // moui格式参数
+    static MoObject::MouiPopupStyle popup_base_style;
+
+
+//-----------------------------------------------------------------------------
+//                                  输入函数
+//-----------------------------------------------------------------------------
+    // 一行两个即：一个固定一个输入  
+    static float DoubleElementSimpleWrite(const std::string& text_name, char* buff, const size_t buff_size,
+        const float& pos_x, const float& space, const float& input_width, const char* label, const float& space_high = 0, const bool& enable_high = 0)
+    {
+        // 一行两个，带有与前面元素的间距
+        if (enable_high)
+            ImGui::Dummy(ImVec2(0, space_high));
+
+        ImGui::SetCursorPosX(pos_x);
+        ImGui::Text(text_name.c_str());
+        ImGui::SameLine();
+        float text_name1_width = ImGui::CalcTextSize(text_name.c_str()).x;
+        ImGui::SetCursorPosX(pos_x + text_name1_width + space);
+        ImGui::SetNextItemWidth(input_width);
+        ImGui::InputText(label, buff, buff_size);
+        return pos_x + text_name1_width + space;
+    }
+//-----------------------------------------------------------------------------
+//                                  显示弹窗函数
+//-----------------------------------------------------------------------------    
+    // 提示窗口
+    void RemindPopup(const std::string& text, const float& current_scale)
+    {
+        // 弹窗建立一次标志位
+        static bool ones_open_popup = true;
+
+        /*-------------------------窗口信息设置----------------------------*/
+        static MoObject::MouiPopupStyle current_popup_style = popup_base_style;
+        // 窗口信息
+        static float window_hight = current_popup_style.window_hight;
+        static float window_width = current_popup_style.window_width;
+        // 设置弹窗的尺寸和确定按钮的大小
+        static ImVec2 element_pos = current_popup_style.element_pos;
+        static ImVec2 element_space = current_popup_style.element_space;
+        static ImVec2 bar_size = current_popup_style.bar_size;
+        static ImVec2 button_size = current_popup_style.button_size;
+        // 不同规模变化不同的尺寸
+        static float next_scale = 0.f;              // 保证尺寸只进行一次变化
+        if (next_scale != current_scale && current_scale != current_popup_style.scale)
+        {
+
+            next_scale = current_scale;
+            current_popup_style.ChangeStlyeSize(current_scale);
+
+            window_hight = current_popup_style.window_hight;
+            window_width = current_popup_style.window_width;
+            element_pos = current_popup_style.element_pos;         // 元素位置
+            element_space = current_popup_style.element_space;     // 元素间距
+            bar_size = current_popup_style.bar_size;               // 进度条尺寸
+            button_size = current_popup_style.button_size;         // 按钮尺寸
+        }
+
+        // 保证只建立一次弹窗
+        if (ones_open_popup)
+        {
+            ImGui::OpenPopup(u8"MoZI小提示"); // 建立弹窗
+            ones_open_popup = false;
+        }
+
+        /*-------------------------弹窗位置与大小设置----------------------------*/
+        ImVec2 center = ImGui::GetMainViewport()->GetCenter();
+        ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
+
+        // 最小弹窗大小设置
+        static bool flag_ones = false;
+        if (flag_ones == false)
+        {
+            ImGui::SetNextWindowSize(ImVec2(window_width * 0.8, window_hight * 0.5));
+            flag_ones = true;
+        }
+
+        /*-------------------------弹窗内容部分----------------------------*/
+        if (ImGui::BeginPopupModal(u8"MoZI小提示"), 0, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse)  // 打开弹窗
+        {
+            //// 窗口最小的大小为1000*1000
+            float win_h = ImGui::GetWindowHeight(), win_w = ImGui::GetWindowWidth();        // 窗口的实时大小
+
+            // 显示错误内容
+            ImGui::TextWrapped(text.c_str());
+
+            // 编辑确认按键
+            ImGui::SetCursorPos(ImVec2(win_w - element_pos.x * 4, win_h - element_pos.y * 2.5));
+            if (ImGui::Button(u8"确定", button_size)) 
+            {
+
+                ones_open_popup = true;
+                ImGui::CloseCurrentPopup();
+            }
+            ImGui::SetItemDefaultFocus();
+            ImGui::EndPopup();
+        }
+    }
+
+    // 错误窗口
+    bool ErrorPopup(const std::string& text, bool& confirm_flag, const float& current_scale)
+    {
+        // 弹窗建立一次标志位
+        static bool ones_open_popup = true;
+
+        /*-------------------------窗口信息设置----------------------------*/
+        static MoObject::MouiPopupStyle current_popup_style = popup_base_style;
+        // 窗口信息
+        static float window_hight = current_popup_style.window_hight;
+        static float window_width = current_popup_style.window_width;
+        // 设置弹窗的尺寸和确定按钮的大小
+        static ImVec2 element_pos = current_popup_style.element_pos;
+        static ImVec2 element_space = current_popup_style.element_space;
+        static ImVec2 bar_size = current_popup_style.bar_size;
+        static ImVec2 button_size = current_popup_style.button_size;
+        // 不同规模变化不同的尺寸
+        static float next_scale = 0.f;              // 保证尺寸只进行一次变化
+        if (next_scale != current_scale && current_scale != current_popup_style.scale)
+        {
+
+            next_scale = current_scale;
+            current_popup_style.ChangeStlyeSize(current_scale);
+
+            window_hight = current_popup_style.window_hight;
+            window_width = current_popup_style.window_width;
+            element_pos = current_popup_style.element_pos;         // 元素位置
+            element_space = current_popup_style.element_space;     // 元素间距
+            bar_size = current_popup_style.bar_size;               // 进度条尺寸
+            button_size = current_popup_style.button_size;         // 按钮尺寸
+        }
+
+        // 保证只建立一次弹窗
+        if (ones_open_popup)
+        {
+            ImGui::OpenPopup(u8"MoZI小提示"); // 建立弹窗
+            ones_open_popup = false;
+        }
+
+        /*-------------------------弹窗位置与大小设置----------------------------*/
+        ImVec2 center = ImGui::GetMainViewport()->GetCenter();
+        ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
+
+        // 最小弹窗大小设置
+        static bool flag_ones = false;
+        if (flag_ones == false)
+        {
+            ImGui::SetNextWindowSize(ImVec2(window_width * 0.8, window_hight * 0.5));
+            flag_ones = true;
+        }
+        /*-------------------------弹窗内容部分----------------------------*/
+        if (ImGui::BeginPopupModal(u8"MoZI小提示", 0, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse))  // 打开弹窗
+        {
+            // 窗口最小的大小为1000*1000
+            float win_h = ImGui::GetWindowHeight(), win_w = ImGui::GetWindowWidth();        // 窗口的实时大小
+
+            // 显示错误内容
+            ImGui::TextWrapped(text.c_str());
+
+            // 编辑确认按键
+            ImGui::SetCursorPos(ImVec2(win_w - element_pos.x * 4, win_h - element_pos.y * 2.5));
+            if (ImGui::Button(u8"确定", button_size)) 
+            {
+                ones_open_popup = true;
+                confirm_flag =true;
+                ImGui::CloseCurrentPopup();
+                ImGui::SetItemDefaultFocus();
+                ImGui::EndPopup();
+                return true;
+            }
+            // 编辑取消按键
+            ImGui::SetCursorPos(ImVec2(win_w - element_pos.x * 8, win_h - element_pos.y * 2.5));
+            if (ImGui::Button(u8"取消", button_size)) 
+            {
+                ones_open_popup = true;
+                ImGui::CloseCurrentPopup();
+                confirm_flag = false;
+                ImGui::SetItemDefaultFocus();
+                ImGui::EndPopup();
+                return false;
+            }
+            ImGui::SetItemDefaultFocus();
+            ImGui::EndPopup();
+            return false;
+        }
+    }
+//-----------------------------------------------------------------------------
+//                                弹窗函数
+//-----------------------------------------------------------------------------
+    // 新建文件和文件夹弹窗
+    void AddNewFileAndFolderPopup(bool& open_popup, const char* popup_name, const FileOperate::FileFormat& file_format,const std::filesystem::path& current_path,
+        const float& current_scale)
+    {
+        // 弹窗建立一次标志位
+        static bool ones_open_popup = true;
+
+        // 编辑确认按键
+        static bool rename_flag = false;
+
+        /*-------------------------窗口信息设置----------------------------*/
+        static MoObject::MouiPopupStyle current_popup_style = popup_base_style;
+        // 窗口信息
+        static float window_hight = current_popup_style.window_hight;
+        static float window_width = current_popup_style.window_width;
+        // 设置弹窗的尺寸和确定按钮的大小
+        static ImVec2 element_pos = current_popup_style.element_pos;
+        static ImVec2 element_space = current_popup_style.element_space;
+        static ImVec2 bar_size = current_popup_style.bar_size;
+        static ImVec2 button_size = current_popup_style.button_size;
+        // 不同规模变化不同的尺寸
+        static float next_scale = 0.f;              // 保证尺寸只进行一次变化
+        if (next_scale != current_scale && current_scale != current_popup_style.scale)
+        {
+            next_scale = current_scale;
+            current_popup_style.ChangeStlyeSize(current_scale);
+            window_hight = current_popup_style.window_hight;
+            window_width = current_popup_style.window_width;
+            element_pos = current_popup_style.element_pos;         // 元素位置
+            element_space = current_popup_style.element_space;     // 元素间距
+            bar_size = current_popup_style.bar_size;               // 进度条尺寸
+            button_size = current_popup_style.button_size;         // 按钮尺寸
+        }
+
+        // 保证只建立一次弹窗
+        if (ones_open_popup)
+        {
+            ImGui::OpenPopup(popup_name); // 建立弹窗
+            ones_open_popup = false;
+        }
+
+        /*-------------------------弹窗位置与大小设置----------------------------*/
+        static ImGuiWindowFlags window_flags = ImGuiWindowFlags_NoCollapse;
+        ImVec2 center = ImGui::GetMainViewport()->GetCenter();
+        ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
+
+        // 最小弹窗大小设置
+        static bool flag_ones = false;
+        if (flag_ones == false)
+        {
+            ImGui::SetNextWindowSize(ImVec2(window_width, window_hight));
+            flag_ones = true;
+        }
+
+        /*-------------------------存储信息设置----------------------------*/
+        static char name_buff[256] = { 0 };
+        /*-------------------------弹窗内容部分----------------------------*/
+        if (ImGui::BeginPopupModal(popup_name, &open_popup, window_flags))   // 打开弹窗
+        {
+            // 窗口最小的大小为1000*1000
+            float win_h = ImGui::GetWindowHeight(), win_w = ImGui::GetWindowWidth();        // 窗口的实时大小
+            if (ImGui::GetWindowWidth() < window_hight - 200 || ImGui::GetWindowHeight() < window_width - 200)flag_ones = false;
+
+            if (file_format == FileOperate::FileFormat_Directory)
+            {
+                if (rename_flag == false)strcpy_s(name_buff, u8"新建文件夹");
+                DoubleElementSimpleWrite(FILETREE_ICON_FOLDER, name_buff, IM_ARRAYSIZE(name_buff),
+                    element_pos.x, element_space.x, win_w - element_pos.x * 10, "##新建文件夹名称", element_pos.y, 1);
+            }
+            else if (file_format == FileOperate::FileFormat_TextFile)
+            {
+                //if (rename_flag == false)strcpy_s(name_buff, u8"新建文件夹");
+                strcpy_s(name_buff, u8"新建文本文件");
+                DoubleElementSimpleWrite(FILETREE_ICON_TEXTFILE, name_buff, IM_ARRAYSIZE(name_buff),
+                    element_pos.x, element_space.x, win_w - element_pos.x * 10, "##新建文本文件名称", element_pos.y, 1);
+            }
+
+            ImGui::Dummy(ImVec2(0, element_pos.y));        // 与上面的距离
+            ImGui::SeparatorEx(ImGuiSeparatorFlags_Horizontal, 5.0);
+
+
+            ImGui::SetCursorPos(ImVec2(win_w - element_pos.x * 5, win_h - element_pos.y * 5));
+            if (ImGui::Button(u8"确定", button_size)) 
+            {
+                // 调用新建文件函数
+                if (!FileManage::NewBuildFolderAndFile(FileOperate::UTF8_To_string(name_buff), file_format, current_path))
+                {
+                    // 出现重命名，开启标志位
+                    rename_flag = true;
+                }
+                else 
+                {
+                    memset(name_buff, 0, 256);      // 清空文件名称
+                    open_popup = false;
+                    ones_open_popup = true;
+                    ImGui::CloseCurrentPopup();
+                }
+            }
+
+            if (rename_flag && ErrorPopup(u8"文件重命名，是否需要强制创建", rename_flag, current_scale))
+            {
+                // 强制建立文件
+                FileManage::NewBuildFolderAndFile(FileOperate::UTF8_To_string(name_buff), file_format, current_path, true);
+                // 各个标志位恢复，以及清空数组
+                rename_flag = false;
+                memset(name_buff, 0, 256);      // 清空文件名称
+                open_popup = false;
+                ones_open_popup = true;
+                ImGui::CloseCurrentPopup();
+                ImGui::SetItemDefaultFocus();
+                ImGui::EndPopup();
+                return;
+            }
+            ImGui::SetItemDefaultFocus();
+            ImGui::EndPopup();
+        }
+
+        // 直接关闭弹窗后记得清空数组和还原标志位
+        if (open_popup == false)
+        {
+            memset(name_buff, 0, 256);      // 清空文件名称
+            ones_open_popup = true;
+        }
+    }
 //-----------------------------------------------------------------------------
 //                                  APP初始化
 //-----------------------------------------------------------------------------
@@ -61,20 +376,34 @@ namespace Moui {
         }
     }
 
-    // MoziApp初始化程序
+    // MouiPopup格式初始化
+    static void MouiPopupStyleInit()
+    {
+        popup_base_style.scale = 1.5f;        // 2K显示器尺寸
+        popup_base_style.window_hight = 800;
+        popup_base_style.window_width = 1000;
+        popup_base_style.element_pos = ImVec2(50, 30);
+        popup_base_style.element_space = ImVec2(20, 200);
+        popup_base_style.bar_size = ImVec2(800.0f, 30.0f);
+        popup_base_style.button_size = ImVec2(150, 0);
+    }
+
+
+
+
+    // MouiApp初始化程序
     void MouiInit()
     {
         // UI初始化
         Moui::StyleInit();
-        LOG_INFO("格式初始化");
+        LOG_INFO("格式初始化成功");
         Moui::ThemeColorInit(theme_color);
-        LOG_INFO("主题初始化");
-        //Moui::MzuiPopupStyleInit();
-        //// 数据库连接
+        LOG_INFO("主题初始化成功");
+        Moui::MouiPopupStyleInit();
+        LOG_INFO("Moui弹窗初始化成功");
+        // 数据库连接
         //MzMysql::ConnectDatabase(mysql);
     }
-
-
 
     // 动态DPI
     void DynamicDPI(GLFWwindow* window, ImGuiIO& io)

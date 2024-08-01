@@ -1,6 +1,12 @@
 #include "mopch.h"
-#include "MoziPage.h"
+#include "Log.h"
+#include "FileOperate.h"
+#include "MysqlOperate.h"
+#include "MoObject.h"
+
 #include "Moui.h"
+#include "MoziPage.h"
+
 #include "Log.h"
 
 #define APP_NAME u8"MoZI"

@@ -21,5 +21,8 @@ namespace Moui {
     void ChangeThemeColor();
 
 
+    void AddNewFileAndFolderPopup(bool& open_popup, const char* popup_name, const FileOperate::FileFormat& file_format,
+        const std::filesystem::path& current_path, const float& current_scale);
+
 
 }

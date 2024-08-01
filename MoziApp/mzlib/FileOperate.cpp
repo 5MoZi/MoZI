@@ -347,22 +347,8 @@ namespace FileOperate {
             LOG_ERROR("存在路径不存在，导致重命名检测失败！");
             return false;
         }
-        std::cout << "2" << std::endl;
-        //std::cout << target_path / rename << std::endl;
         std::filesystem::path file_to_target_path = target_path;
-        std::cout << file_to_target_path << std::endl;
-        std::cout << rename << std::endl;
         file_to_target_path /= rename;
-        std::cout << "1" << std::endl;
-        //std::cout << file_to_target_path << std::endl;
-        //file_to_target_path /= rename;
-        std::cout << file_to_target_path << std::endl;
-
-        //std::filesystem::path file_to_target_path = target_path.parent_path();
-        //std::cout << "2" << std::endl;
-        //std::cout << file_to_target_path << std::endl;
-        //file_to_target_path /= rename;
-        //std::cout << file_to_target_path << std::endl;
         if (std::filesystem::exists(file_to_target_path))
         {
             LOG_INFO("文件名：{0}，在路径：{1}中存在同名文件", rename, target_path.generic_string());

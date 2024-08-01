@@ -221,6 +221,9 @@ namespace Moui {
 
         // 编辑确认按键
         static bool rename_flag = false;
+        // 错误弹窗一次标志位
+        static bool error_flag = false;
+
 
         /*-------------------------窗口信息设置----------------------------*/
         static MoObject::MouiPopupStyle current_popup_style = popup_base_style;
@@ -283,8 +286,7 @@ namespace Moui {
             }
             else if (file_format == FileOperate::FileFormat_TextFile)
             {
-                //if (rename_flag == false)strcpy_s(name_buff, u8"新建文件夹");
-                strcpy_s(name_buff, u8"新建文本文件");
+                if (rename_flag == false)strcpy_s(name_buff, u8"新建文本文件");
                 DoubleElementSimpleWrite(FILETREE_ICON_TEXTFILE, name_buff, IM_ARRAYSIZE(name_buff),
                     element_pos.x, element_space.x, win_w - element_pos.x * 10, "##新建文本文件名称", element_pos.y, 1);
             }
@@ -294,29 +296,33 @@ namespace Moui {
 
 
             ImGui::SetCursorPos(ImVec2(win_w - element_pos.x * 5, win_h - element_pos.y * 5));
-            if (ImGui::Button(u8"确定", button_size)) 
+            if (ImGui::Button(u8"确定", button_size))
             {
                 // 调用新建文件函数
                 if (!FileManage::NewBuildFolderAndFile(FileOperate::UTF8_To_string(name_buff), file_format, current_path))
                 {
                     // 出现重命名，开启标志位
                     rename_flag = true;
+                    error_flag = true;
                 }
                 else 
                 {
                     memset(name_buff, 0, 256);      // 清空文件名称
+                    rename_flag = false;
+                    error_flag = false;
                     open_popup = false;
                     ones_open_popup = true;
                     ImGui::CloseCurrentPopup();
                 }
             }
 
-            if (rename_flag && ErrorPopup(u8"文件重命名，是否需要强制创建", rename_flag, current_scale))
+            if (error_flag && ErrorPopup(u8"文件重命名，是否需要强制创建", error_flag, current_scale))
             {
                 // 强制建立文件
                 FileManage::NewBuildFolderAndFile(FileOperate::UTF8_To_string(name_buff), file_format, current_path, true);
                 // 各个标志位恢复，以及清空数组
                 rename_flag = false;
+                error_flag = false;
                 memset(name_buff, 0, 256);      // 清空文件名称
                 open_popup = false;
                 ones_open_popup = true;
@@ -334,6 +340,8 @@ namespace Moui {
         {
             memset(name_buff, 0, 256);      // 清空文件名称
             ones_open_popup = true;
+            rename_flag = false;
+            error_flag = false;
         }
     }
 //-----------------------------------------------------------------------------

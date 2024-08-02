@@ -8,7 +8,7 @@
 
 namespace MoziPage {
 
-
+	void MoziAppInit();
 	void HomePage();
 	// ÄÚÖÃº¯Êı
 	static void SoursePage();

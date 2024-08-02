@@ -3,7 +3,7 @@
 #include "Log.h"
 #include "FileOperate.h"
 #include "MoObject.h"
-
+#include "MysqlOperate.h"
 #include "Moui.h"
 #include "FileManage.h"
 
@@ -26,7 +26,7 @@ namespace Moui {
     // moui格式参数
     static MoObject::MouiPopupStyle popup_base_style;
 
-
+    
 //-----------------------------------------------------------------------------
 //                                  输入函数
 //-----------------------------------------------------------------------------
@@ -249,9 +249,14 @@ namespace Moui {
             button_size = current_popup_style.button_size;         // 按钮尺寸
         }
 
+        /*-------------------------存储信息设置----------------------------*/
+        static char name_buff[256] = { 0 };
+
         // 保证只建立一次弹窗
         if (ones_open_popup)
         {
+            if(file_format == FileOperate::FileFormat_Directory)strcpy_s(name_buff, u8"新建文件夹");
+            else if(file_format == FileOperate::FileFormat_TextFile)strcpy_s(name_buff, u8"新建文本文件");
             ImGui::OpenPopup(popup_name); // 建立弹窗
             ones_open_popup = false;
         }
@@ -269,8 +274,7 @@ namespace Moui {
             flag_ones = true;
         }
 
-        /*-------------------------存储信息设置----------------------------*/
-        static char name_buff[256] = { 0 };
+
         /*-------------------------弹窗内容部分----------------------------*/
         if (ImGui::BeginPopupModal(popup_name, &open_popup, window_flags))   // 打开弹窗
         {
@@ -280,13 +284,13 @@ namespace Moui {
 
             if (file_format == FileOperate::FileFormat_Directory)
             {
-                if (rename_flag == false)strcpy_s(name_buff, u8"新建文件夹");
+                //if (rename_flag == false)strcpy_s(name_buff, u8"新建文件夹");
                 DoubleElementSimpleWrite(FILETREE_ICON_FOLDER, name_buff, IM_ARRAYSIZE(name_buff),
                     element_pos.x, element_space.x, win_w - element_pos.x * 10, "##新建文件夹名称", element_pos.y, 1);
             }
             else if (file_format == FileOperate::FileFormat_TextFile)
             {
-                if (rename_flag == false)strcpy_s(name_buff, u8"新建文本文件");
+                //if (rename_flag == false)strcpy_s(name_buff, u8"新建文本文件");
                 DoubleElementSimpleWrite(FILETREE_ICON_TEXTFILE, name_buff, IM_ARRAYSIZE(name_buff),
                     element_pos.x, element_space.x, win_w - element_pos.x * 10, "##新建文本文件名称", element_pos.y, 1);
             }
@@ -404,13 +408,11 @@ namespace Moui {
     {
         // UI初始化
         Moui::StyleInit();
-        LOG_INFO("格式初始化成功");
+        LOG_INFO("Moui格式初始化完成");
         Moui::ThemeColorInit(theme_color);
-        LOG_INFO("主题初始化成功");
+        LOG_INFO("Moui主题初始化完成");
         Moui::MouiPopupStyleInit();
-        LOG_INFO("Moui弹窗初始化成功");
-        // 数据库连接
-        //MzMysql::ConnectDatabase(mysql);
+        LOG_INFO("Moui弹窗初始化完成");
     }
 
     // 动态DPI

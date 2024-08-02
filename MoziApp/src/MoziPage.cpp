@@ -38,7 +38,20 @@ namespace MoziPage{
 
 
 
-
+    // MoZIApp初始化
+    void MoziAppInit()
+    {
+        // 日志初始化
+        MoLog::Log::LogInit();
+        LOG_INFO("日志初始化设置完成");
+        // 初始化设置
+        LOG_INFO("MOUI初始化设置中...");
+        Moui::MouiInit();              // UI初始化
+        LOG_INFO("MOUI初始化完成");
+        // 数据库连接
+        LOG_INFO("Mysql数据库初始设置中...");
+        MysqlOperate::MysqlData mysql_data_base(DATABASE_USER_NAME, DATABASE_PASSWORD, DATABASE_NAME);
+    }
 
 //-----------------------------------------------------------------------------
 //                                  主页

@@ -84,7 +84,7 @@ namespace FileOperate {
 //                   文件复制(粘贴)、剪切、删除、新建立等相关操作
 //-----------------------------------------------------------------------------
 	// 新建文件夹
-	void AddFolder(const std::string& file_name, const std::filesystem::path& target_path, const bool& forced_flag = false);
+	std::filesystem::path AddFolder(const std::string& file_name, const std::filesystem::path& target_path, const bool& forced_flag = 0);
 	// 新建文本文件
 	void AddTextFile(const std::string& file_name, const std::filesystem::path& target_path, const bool& forced_flag = false);
 

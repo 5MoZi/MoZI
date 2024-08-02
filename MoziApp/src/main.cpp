@@ -61,21 +61,18 @@ int main()
     // Setup Platform/Renderer backends
     ImGui_ImplGlfw_InitForOpenGL(window, true);          // Second param install_callback=true will install GLFW callbacks and chain to existing ones.
     ImGui_ImplOpenGL3_Init(glsl_version);
-
     //-----------------------------------------------------------------------------
     //                               MOZI初始化设置
     //-----------------------------------------------------------------------------
-    // 日志初始化
-    MoLog::Log::LogInit();
-    // 初始化设置
-    LOG_INFO("MOUI初始化设置开始");
-    Moui::MouiInit();              // UI初始化
-    LOG_INFO("MOUI初始化设置结束");
 
-
+ 
     bool show_demo_window = true;
     ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
 
+    //MysqlOperate::MysqlData mysql_database;
+
+    std::cout << "dad" << std::endl;
+    MoziPage::MoziAppInit();
 
     //-----------------------------------------------------------------------------
     //                               循环主体
@@ -117,7 +114,7 @@ int main()
     }
 
     // Cleanup
-    //mysql_close(&mysql);		//关闭数据库
+    mysql_close(MysqlOperate::GetMysqlIo());		//关闭数据库
 
     ImGui_ImplOpenGL3_Shutdown();
     ImGui_ImplGlfw_Shutdown();

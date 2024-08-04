@@ -24,6 +24,13 @@
 #define MOZI_EXTENSION_PLAN ".mzplan"		// 目标信息扩展名
 #define MOZI_EXTENSION_TARGET ".mztarget"	// 目标信息扩展名
 #define MOZI_RECYCLE_BIN "回收站"
+
+
+// 文件扩展名宏定义
+#define FILE_EXTENSION_TXT		".txt"		// 文本文件扩展名
+#define FILE_EXTENSION_WORD		".docx"		// word文档扩展名
+#define FILE_EXTENSION_PPT		".pptx"		// ppt扩展名
+
 namespace FileOperate {
 
 	enum FileFormat
@@ -54,6 +61,14 @@ namespace FileOperate {
 		FileFormat_MzTargetFile
 	};
 
+
+	enum FileOperateReturnFlag
+	{
+		FileOperateReturnFlag_ExistRename,
+		FileOperateReturnFlag_OperateSuccess,
+		FileOperateReturnFlag_OperateFailure
+	};
+
 	// 识别文件格式
 	FileFormat CheckFileType(const std::filesystem::path& file_path);
 	// 文件树前的图标
@@ -64,6 +79,7 @@ namespace FileOperate {
 
 
 	std::string UTF8_To_string(const std::string& str);
+
 	class FolderMap
 	{
 	public:
@@ -84,10 +100,10 @@ namespace FileOperate {
 //                   文件复制(粘贴)、剪切、删除、新建立等相关操作
 //-----------------------------------------------------------------------------
 	// 新建文件夹
-	std::filesystem::path AddFolder(const std::string& file_name, const std::filesystem::path& target_path, const bool& forced_flag = 0);
+	std::filesystem::path AddFolder(const std::string& file_name, const std::filesystem::path& target_path, const bool& forced_flag = false);
 	// 新建文本文件
-	void AddTextFile(const std::string& file_name, const std::filesystem::path& target_path, const bool& forced_flag = false);
-
+	std::filesystem::path AddTextFile(const std::string& file_name, const std::string& file_extension,
+		const std::filesystem::path& target_path, const bool& forced_flag = false);
 
 	// 路径是否存在检测
 	bool PathCheck(const std::vector<std::filesystem::path>& file_path);
@@ -96,15 +112,18 @@ namespace FileOperate {
 	bool RenameCheck(const std::filesystem::path& file_path, const std::filesystem::path& target_path);
 	// 重命名检测重载
 	bool RenameCheck(const std::string& rename, const std::filesystem::path& target_path);
-	// 复制粘贴文件到文件夹
+	// 复制粘贴文件
 	void CopyFolderAndFile(const std::filesystem::path& from_path, const std::filesystem::path& to_path);
+	// 专有的复制粘贴文件
+	FileOperate::FileOperateReturnFlag SpecialCopyFolderAndFile(const std::filesystem::path& from_path, const std::filesystem::path& to_path);
+
 	// 完全删除文件
 	void DeleteFolderOrFile(const std::filesystem::path& filepath);
 	// 重命名文件夹或文件
 	// 注意如果是对文件进行改名输入的rename一定要带扩展名，
 	// 因为replace_filename函数会对名字和扩展名进行全部替换
 	// 该函数执行强制重命名，并不对重命名进行检测，检测部分需要自己调用
-	void RenameFile(const std::string& rename, std::filesystem::path& old_path);
+	std::filesystem::path RenameFile(const std::string& rename, std::filesystem::path& old_path, const bool& forced_flag = false);
 
 }
 

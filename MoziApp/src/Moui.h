@@ -23,6 +23,9 @@ namespace Moui {
 
     void AddNewFileAndFolderPopup(bool& open_popup, const char* popup_name, const FileOperate::FileFormat& file_format,
         const std::filesystem::path& current_path, const float& current_scale);
-
+    void CopyPasteFilePopup(bool& open_popup, const char* popup_name, const std::filesystem::path& from_path,
+        const std::filesystem::path& to_path, const float& current_scale);
+    void CutPasteFilePopup(bool& open_popup, const char* popup_name, const std::filesystem::path& from_path,
+        const std::filesystem::path& to_path, const float& current_scale);
 
 }

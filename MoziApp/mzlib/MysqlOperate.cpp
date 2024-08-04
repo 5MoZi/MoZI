@@ -61,10 +61,9 @@ namespace MysqlOperate {
 		mysql_close(&mysql);		//关闭数据库
 	}
 
-
-
 	MysqlTable::MysqlTable(const char* c_database_table_name)
 	{
+		one_build_flag = false;
 		database_table_name = c_database_table_name;
 		LOG_INFO("MysqlTable::MysqlTable：创建数据表中...");
 		CreateDataTable();
@@ -101,7 +100,7 @@ namespace MysqlOperate {
 	{
 		if (!std::filesystem::exists(file_path))
 		{
-			LOG_WARN("检测数据库：文件路径不存在,path:{}", file_path.generic_string());
+			LOG_INFO("检测数据库：文件路径不存在,path:{}", file_path.generic_string());
 			return false;
 		}
 		char check_path[256];
@@ -146,6 +145,27 @@ namespace MysqlOperate {
 		return;
 	}
 
+	// 复制粘贴数据
+	void MysqlTable::CopyPasteMysqlFileData(const std::filesystem::path& from_path, const std::filesystem::path& to_path)
+	{
+		LOG_INFO("MysqlTable::CopyPasteMysqlFileData:在Mysql复制粘贴文件中...");
+
+		if (MysqlFilePathCheck(to_path/ from_path.filename()))
+		{
+			LOG_WARN("复制粘贴Mysql数据：存在同路径的数据，无法进行复制粘贴数据操作");
+			return;
+		}
+		FileDataStream file_data(to_path / from_path.filename());
+
+		char get_data[2000];
+		snprintf(get_data, 2000, "insert into %s(file_name,create_date,file_path)values('%s','%s','%s');",
+			database_table_name, file_data.GetName().c_str(), file_data.GetCreateDate().c_str(), file_data.GetPath().c_str());
+		mysql_query(&mysql, get_data);
+
+		LOG_INFO("复制粘贴Mysql数据：数据复制粘贴成功");
+		return;
+	}
+
 	// 删除数据
 	void MysqlTable::DeleteMysqlFileData(const std::filesystem::path& delete_path)
 	{
@@ -155,7 +175,7 @@ namespace MysqlOperate {
 			return;
 		}
 		char sql[2000];
-		snprintf(sql, 2000, "delete from %s where path='%s';", database_table_name, delete_path.generic_u8string().c_str());
+		snprintf(sql, 2000, "delete from %s where file_path='%s';", database_table_name, delete_path.generic_u8string().c_str());
 		mysql_query(&mysql, sql);
 		LOG_INFO("删除Mysql数据：数据删除成功");
 		return;
@@ -170,7 +190,7 @@ namespace MysqlOperate {
 			return;
 		}
 		char sql[2000];
-		snprintf(sql, 2000, "update %s set name='%s',create_date='%s',path='%s' where path='%s';",
+		snprintf(sql, 2000, "update %s set file_name='%s',create_date='%s',file_path='%s' where file_path='%s';",
 			database_table_name, file_data.GetName().c_str(), file_data.GetCreateDate().c_str(), 
 			file_data.GetPath().c_str(), old_path.generic_string().c_str());
 		mysql_query(&mysql, sql);

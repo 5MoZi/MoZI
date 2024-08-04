@@ -62,15 +62,18 @@ namespace MysqlOperate {
 	class MysqlTable: public MysqlData
 	{
 	public:
+		MysqlTable() = default;
 		MysqlTable(const char* c_database_table_name);
 		void CreateDataTable();
 
 		void AddMysqlFileData(const std::filesystem::path& file_path);
 		void DeleteMysqlFileData(const std::filesystem::path& delete_path);
+		void CopyPasteMysqlFileData(const std::filesystem::path& from_path, const std::filesystem::path& to_path);
 		void ChangeMysqlFileData(const std::filesystem::path& old_path, const MysqlOperate::FileDataStream& file_data);
 		bool MysqlFilePathCheck(const std::filesystem::path& file_path);
 	private:
 		const char* database_table_name;
+		bool one_build_flag;
 	};
 }
 

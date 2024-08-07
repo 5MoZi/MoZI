@@ -98,11 +98,11 @@ namespace MysqlOperate {
 	// 检测数据库是否有同样的路径
 	bool MysqlTable::MysqlFilePathCheck(const std::filesystem::path& file_path)
 	{
-		if (!std::filesystem::exists(file_path))
-		{
-			LOG_INFO("检测数据库：文件路径不存在,path:{}", file_path.generic_string());
-			return false;
-		}
+		//if (!std::filesystem::exists(file_path))
+		//{
+		//	LOG_INFO("检测数据库：文件路径不存在,path:{}", file_path.generic_string());
+		//	return false;
+		//}
 		char check_path[256];
 		snprintf(check_path, 256, "select * from %s where file_path ='%s';", database_table_name, file_path.generic_u8string().c_str());
 		mysql_query(&mysql, check_path);
@@ -193,6 +193,22 @@ namespace MysqlOperate {
 		snprintf(sql, 2000, "update %s set file_name='%s',create_date='%s',file_path='%s' where file_path='%s';",
 			database_table_name, file_data.GetName().c_str(), file_data.GetCreateDate().c_str(), 
 			file_data.GetPath().c_str(), old_path.generic_string().c_str());
+		mysql_query(&mysql, sql);
+		LOG_INFO("修改Mysql数据：数据修改成功");
+		return;
+	}
+
+	// 修改数据
+	void MysqlTable::ChangeMysqlFileData(const std::filesystem::path& old_path, const std::filesystem::path& new_path)
+	{
+		if (!MysqlFilePathCheck(old_path))
+		{
+			LOG_WARN("修改Mysql数据：不存在该路径的数据，无法进行修改数据操作");
+			return;
+		}
+		char sql[2000];
+		snprintf(sql, 2000, "update %s set file_name='%s',file_path='%s' where file_path='%s';",
+			database_table_name, new_path.filename().generic_u8string().c_str(), new_path.generic_u8string().c_str(), old_path.generic_u8string().c_str());
 		mysql_query(&mysql, sql);
 		LOG_INFO("修改Mysql数据：数据修改成功");
 		return;

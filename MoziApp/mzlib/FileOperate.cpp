@@ -5,10 +5,10 @@
 #include "MoObject.h"
 
 namespace FileOperate {
-//-----------------------------------------------------------------------------
-//                               file基础操作
-//-----------------------------------------------------------------------------
-    // 连接图标和汉字
+    //-----------------------------------------------------------------------------
+    //                               file基础操作
+    //-----------------------------------------------------------------------------
+        // 连接图标和汉字
     const std::string IconAndChinese(const std::string str1, const std::string str2, const int type)
     {
         std::string temp_str;
@@ -38,27 +38,22 @@ namespace FileOperate {
     };
 
     // 检查文件类型
-    FileFormat CheckFileType(const std::filesystem::path& file_path)
+    FileOperate::FileFormat CheckFileFormat(const std::filesystem::path& file_path)
     {
         std::filesystem::path file_extension = file_path.extension();
         if (file_format.count(file_extension))
             return file_format.at(file_extension);
-        return FileFormat_UnknownFile;
+        return FileFormat::FileFormat_UnknownFileFormat;
     }
 
     // 设置对应文件夹前面的图标
     const std::string TreeFileIconConnect(const std::filesystem::path& file_path)
     {
-        //// 计划使用的图标
-        //MoZi::ObjectType object_type = MzMysql::CheckObjectType(file_path);
-        //if (object_type == MoZi::ObjectType_IsPlan)
-        //    return IconAndChinese(FILETREE_ICON_PLAN, file_path.filename().generic_u8string(), 1);
-
-        // 其他文件使用图标
-        FileOperate::FileFormat file_format = FileOperate::CheckFileType(file_path);
+        // 文件使用图标
+        FileOperate::FileFormat file_format = FileOperate::CheckFileFormat(file_path);
         switch (file_format)
         {
-        case FileOperate::FileFormat_UnknownFile:
+        case FileOperate::FileFormat_UnknownFileFormat:
             return IconAndChinese(FILETREE_ICON_NOFILE, file_path.filename().generic_u8string(), 1);
         case FileOperate::FileFormat_Directory:
             return IconAndChinese(FILETREE_ICON_FOLDER, file_path.filename().generic_u8string(), 1);
@@ -163,11 +158,11 @@ namespace FileOperate {
         return retStr;
     }
 
-//-----------------------------------------------------------------------------
-//                               FolderMap相关操作
-//-----------------------------------------------------------------------------
-	// 初始化FolderMap
-	std::map<std::filesystem::path, bool> FolderMap::folder_map;
+    //-----------------------------------------------------------------------------
+    //                               FolderMap相关操作
+    //-----------------------------------------------------------------------------
+        // 初始化FolderMap
+    std::map<std::filesystem::path, bool> FolderMap::folder_map;
 
     void FolderMap::AddFolderPath(const std::filesystem::path& current_path, const bool& tree_node_open)
     {
@@ -201,7 +196,7 @@ namespace FileOperate {
             LOG_ERROR("在FolderMap中不存在该路径，修改失败，path：{}", old_path.generic_string());
             return;
         }
-        else 
+        else
         {
             const bool tree_node_open = folder_map.at(old_path);
             folder_map.erase(old_path);
@@ -279,6 +274,7 @@ namespace FileOperate {
         double_click_get_path = last_path;
         return;
     }
+
 
 //-----------------------------------------------------------------------------
 //                   文件复制(粘贴)、剪切、删除、新建立等相关操作
@@ -497,22 +493,56 @@ namespace FileOperate {
     // 该函数执行强制重命名，并不对重命名进行检测，检测部分需要自己调用
     std::filesystem::path RenameFile(const std::string& rename, std::filesystem::path& old_path, const bool& forced_flag)
     {
+        std::filesystem::path new_file_path = old_path;
+
         std::filesystem::path new_file_name = rename;
-        // 如果是文件扩展名
         std::filesystem::path new_file_extension = new_file_name.extension();
-        // 如果是文件名则，只取文件名
         new_file_name = new_file_name.stem();
 
         if (forced_flag)
         {
             LOG_INFO("RenameFile:强制重命名文件");
-            while (RenameCheck(new_file_name, old_path))
+            std::filesystem::path file_to_target_path = old_path.parent_path() / new_file_name;
+            while (std::filesystem::exists(file_to_target_path))
             {
                 new_file_name += "-副本";
+                new_file_name += new_file_extension;
+                file_to_target_path /= new_file_name;
             }
         }
-        old_path.replace_filename(new_file_name.generic_string() + new_file_extension.generic_string());
+        new_file_path.replace_filename(new_file_name.generic_string() + new_file_extension.generic_string());
+        std::filesystem::rename(old_path, new_file_path);
         LOG_INFO("重命名操作成功！");
-        return old_path;
+        return new_file_path;
+    }
+
+    std::filesystem::path CopyAndCutForcedRenameFile(const std::filesystem::path& from_path, const std::filesystem::path& to_path)
+    {
+        // 分别取文件的扩展名和文件名
+        std::filesystem::path new_file_extension = from_path.extension();
+        std::filesystem::path new_file_name = from_path.stem();
+
+        LOG_INFO("CopyAndCutForcedRenameFile:强制重命名文件");
+        while (RenameCheck(new_file_name.generic_string() + new_file_extension.generic_string(), to_path))
+        {
+            new_file_name += "-副本";
+        }
+        // 组合新路径，需要注意该路径在文件系统中并不存在，所以不能用filesystem中一些自带的
+        // 检测函数，会导致出现错误，因为路径不存在的错误
+        std::filesystem::path new_file_path = from_path.parent_path() / (new_file_name.generic_string() + new_file_extension.generic_string());
+        // 文件夹复制使用recursive选择
+        if (new_file_extension.generic_string() == "")  
+        { 
+            // 执行文件夹复制操作
+            std::filesystem::copy(from_path, to_path / new_file_path.filename(), std::filesystem::copy_options::recursive);
+            LOG_INFO("成功复制文件夹 from_path:{0}--to_path:{1}", from_path.generic_string(), to_path.generic_string());
+        }
+        else
+        {
+            // 执行文件复制操作
+            std::filesystem::copy(from_path, to_path / new_file_path.filename());
+            LOG_INFO("成功复制文件 from_path:{0}--to_path:{1}", from_path.generic_string(), to_path.generic_string());
+        }
+        return new_file_path;
     }
 }

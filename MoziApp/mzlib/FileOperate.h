@@ -35,7 +35,7 @@ namespace FileOperate {
 
 	enum FileFormat
 	{
-		FileFormat_UnknownFile,		// 未识别类文件
+		FileFormat_UnknownFileFormat,		// 未识别类文件
 
 		/*******文件夹类型********/
 		FileFormat_Directory,		// 目录
@@ -70,7 +70,7 @@ namespace FileOperate {
 	};
 
 	// 识别文件格式
-	FileFormat CheckFileType(const std::filesystem::path& file_path);
+	FileOperate::FileFormat CheckFileFormat(const std::filesystem::path& file_path);
 	// 文件树前的图标
 	const std::string TreeFileIconConnect(const std::filesystem::path& file_path);
 	
@@ -125,5 +125,7 @@ namespace FileOperate {
 	// 该函数执行强制重命名，并不对重命名进行检测，检测部分需要自己调用
 	std::filesystem::path RenameFile(const std::string& rename, std::filesystem::path& old_path, const bool& forced_flag = false);
 
+
+	std::filesystem::path CopyAndCutForcedRenameFile(const std::filesystem::path& from_path, const std::filesystem::path& to_path);
 }
 

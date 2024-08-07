@@ -439,25 +439,15 @@ namespace Moui {
                 ones_open_popup = true;
                 ImGui::CloseCurrentPopup();
             }
-            //ImGui::SetCursorPos(ImVec2(win_w - element_pos.x * 15, win_h - element_pos.y * 10));
-            //if (ImGui::Button(u8"强制建立文件", button_size))
-            //{
-            //    LOG_INFO("CopyPasteFilePopup:替强制建立文件中...");
-            //     如果是文件名则，只取文件名
-            //    std::filesystem::path new_file_path = from_path;
-            //    std::filesystem::path new_file_name = from_path.stem();
-            //     如果是文件扩展名
-            //    std::filesystem::path new_file_extension = from_path.extension();
-
-            //    while (FileOperate::RenameCheck(new_file_name.generic_string() + new_file_extension.generic_string(), to_path))
-            //    {
-            //        new_file_name += "-副本";
-            //    }
-            //    FileOperate::SpecialCopyFolderAndFile(new_file_name.generic_string() + new_file_extension.generic_string(), to_path);
-            //    open_popup = false;
-            //    ones_open_popup = true;
-            //    ImGui::CloseCurrentPopup();
-            //}
+            ImGui::SetCursorPos(ImVec2(win_w - element_pos.x * 15, win_h - element_pos.y * 10));
+            if (ImGui::Button(u8"强制建立文件", button_size))
+            {
+                LOG_INFO("CopyPasteFilePopup:替强制建立文件中...");
+                FileManage::CopyPasteFile(from_path, to_path, 1);
+                open_popup = false;
+                ones_open_popup = true;
+                ImGui::CloseCurrentPopup();
+            }
             ImGui::SetCursorPos(ImVec2(win_w - element_pos.x * 15, win_h - element_pos.y * 5));
             if (ImGui::Button(u8"取消本次操作", button_size))
             {
@@ -568,27 +558,18 @@ namespace Moui {
                 ones_open_popup = true;
                 ImGui::CloseCurrentPopup();
             }
-            //ImGui::SetCursorPos(ImVec2(win_w - element_pos.x * 15, win_h - element_pos.y * 10));
-            //// 该功能未来开发，需要利用中转，即先将文件复制到一个地方（中转地），然后再将中转地的文件重命名
-            //// 然后再将中转地的文件剪切到目标目录中。
-            //// 同时为了避免在中转地中发生重命名即要时刻保持中转地只能有一个中转文件
-            //if (ImGui::Button(u8"强制建立文件", button_size))
-            //{
-            //    LOG_INFO("CutPasteFilePopup:替强制建立文件中...");
-            //    // 如果是文件名则，只取文件名
-            //    std::filesystem::path new_file_name = from_path.stem();
-            //    // 如果是文件扩展名
-            //    std::filesystem::path new_file_extension = from_path.extension();
-            //  
-            //    while (FileOperate::RenameCheck(new_file_name.generic_string() + new_file_extension.generic_string(), to_path))
-            //    {
-            //        new_file_name += "-副本";
-            //    }
-            //    FileOperate::SpecialCopyFolderAndFile(new_file_name.generic_string() + new_file_extension.generic_string(), to_path);
-            //    open_popup = false;
-            //    ones_open_popup = true;
-            //    ImGui::CloseCurrentPopup();
-            //}
+            ImGui::SetCursorPos(ImVec2(win_w - element_pos.x * 15, win_h - element_pos.y * 10));
+            // 该功能未来开发，需要利用中转，即先将文件复制到一个地方（中转地），然后再将中转地的文件重命名
+            // 然后再将中转地的文件剪切到目标目录中。
+            // 同时为了避免在中转地中发生重命名即要时刻保持中转地只能有一个中转文件
+            if (ImGui::Button(u8"强制建立文件", button_size))
+            {
+                LOG_INFO("CutPasteFilePopup:替强制建立文件中...");
+                FileManage::CutPasteFile(from_path, to_path, 1);
+                open_popup = false;
+                ones_open_popup = true;
+                ImGui::CloseCurrentPopup();
+            }
             ImGui::SetCursorPos(ImVec2(win_w - element_pos.x * 15, win_h - element_pos.y * 5));
             if (ImGui::Button(u8"取消本次操作", button_size))
             {
@@ -605,6 +586,132 @@ namespace Moui {
         if (open_popup == false)
         {
             ones_open_popup = true;
+        }
+    }
+
+    // 重命名弹窗
+    void RenameFilePopup(bool& open_popup, const char* popup_name,
+        std::filesystem::path& current_path, const float& current_scale)
+    {
+        // 弹窗建立一次标志位
+        static bool ones_open_popup = true;
+
+        // 编辑确认按键
+        static bool rename_flag = false;
+        // 错误弹窗一次标志位
+        static bool error_flag = false;
+
+
+        /*-------------------------窗口信息设置----------------------------*/
+        static MoObject::MouiPopupStyle current_popup_style = popup_base_style;
+        // 窗口信息
+        static float window_hight = current_popup_style.window_hight;
+        static float window_width = current_popup_style.window_width;
+        // 设置弹窗的尺寸和确定按钮的大小
+        static ImVec2 element_pos = current_popup_style.element_pos;
+        static ImVec2 element_space = current_popup_style.element_space;
+        static ImVec2 bar_size = current_popup_style.bar_size;
+        static ImVec2 button_size = current_popup_style.button_size;
+        // 不同规模变化不同的尺寸
+        static float next_scale = 0.f;              // 保证尺寸只进行一次变化
+        if (next_scale != current_scale && current_scale != current_popup_style.scale)
+        {
+            next_scale = current_scale;
+            current_popup_style.ChangeStlyeSize(current_scale);
+            window_hight = current_popup_style.window_hight;
+            window_width = current_popup_style.window_width;
+            element_pos = current_popup_style.element_pos;         // 元素位置
+            element_space = current_popup_style.element_space;     // 元素间距
+            bar_size = current_popup_style.bar_size;               // 进度条尺寸
+            button_size = current_popup_style.button_size;         // 按钮尺寸
+        }
+
+        /*-------------------------存储信息设置----------------------------*/
+        static char name_buff[256] = { 0 };
+
+        // 保证只建立一次弹窗
+        if (ones_open_popup)
+        {
+            // 将文件名放入输入框中
+            // 只放文件名不放入后缀
+            strcpy_s(name_buff, current_path.stem().generic_u8string().c_str());
+            ImGui::OpenPopup(popup_name); // 建立弹窗
+            ones_open_popup = false;
+        }
+
+        /*-------------------------弹窗位置与大小设置----------------------------*/
+        static ImGuiWindowFlags window_flags = ImGuiWindowFlags_NoCollapse;
+        ImVec2 center = ImGui::GetMainViewport()->GetCenter();
+        ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
+
+        // 最小弹窗大小设置
+        static bool flag_ones = false;
+        if (flag_ones == false)
+        {
+            ImGui::SetNextWindowSize(ImVec2(window_width, window_hight));
+            flag_ones = true;
+        }
+
+
+        /*-------------------------弹窗内容部分----------------------------*/
+        if (ImGui::BeginPopupModal(popup_name, &open_popup, window_flags))   // 打开弹窗
+        {
+            // 窗口最小的大小为1000*1000
+            float win_h = ImGui::GetWindowHeight(), win_w = ImGui::GetWindowWidth();        // 窗口的实时大小
+            if (ImGui::GetWindowWidth() < window_hight - 200 || ImGui::GetWindowHeight() < window_width - 200)flag_ones = false;
+
+            DoubleElementSimpleWrite(FILETREE_ICON_TEXTFILE, name_buff, IM_ARRAYSIZE(name_buff),
+                element_pos.x, element_space.x, win_w - element_pos.x * 10, "##重命名名称", element_pos.y, 1);
+            ImGui::Dummy(ImVec2(0, element_pos.y));        // 与上面的距离
+            ImGui::SeparatorEx(ImGuiSeparatorFlags_Horizontal, 5.0);
+
+            ImGui::SetCursorPos(ImVec2(win_w - element_pos.x * 5, win_h - element_pos.y * 5));
+            if (ImGui::Button(u8"确定", button_size))
+            {
+                // 调用新建文件函数
+                if (!FileManage::RenameFolderAndFile(FileOperate::UTF8_To_string(name_buff), current_path))
+                {
+                    // 出现重命名，开启标志位
+                    rename_flag = true;
+                    error_flag = true;
+                }
+                else
+                {
+                    memset(name_buff, 0, 256);      // 清空文件名称
+                    rename_flag = false;
+                    error_flag = false;
+                    open_popup = false;
+                    ones_open_popup = true;
+                    ImGui::CloseCurrentPopup();
+                }
+            }
+
+            if (error_flag && ErrorPopup(u8"文件重命名，是否需要强制创建", error_flag, current_scale))
+            {
+                // 强制建立文件
+                FileManage::RenameFolderAndFile(FileOperate::UTF8_To_string(name_buff), current_path, true);
+                // 各个标志位恢复，以及清空数组
+                rename_flag = false;
+                error_flag = false;
+                memset(name_buff, 0, 256);      // 清空文件名称
+                open_popup = false;
+                ones_open_popup = true;
+                ImGui::CloseCurrentPopup();
+                ImGui::SetItemDefaultFocus();
+                ImGui::EndPopup();
+                return;
+            }
+            ImGui::SetItemDefaultFocus();
+            ImGui::EndPopup();
+        }
+
+        // 直接关闭弹窗后记得清空数组和还原标志位
+        if (open_popup == false)
+        {
+            memset(name_buff, 0, 256);      // 清空文件名称
+            ones_open_popup = true;
+            rename_flag = false;
+            error_flag = false;
         }
     }
 //-----------------------------------------------------------------------------

@@ -38,14 +38,11 @@ namespace MoziPage{
     static bool add_new_file_flag = false;               // 新建文件标志位
 
     static bool complete_delete_file_flag = false;       // 完全删除文件标志位
+    static bool delete_file_to_bin_flag = false;         // 删除文件至回收站标志位
     static bool copy_file_flag = false;                  // 复制文件标志位
     static bool cut_file_flag = false;                   // 剪切文件标志位
     static bool paste_file_flag = false;                 // 粘贴文件标志位
-    static bool rename_file_flag = false;                   // 剪切文件标志位
-    //static bool paste_file_flag = false;                 // 粘贴文件标志位
-    //static bool add_new_plan_popup = false;                    // 新建计划标志位
-    //static bool open_rename_popup = false;                     // 开启新建文件夹弹窗标志位
-
+    static bool rename_file_flag = false;                // 重命名文件标志位
 
 
     // MoZIApp初始化
@@ -219,8 +216,9 @@ namespace MoziPage{
 
 
             if (ImGui::MenuItem(HOMEPAGE_IOCN_FA_FOLDER_PLUS)) {
-                //prior_file_path = STORAGE_PATH;
-                //add_new_folder_popup = true;
+                right_click_get_path = STORAGE_PATH;
+                add_new_file_flag = true;
+                add_new_file_fileformat = FileOperate::FileFormat_Directory;
             }
 
             if (ImGui::MenuItem(HOMEPAGE_IOCN_FA_FOLDER_OPEN)) {}
@@ -316,14 +314,13 @@ namespace MoziPage{
             default:break;
             }
         }
-
-        // 删除文件
-        if (complete_delete_file_flag)
+        // 打开新建文件夹弹窗
+        if (rename_file_flag)
         {
-            FileManage::CompleteDeleteFile(right_click_get_path);
-            complete_delete_file_flag = false;
+            Moui::RenameFilePopup(rename_file_flag, u8"重命名文件夹", right_click_get_path, 0.f);
         }
-
+        
+        
         // 复制粘贴操作，一次复制可以有n次粘贴
         if (copy_file_flag && paste_file_flag)
         {
@@ -337,27 +334,20 @@ namespace MoziPage{
             // 当执行完粘贴后，使剪切标志位恢复，即一次剪切只能有一次粘贴
             if (!paste_file_flag)cut_file_flag = false;
         }
-        //if (copy_file_flag)
-        //{
-        //    if (paste_file_flag)
-        //    {
 
-        //    }
-        //}
-        //else if (cut_file_flag)
-        //{
-        //    if (paste_file_flag)
-        //    {
-
-        //    }
-        //}
-        //// 当复制粘贴或者剪切粘贴操作执行完毕后，恢复粘贴标志位
-        //else if (!copy_file_flag || !cut_file_flag)
-        //{
-        //    paste_file_flag = false;
-        //}
-
-
+        // 删除文件
+        // 删除文件至回收站
+        if (delete_file_to_bin_flag)
+        {
+            FileManage::DeleteFileToBin(right_click_get_path);
+            delete_file_to_bin_flag = true;
+        }
+        // 彻底删除文件
+        else if (complete_delete_file_flag)
+        {
+            FileManage::CompleteDeleteFile(right_click_get_path);
+            complete_delete_file_flag = false;
+        }
         //if (add_new_folder)Moui::AddNewFileAndFolderPopup(add_new_folder, 
         //    u8"新建文件夹", FileOperate::FileFormat_Directory, right_click_get_path, 0.f);
         //else if (add_new_text_file)Moui::AddNewFileAndFolderPopup(add_new_folder,
@@ -417,7 +407,7 @@ namespace MoziPage{
     }
 
     // 右击文件夹打开视窗
-    static void RightFolderPopup(const char* str_id, ImGuiPopupFlags popup_flags, const std::filesystem::path& current_path)
+    static void RightFolderPopup(const char* str_id, ImGuiPopupFlags popup_flags, const std::filesystem::path& current_path, const bool& bin_file_flag)
     {
         // 这里使用新函数直接一步到位
         // ImGui::OpenPopupOnItemClick(str_idd.c_str(), popup_flags);   // 创建视窗
@@ -427,81 +417,95 @@ namespace MoziPage{
 
         if (ImGui::BeginPopupContextItem(str_id, popup_flags))
         {
-            // 只有文件夹才有的操作
-            if (foler_flag)
+            // 回收站特有操作
+            if (current_path.generic_u8string() == MOZI_RECYCLE_BIN_PATH)
             {
-                // 新建部分
-                if (ImGui::BeginMenu(SOURSEPAGE_FOLDER_POPUP_ADD))
+                // 一键清空删除
+                if (ImGui::MenuItem(SOURSEPAGE_RECYCLE_BIN_POPUP_DELETE)) 
                 {
-                    // 新建文件夹
-                    if (ImGui::MenuItem(SOURSEPAGE_FOLDER_POPUP_SUBADD_NEWFOLDER)) {
-                        right_click_get_path = current_path;
-                        add_new_file_flag = true;
-                        add_new_file_fileformat = FileOperate::FileFormat_Directory;
-                    }
-                    // 新建文本文件
-                    if (ImGui::MenuItem(SOURSEPAGE_FOLDER_POPUP_SUBADD_NEW_TEXTFILE)) {
-                        right_click_get_path = current_path;
-                        add_new_file_flag = true;
-                        add_new_file_fileformat = FileOperate::FileFormat_TextFile;
-                    }
-                    // 新建Word文档
-                    if (ImGui::MenuItem(SOURSEPAGE_FOLDER_POPUP_SUBADD_NEW_WORDFILE)) {
-                        right_click_get_path = current_path;
-                        add_new_file_flag = true;
-                        add_new_file_fileformat = FileOperate::FileFormat_WordFile;
-                    }
-                    // 新建PPT文件
-                    if (ImGui::MenuItem(SOURSEPAGE_FOLDER_POPUP_SUBADD_NEW_PPTFILE)) {
-                        right_click_get_path = current_path;
-                        add_new_file_flag = true;
-                        add_new_file_fileformat = FileOperate::FileFormat_PptFile;
-                    }
-                    ImGui::EndMenu();
+                    //MzFile::DeleteFolderOrFile(current_path, 1);                  // 对还原的文件进行删除
                 }
             }
+            else
+            {
+                // 只有不是回收站内的文件夹才有的操作
+                if (foler_flag && !bin_file_flag)
+                {
+                    // 新建部分
+                    if (ImGui::BeginMenu(SOURSEPAGE_FOLDER_POPUP_ADD))
+                    {
+                        // 新建文件夹
+                        if (ImGui::MenuItem(SOURSEPAGE_FOLDER_POPUP_SUBADD_NEWFOLDER)) {
+                            right_click_get_path = current_path;
+                            add_new_file_flag = true;
+                            add_new_file_fileformat = FileOperate::FileFormat_Directory;
+                        }
+                        // 新建文本文件
+                        if (ImGui::MenuItem(SOURSEPAGE_FOLDER_POPUP_SUBADD_NEW_TEXTFILE)) {
+                            right_click_get_path = current_path;
+                            add_new_file_flag = true;
+                            add_new_file_fileformat = FileOperate::FileFormat_TextFile;
+                        }
+                        // 新建Word文档
+                        if (ImGui::MenuItem(SOURSEPAGE_FOLDER_POPUP_SUBADD_NEW_WORDFILE)) {
+                            right_click_get_path = current_path;
+                            add_new_file_flag = true;
+                            add_new_file_fileformat = FileOperate::FileFormat_WordFile;
+                        }
+                        // 新建PPT文件
+                        if (ImGui::MenuItem(SOURSEPAGE_FOLDER_POPUP_SUBADD_NEW_PPTFILE)) {
+                            right_click_get_path = current_path;
+                            add_new_file_flag = true;
+                            add_new_file_fileformat = FileOperate::FileFormat_PptFile;
+                        }
+                        ImGui::EndMenu();
+                    }
+                }
 
-            // 剪切和复制操作同一时刻只能存在一个，不能共存
-            // 剪切操作
-            if (ImGui::MenuItem(SOURSEPAGE_FOLDER_POPUP_CUT)) {
-                last_click_get_path = current_path;
-                cut_file_flag = true;
-                copy_file_flag = false;
-            }
-            // 复制操作
-            if (ImGui::MenuItem(SOURSEPAGE_FOLDER_POPUP_COPY)) {
-                last_click_get_path = current_path;
-                copy_file_flag = true;
-                cut_file_flag = false;
-            }
-            // 只有复制或剪切了粘贴才有效,并且判断接受文件是文件还是目录，如果是文件则不接收只有目录才能接收
-            // 只有文件才有的操作
-            if (foler_flag)        
-            {
-                if (ImGui::MenuItem(SOURSEPAGE_FOLDER_POPUP_PASTE, 0, false, copy_file_flag || cut_file_flag))
-                {
-                    right_click_get_path = current_path;
-                    paste_file_flag = true;
+                // 剪切和复制操作同一时刻只能存在一个，不能共存
+                // 剪切操作
+                if (ImGui::MenuItem(SOURSEPAGE_FOLDER_POPUP_CUT)) {
+                    last_click_get_path = current_path;
+                    cut_file_flag = true;
+                    copy_file_flag = false;
                 }
-            }
-            
-            // 删除操作
-            if (ImGui::MenuItem(SOURSEPAGE_FOLDER_POPUP_DELETE)) {
-                right_click_get_path = current_path;
-                complete_delete_file_flag = true;
-            }
-            // 重命名操作
-            if (ImGui::MenuItem(SOURSEPAGE_FOLDER_POPUP_RENAME)) {
-                right_click_get_path = current_path;
-                rename_file_flag = true;
-            }
+                // 复制操作
+                if (ImGui::MenuItem(SOURSEPAGE_FOLDER_POPUP_COPY)) {
+                    last_click_get_path = current_path;
+                    copy_file_flag = true;
+                    cut_file_flag = false;
+                }
+                // 只有复制或剪切了粘贴才有效,并且判断接受文件是文件还是目录，如果是文件则不接收只有目录才能接收
+                // 只有文件才有的操作
+                if (foler_flag)
+                {
+                    if (ImGui::MenuItem(SOURSEPAGE_FOLDER_POPUP_PASTE, 0, false, copy_file_flag || cut_file_flag))
+                    {
+                        right_click_get_path = current_path;
+                        paste_file_flag = true;
+                    }
+                }
+
+                // 删除操作
+                if (ImGui::MenuItem(SOURSEPAGE_FOLDER_POPUP_DELETE)) {
+                    right_click_get_path = current_path;
+                    // 回收站内的文件彻底删除，不是回收站的文件使用删除移动入回收站中
+                    if (bin_file_flag)complete_delete_file_flag = true;
+                    else delete_file_to_bin_flag = true;
+                }
+                // 重命名操作
+                if (ImGui::MenuItem(SOURSEPAGE_FOLDER_POPUP_RENAME)) {
+                    right_click_get_path = current_path;
+                    rename_file_flag = true;
+                }
+            }    
             ImGui::EndPopup();
         }
     }
 
 
     // 递归打开逐层文件
-    static void OpenFolder(const std::filesystem::path& parent_path, bool top_flag)
+    static void OpenFolder(const std::filesystem::path& parent_path, bool top_flag, const bool& bin_file_flag)
     {
         // 文件相关参数
         static ImGuiTreeNodeFlags tree_flag = ImGuiTreeNodeFlags_OpenOnArrow             // 添加文件夹树标志位
@@ -529,7 +533,7 @@ namespace MoziPage{
             bool node_open = ImGui::TreeNodeEx(folder_only_flag.c_str(), tree_flag, FileOperate::TreeFileIconConnect(folder_path[i]).c_str());
             //if (bin_flag == 1)RightRecycleBinPopup(tree_flag_name.c_str(), ImGuiPopupFlags_MouseButtonRight, folder_path[i]);
             //else 
-            RightFolderPopup(folder_only_flag.c_str(), ImGuiPopupFlags_MouseButtonRight, folder_path[i]);
+            RightFolderPopup(folder_only_flag.c_str(), ImGuiPopupFlags_MouseButtonRight, folder_path[i], bin_file_flag);
 
             // 双击获取当前文件夹的路径
             //double_click_current_path = folder_maper.BuildFolderTree(folder_path[i], node_open);
@@ -550,7 +554,7 @@ namespace MoziPage{
             bool file_node_open = ImGui::TreeNodeEx(file_only_flag.c_str(), tree_flag, FileOperate::TreeFileIconConnect(file_path[i]).c_str());
             //if (bin_flag == 1)RightRecycleBinPopup(tree_flag_name.c_str(), ImGuiPopupFlags_MouseButtonRight, folder_path[i]);
             //else 
-            RightFolderPopup(file_only_flag.c_str(), ImGuiPopupFlags_MouseButtonRight, file_path[i]);
+            RightFolderPopup(file_only_flag.c_str(), ImGuiPopupFlags_MouseButtonRight, file_path[i], bin_file_flag);
 
             // 双击获取当前文件夹的路径
             folder_maper.BuildFolderTree(file_path[i], file_node_open, double_click_get_path);
@@ -582,10 +586,10 @@ namespace MoziPage{
             }
 
             bool recycle_node_open = ImGui::TreeNodeEx(u8"回收站", tree_flag, FILETREE_ICON_BIN);
-            RightRecycleBinPopup(recycle_bin_folder.generic_string().c_str(), ImGuiPopupFlags_MouseButtonRight, recycle_bin_folder); // 右击文件夹
+            RightFolderPopup(recycle_bin_folder.generic_string().c_str(), ImGuiPopupFlags_MouseButtonRight, recycle_bin_folder, 0); // 右击文件夹
             if (recycle_node_open)
             {
-                OpenFolder(recycle_bin_folder, 0);
+                OpenFolder(recycle_bin_folder, 0, 1);
                 ImGui::TreePop();
             }
         }

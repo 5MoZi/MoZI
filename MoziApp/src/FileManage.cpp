@@ -11,6 +11,60 @@
 
 namespace FileManage {
 	 
+
+	static FileOperate::FolderMap folder_maper;
+
+	bool NewBuildFile(const std::filesystem::path& file_name, const FileOperate::FileFormat& file_format,
+		const std::filesystem::path& target_path, const bool& forced_flag)
+	{
+		static MysqlOperate::MysqlTable fileinfo_mysql_table(DATABASE_FILETABLE_NAME);
+
+		if (forced_flag == false)LOG_INFO("NewBuildFile：新建文件中......");
+		else LOG_INFO("NewBuildFile：强制建立文件中......");
+
+		std::filesystem::path new_file_path;
+		std::string file_extension = "";
+
+		// 创建文件夹
+		if (file_format == FileOperate::FileFormat_Directory)
+		{
+			// 强制创建文件夹
+			if (forced_flag)
+			{
+				new_file_path = FileOperate::AddFile(file_name, target_path, forced_flag);
+				fileinfo_mysql_table.AddMysqlFileData(new_file_path);
+				return true;
+			}
+			if (FileOperate::RenameCheck(file_name, target_path))
+			{
+				return false;
+			}
+			new_file_path = FileOperate::AddFile(file_name, target_path);
+			fileinfo_mysql_table.AddMysqlFileData(new_file_path);
+			return true;
+		}
+		// 创建文件
+		else
+		{
+			// 识别文件后缀
+			file_extension = FileOperate::CheckFileExtension(file_format);
+			// 强制创建文本文件
+			if (forced_flag)
+			{
+				new_file_path = FileOperate::AddFile(file_name.generic_string() + file_extension, target_path, forced_flag);
+				fileinfo_mysql_table.AddMysqlFileData(new_file_path);
+				return true;
+			}
+			if (FileOperate::RenameCheck(file_name.generic_string() + file_extension, target_path))
+			{
+				return false;
+			}
+			new_file_path = FileOperate::AddFile(file_name.generic_string() + file_extension, target_path);
+			fileinfo_mysql_table.AddMysqlFileData(new_file_path);
+			return true;
+		}
+	}
+
 	bool NewBuildFolderAndFile(const std::string& file_name, const FileOperate::FileFormat& file_format,
 		const std::filesystem::path& target_path, const bool& forced_flag)
 	{
@@ -67,8 +121,9 @@ namespace FileManage {
 		}
 	}
 
+
 	// 由于需要对文件进行重命名则，输入的目标文件target_path不能为常量
-	bool RenameFolderAndFile(const std::string& file_name, std::filesystem::path& target_path, const bool& forced_flag)
+	bool FileManageRenameFile(const std::filesystem::path& file_name, const std::filesystem::path& target_path, const bool& forced_flag)
 	{
 		static MysqlOperate::MysqlTable fileinfo_mysql_table(DATABASE_FILETABLE_NAME);
 
@@ -80,72 +135,83 @@ namespace FileManage {
 		std::filesystem::path new_file_path = target_path;
 		std::string file_extension = "";
 
-
 		if (file_format == FileOperate::FileFormat_Directory)
 		{
 			// 强制创建文件夹
 			if (forced_flag)
 			{
-				new_file_path =FileOperate::RenameFile(file_name, target_path, forced_flag);
+				new_file_path = FileOperate::RenameFile(file_name, target_path);
 				fileinfo_mysql_table.ChangeMysqlFileData(target_path, new_file_path);
+				folder_maper.ChangeFolderPath(target_path, new_file_path);
 				return true;
 			}
 			// 重命名检测
-			std::filesystem::path file_to_target_path = target_path.parent_path();
-			file_to_target_path /= file_name;
-			if (std::filesystem::exists(file_to_target_path))
+			if (FileOperate::RenameCheck(file_name.generic_string() + file_extension, target_path, true))
 			{
-				LOG_INFO("存在重命名");
 				return false;
 			}
-
 			new_file_path = FileOperate::RenameFile(file_name, target_path);
 			fileinfo_mysql_table.ChangeMysqlFileData(target_path, new_file_path);
+			folder_maper.ChangeFolderPath(target_path, new_file_path);
 			return true;
 		}
 		else
 		{
 
-			switch (file_format)
-			{
-			case FileOperate::FileFormat_TextFile:	file_extension = FILE_EXTENSION_TXT; break;
-			case FileOperate::FileFormat_WordFile:	file_extension = FILE_EXTENSION_WORD; break;
-			case FileOperate::FileFormat_PptFile:	file_extension = FILE_EXTENSION_PPT; break;
-			default: break;
-			}
+			// 识别文件后缀
+			file_extension = FileOperate::CheckFileExtension(file_format);
 			// 强制创建文本文件
 			if (forced_flag)
 			{
-				FileOperate::RenameFile(file_name + file_extension, target_path, forced_flag);
+				FileOperate::RenameFile(file_name.generic_string() + file_extension, target_path);
 				fileinfo_mysql_table.ChangeMysqlFileData(target_path, new_file_path);
+				folder_maper.ChangeFolderPath(target_path, new_file_path);
 				return true;
 			}
-			std::filesystem::path file_to_target_path = target_path.parent_path();
-			file_to_target_path /= (file_name + file_extension);
-			if (std::filesystem::exists(file_to_target_path))
+			if (FileOperate::RenameCheck(file_name.generic_string() + file_extension, target_path, true))
 			{
-				LOG_INFO("存在重命名");
 				return false;
 			}
-			FileOperate::RenameFile(file_name + file_extension, target_path);
+			FileOperate::RenameFile(file_name.generic_string() + file_extension, target_path);
 			fileinfo_mysql_table.ChangeMysqlFileData(target_path, new_file_path);
+			folder_maper.ChangeFolderPath(target_path, new_file_path);
 			return true;
 		}
 	}
-	void CompleteDeleteFile(const std::filesystem::path& target_path)
+
+
+	bool FileManagePasteFile(const std::filesystem::path& from_path, const std::filesystem::path& to_path,
+		const bool& copy_cut_flag, const bool& force_flag)
 	{
-		LOG_INFO("CompleteDeleteFile:正在删除文件：{}...", target_path.generic_string());
-		static FileOperate::FolderMap folder_maper;
+		LOG_INFO("FileManagePasteFile：粘贴文件中...");
 		static MysqlOperate::MysqlTable fileinfo_mysql_table(DATABASE_FILETABLE_NAME);
 
-		// 需要注意文件删除顺序，资源管理器页面要在最后删除
-		LOG_INFO("在FileMap删除文件中...");
-		folder_maper.DeleteFolderPath(target_path);
-		LOG_INFO("在Mysql数据表：{}，删除文件中...", DATABASE_FILETABLE_NAME);
-		fileinfo_mysql_table.DeleteMysqlFileData(target_path);
-		LOG_INFO("在资源管理页面删除文件中...");
-		FileOperate::DeleteFolderOrFile(target_path);
-
+		if (force_flag == false)
+		{
+			if (FileOperate::RenameCheck(from_path, to_path))
+			{
+				return false;
+			}
+			FileOperate::PasteFile(from_path, to_path);
+			fileinfo_mysql_table.CopyPasteMysqlFileData(from_path, to_path);
+			// 复制操作不需要删除原文件，而剪切操作需要
+			if(copy_cut_flag == true)
+			{
+				CompleteDeleteFile(from_path);
+			}
+			return true;
+		}
+		else if (force_flag == true)
+		{
+			std::filesystem::path new_file_path = FileOperate::PasteFile(from_path, to_path, true);
+			fileinfo_mysql_table.CopyPasteMysqlFileData(new_file_path, to_path);
+			// 复制操作不需要删除原文件，而剪切操作需要
+			if (copy_cut_flag == true)
+			{
+				CompleteDeleteFile(from_path);
+			}
+			return true;
+		}
 	}
 
 	FileOperate::FileOperateReturnFlag CopyPasteFile(const std::filesystem::path& from_path, const std::filesystem::path& to_path,
@@ -205,43 +271,30 @@ namespace FileManage {
 		return FileOperate::FileOperateReturnFlag_OperateFailure;
 	}
 
+
+	// 删除至回收站本质是一个剪切操作，因此这里调用FileManagePasteFile即可
 	void DeleteFileToBin(const std::filesystem::path& file_path)
 	{
-		LOG_INFO("DeleteFileToBin:删除文件至回收站中...");
-		static MysqlOperate::MysqlTable fileinfo_mysql_table(DATABASE_FILETABLE_NAME);
-		// 分别取文件的扩展名和文件名
-		std::filesystem::path new_file_extension = file_path.extension();
-		std::filesystem::path new_file_name = file_path.stem();
-		while (FileOperate::RenameCheck(new_file_name.generic_string() + new_file_extension.generic_string(), MOZI_RECYCLE_BIN_PATH))
+		LOG_INFO("DeleteFileToBin：删除文件至回收站中...");
+		if (FileManagePasteFile(file_path, MOZI_RECYCLE_BIN_PATH, 1) == false)
 		{
-			new_file_name += "-副本";
+			FileManagePasteFile(file_path, MOZI_RECYCLE_BIN_PATH, 1, 1);
 		}
-		// 组合新路径，需要注意该路径在文件系统中并不存在，所以不能用filesystem中一些自带的
-		// 检测函数，会导致出现错误，因为路径不存在的错误
-		std::filesystem::path new_file_path = file_path.parent_path() / (new_file_name.generic_string() + new_file_extension.generic_string());
-		std::cout << new_file_path << std::endl;
-		// 文件夹复制使用recursive选择
-		if (new_file_extension.generic_string() == "")
-		{
-			// 执行文件夹复制操作
-			std::filesystem::copy(file_path, (MOZI_RECYCLE_BIN_PATH / new_file_path.filename()), std::filesystem::copy_options::recursive);
-			fileinfo_mysql_table.CopyPasteMysqlFileData(new_file_path, MOZI_RECYCLE_BIN_PATH);
-			CompleteDeleteFile(file_path);
-			LOG_INFO("成功删除文件夹 from_path:{}", file_path.generic_string());
-		}
-		else
-		{
-			// 执行文件复制操作
-			std::filesystem::copy(file_path, (MOZI_RECYCLE_BIN_PATH / new_file_path.filename()));
-			fileinfo_mysql_table.CopyPasteMysqlFileData(new_file_path, MOZI_RECYCLE_BIN_PATH);
-			CompleteDeleteFile(file_path);
-			LOG_INFO("成功删除文件 from_path:{0}", file_path.generic_string());
-		}
+		LOG_INFO("DeleteFileToBin：删除文件至回收站完成");
 	}
 
-	void RenameFile(const std::filesystem::path& file_path)
+	void CompleteDeleteFile(const std::filesystem::path& target_path)
 	{
+		LOG_INFO("CompleteDeleteFile:正在删除文件：{}...", target_path.generic_string());
+		static FileOperate::FolderMap folder_maper;
+		static MysqlOperate::MysqlTable fileinfo_mysql_table(DATABASE_FILETABLE_NAME);
 
+		// 需要注意文件删除顺序，资源管理器页面要在最后删除
+		LOG_INFO("CompleteDeleteFile：在FileMap删除文件中...");
+		folder_maper.DeleteFolderPath(target_path);
+		LOG_INFO("CompleteDeleteFile：在Mysql数据表：{}，删除文件中...", DATABASE_FILETABLE_NAME);
+		fileinfo_mysql_table.DeleteMysqlFileData(target_path);
+		LOG_INFO("CompleteDeleteFile：在资源管理页面删除文件中...");
+		FileOperate::DeleteFolderOrFile(target_path);
 	}
-
 }

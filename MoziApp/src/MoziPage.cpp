@@ -26,23 +26,24 @@ namespace MoziPage{
 
     // 路径参数
     static std::filesystem::path double_click_get_path = STORAGE_PATH;       // 获取双击文件夹后，该文件夹的路径
-    static std::filesystem::path right_click_get_path = STORAGE_PATH;        // 获取右击文件夹后，该文件夹的路径
-    static std::filesystem::path last_click_get_path = STORAGE_PATH;         // 保持上一次点击的路径，该文件夹的路径
+    static std::filesystem::path right_click_get_path  = STORAGE_PATH;       // 获取右击文件夹后，该文件夹的路径
+    static std::filesystem::path last_click_get_path   = STORAGE_PATH;       // 保持上一次点击的路径，该文件夹的路径
 
 
+    // 用于建立文件树的FolerMap
     static FileOperate::FolderMap folder_maper;
 
 
-    // 弹窗标志位
-    FileOperate::FileFormat add_new_file_fileformat;     // 新建文件类型
-    static bool add_new_file_flag = false;               // 新建文件标志位
-
-    static bool complete_delete_file_flag = false;       // 完全删除文件标志位
-    static bool delete_file_to_bin_flag = false;         // 删除文件至回收站标志位
-    static bool copy_file_flag = false;                  // 复制文件标志位
-    static bool cut_file_flag = false;                   // 剪切文件标志位
-    static bool paste_file_flag = false;                 // 粘贴文件标志位
-    static bool rename_file_flag = false;                // 重命名文件标志位
+    // 文件相关操作标志位
+    // 包含：新建、复制、粘贴、剪切、重命名、完全删除、删除至回收站
+    static FileOperate::FileFormat add_new_file_fileformat;     // 新建文件类型
+    static bool add_new_file_flag = false;                      // 新建文件标志位
+    static bool complete_delete_file_flag = false;              // 完全删除文件标志位
+    static bool delete_file_to_bin_flag = false;                // 删除文件至回收站标志位
+    static bool copy_file_flag = false;                         // 复制文件标志位
+    static bool cut_file_flag = false;                          // 剪切文件标志位
+    static bool paste_file_flag = false;                        // 粘贴文件标志位
+    static bool rename_file_flag = false;                       // 重命名文件标志位
 
 
     // MoZIApp初始化
@@ -235,7 +236,6 @@ namespace MoziPage{
 
         // 其他页面调用
         SoursePage();   // 资源管理器界面
-        //ContentPage(double_click_current_path);  // 显示界面
 
         ImGui::End();
 	}
@@ -296,19 +296,19 @@ namespace MoziPage{
             switch (add_new_file_fileformat)
             {
             case FileOperate::FileFormat_Directory:
-                Moui::AddNewFileAndFolderPopup(add_new_file_flag,
+                Moui::AddNewFilePopup(add_new_file_flag,
                     u8"新建文件夹", FileOperate::FileFormat_Directory, right_click_get_path, 0.f);
                 break;
             case FileOperate::FileFormat_TextFile:
-                Moui::AddNewFileAndFolderPopup(add_new_file_flag,
+                Moui::AddNewFilePopup(add_new_file_flag,
                     u8"新建文本文件", FileOperate::FileFormat_TextFile, right_click_get_path, 0.f);
                 break;
             case FileOperate::FileFormat_WordFile:
-                Moui::AddNewFileAndFolderPopup(add_new_file_flag,
+                Moui::AddNewFilePopup(add_new_file_flag,
                     u8"新建文本文件", FileOperate::FileFormat_WordFile, right_click_get_path, 0.f);
                 break;
             case FileOperate::FileFormat_PptFile:
-                Moui::AddNewFileAndFolderPopup(add_new_file_flag,
+                Moui::AddNewFilePopup(add_new_file_flag,
                     u8"新建文本文件", FileOperate::FileFormat_PptFile, right_click_get_path, 0.f);
                 break;
             default:break;
@@ -320,16 +320,17 @@ namespace MoziPage{
             Moui::RenameFilePopup(rename_file_flag, u8"重命名文件夹", right_click_get_path, 0.f);
         }
         
-        
         // 复制粘贴操作，一次复制可以有n次粘贴
         if (copy_file_flag && paste_file_flag)
         {
-            Moui::CopyPasteFilePopup(paste_file_flag, u8"复制粘贴文件", last_click_get_path, right_click_get_path, 0.f);
+            Moui::PasteFilePopup(paste_file_flag, u8"复制粘贴文件", last_click_get_path, right_click_get_path, 0.f, false);
+            //Moui::CopyPasteFilePopup(paste_file_flag, u8"复制粘贴文件", last_click_get_path, right_click_get_path, 0.f);
         }
         // 剪切粘贴操作，一次剪切只能有一次粘贴
         if (cut_file_flag && paste_file_flag)
         {
-            Moui::CutPasteFilePopup(paste_file_flag, u8"剪切粘贴文件", last_click_get_path, right_click_get_path, 0.f);
+            Moui::PasteFilePopup(paste_file_flag, u8"剪切粘贴文件", last_click_get_path, right_click_get_path, 0.f, true);
+            //Moui::CutPasteFilePopup(paste_file_flag, u8"剪切粘贴文件", last_click_get_path, right_click_get_path, 0.f);
 
             // 当执行完粘贴后，使剪切标志位恢复，即一次剪切只能有一次粘贴
             if (!paste_file_flag)cut_file_flag = false;
@@ -340,7 +341,7 @@ namespace MoziPage{
         if (delete_file_to_bin_flag)
         {
             FileManage::DeleteFileToBin(right_click_get_path);
-            delete_file_to_bin_flag = true;
+            delete_file_to_bin_flag = false;
         }
         // 彻底删除文件
         else if (complete_delete_file_flag)
@@ -348,62 +349,7 @@ namespace MoziPage{
             FileManage::CompleteDeleteFile(right_click_get_path);
             complete_delete_file_flag = false;
         }
-        //if (add_new_folder)Moui::AddNewFileAndFolderPopup(add_new_folder, 
-        //    u8"新建文件夹", FileOperate::FileFormat_Directory, right_click_get_path, 0.f);
-        //else if (add_new_text_file)Moui::AddNewFileAndFolderPopup(add_new_folder,
-        //    u8"新建文本文件", FileOperate::FileFormat_TextFile, right_click_get_path, 0.f);
-        //if (add_new_plan_popup) MZUI::AddNewPlanPopup(add_new_plan_popup, prior_file_path, current_scale, big_font);
-        ////// 重命名
-        ////if (open_rename_popup && (prior_file_path != STORAGE_PATH))RenamePopup(open_rename_popup, prior_file_path);
-
-
-        ////if (property_open)PropertyPage(double_click_current_path);    // 展示文件属性页面
-        ////if (content_open)ContentPage(double_click_current_path);    // 展示显示页面
-
-        //open_all_file_action = -1;      // 恢复展开标志位
-
         ImGui::End();
-    }
-
-    // 右击回收站
-    static void RightRecycleBinPopup(const char* str_id, ImGuiPopupFlags popup_flags, const std::filesystem::path& current_path)
-    {
-
-        if (ImGui::BeginPopupContextItem(str_id, popup_flags))
-        {
-            // 对回收站下的文件进行操作
-            if (current_path.filename() != MOZI_RECYCLE_BIN)
-            {
-                // 剪切操作，可指定还原回的位置
-                if (ImGui::MenuItem(SOURSEPAGE_RECYCLE_BIN_POPUP_CUT)) {
-                    //prior_file_path = current_path;
-                    //paste_file = true;
-                    //cut_file = true;
-                }
-
-                // 还原回主目录
-                if (ImGui::MenuItem(SOURSEPAGE_RECYCLE_BIN_POPUP_RETURN)) {
-                 /*   if (std::filesystem::is_directory(current_path))MzFile::CopyFolderToFolder(current_path, STORAGE_PATH);
-                    else if (std::filesystem::is_regular_file(current_path))MzFile::CopyFileToFolder(current_path, STORAGE_PATH);*/
-
-                    //MzFile::DeleteFolderOrFile(current_path);                   // 对还原的文件进行删除
-                }
-
-                // 彻底删除
-                if (ImGui::MenuItem(SOURSEPAGE_RECYCLE_BIN_POPUP_DELETE)) {
-                    //MzFile::DeleteFolderOrFile(current_path, 1);                  // 对还原的文件进行删除
-                }
-            }
-
-            // 只有回收站才有的操作
-            // 清空回收站操作
-            if (current_path.filename() == MOZI_RECYCLE_BIN)
-                if (ImGui::MenuItem(SOURSEPAGE_RECYCLE_BIN_POPUP_EMPTY)) {
-                    //MzFile::ClearBin();
-                }
-
-            ImGui::EndPopup();
-        }
     }
 
     // 右击文件夹打开视窗
@@ -423,7 +369,8 @@ namespace MoziPage{
                 // 一键清空删除
                 if (ImGui::MenuItem(SOURSEPAGE_RECYCLE_BIN_POPUP_DELETE)) 
                 {
-                    //MzFile::DeleteFolderOrFile(current_path, 1);                  // 对还原的文件进行删除
+                    std::filesystem::remove_all(MOZI_RECYCLE_BIN_PATH);
+                    LOG_INFO("一键清空回收站完成");
                 }
             }
             else
@@ -502,7 +449,6 @@ namespace MoziPage{
             ImGui::EndPopup();
         }
     }
-
 
     // 递归打开逐层文件
     static void OpenFolder(const std::filesystem::path& parent_path, bool top_flag, const bool& bin_file_flag)

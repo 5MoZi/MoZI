@@ -8,7 +8,7 @@ namespace FileOperate {
     //-----------------------------------------------------------------------------
     //                               file基础操作
     //-----------------------------------------------------------------------------
-        // 连接图标和汉字
+    // 连接图标和汉字
     const std::string IconAndChinese(const std::string str1, const std::string str2, const int type)
     {
         std::string temp_str;
@@ -46,6 +46,18 @@ namespace FileOperate {
         return FileFormat::FileFormat_UnknownFileFormat;
     }
 
+    // 检查文件类型
+    const std::string CheckFileExtension(const FileOperate::FileFormat& file_format)
+    {
+        switch (file_format)
+        {
+        case FileOperate::FileFormat_Directory:	return FILE_EXTENSION_FOLDER;
+        case FileOperate::FileFormat_TextFile:	return FILE_EXTENSION_TXT; 
+        case FileOperate::FileFormat_WordFile:	return FILE_EXTENSION_WORD;
+        case FileOperate::FileFormat_PptFile:	return FILE_EXTENSION_PPT;
+        default: break;
+        }
+    }
     // 设置对应文件夹前面的图标
     const std::string TreeFileIconConnect(const std::filesystem::path& file_path)
     {
@@ -158,10 +170,10 @@ namespace FileOperate {
         return retStr;
     }
 
-    //-----------------------------------------------------------------------------
-    //                               FolderMap相关操作
-    //-----------------------------------------------------------------------------
-        // 初始化FolderMap
+//-----------------------------------------------------------------------------
+//                               FolderMap相关操作
+//-----------------------------------------------------------------------------
+    // 初始化FolderMap
     std::map<std::filesystem::path, bool> FolderMap::folder_map;
 
     void FolderMap::AddFolderPath(const std::filesystem::path& current_path, const bool& tree_node_open)
@@ -169,10 +181,10 @@ namespace FileOperate {
         if (folder_map.count(current_path) == 0)          // 判断map中是否有该节点,如果没有则添加进去
         {
             folder_map.insert({ current_path ,tree_node_open });
-            LOG_INFO("添加新文件夹至FolderMap中：{}", current_path.generic_string());
+            LOG_INFO("AddFolderPath：添加新文件至FolderMap中：{}", current_path.generic_string());
             return;
         }
-        LOG_WARN("无文件夹可添加");
+        LOG_WARN("AddFolderPath：文件已存在，无需添加");
         return;
     }
 
@@ -236,7 +248,7 @@ namespace FileOperate {
         if (folder_map.count(current_path) == 0)
         {
             folder_map.insert({ current_path ,tree_node_open });
-            LOG_INFO("文件树建立__新添加文件夹：{}", current_path.generic_string());
+            LOG_INFO("BuildFolderTree：文件树建立，新添加文件夹：{}", current_path.generic_string());
             double_click_get_path = last_path;
             return;
         }
@@ -255,7 +267,7 @@ namespace FileOperate {
             {
                 last_path = current_path;                       // 刷新上一个文件夹路径
                 folder_map.at(current_path) = tree_node_open;   // 更新打开关闭节点
-                LOG_INFO("文件夹打开，抓取到当前文件夹路径为：{}", current_path.generic_string());
+                LOG_INFO("BuildFolderTree：文件夹打开，抓取到当前文件夹路径为：{}", current_path.generic_string());
                 double_click_get_path = current_path;
                 return;
             }
@@ -264,13 +276,13 @@ namespace FileOperate {
             {
                 last_path = current_path;                       // 刷新上一个文件夹路径
                 folder_map.at(current_path) = tree_node_open;   // 更新打开关闭节点
-                LOG_INFO("文件夹关闭，抓取到当前文件夹路径为：{}", current_path.generic_string());
+                LOG_INFO("BuildFolderTree：文件夹关闭，抓取到当前文件夹路径为：{}", current_path.generic_string());
                 double_click_get_path = current_path;
                 return;
             }
         }
 
-        LOG_CRITICAL("文件数建立失败");
+        LOG_CRITICAL("BuildFolderTree：文件数建立失败");
         double_click_get_path = last_path;
         return;
     }
@@ -281,6 +293,9 @@ namespace FileOperate {
 //-----------------------------------------------------------------------------
 
     // 路径是否存在检测
+    // 输入：路径容器，可以检测一群路径
+    // 返回：false：只要有一个路径不存在
+    //       true: 所有路径均存在
     bool PathCheck(const std::vector<std::filesystem::path>& file_path)
     {
         bool PathExists = true;
@@ -288,18 +303,123 @@ namespace FileOperate {
         {
             if (!std::filesystem::exists(*it))
             {
-                LOG_WARN("路径不存在,path:{}", (*it).generic_string());
+                LOG_WARN("PathCheck：路径不存在,path:{}", (*it).generic_string());
                 PathExists = false;
             }
         }
         if (PathExists)
         {
-            LOG_INFO("检测所有路径均存在");
+            LOG_INFO("PathCheck：检测路径存在");
             return true;
         }
         else return false;
     }
+
+    // 重命名检测存在两种情况
+    // 1：将file_path的名字放到target_path目录下进行检测
+    // 2：将file_path的名字放到file_path的父目录下进行检测
+    //    但是要注意file_path的名字不能和原来的一样，一样要
+    //    注意，因为也会发生重命名
+    // 输入： file_path：完整的路径或文件名（带扩展名）
+    //        target_path：需要被检测的目录，一定要是完整的路径，如果是情况2则可以有file_path=target_path
+    //        parent_check_flag：1为情况2，0为情况1
+    // 返回值：
+    //      true：   检测到重命名
+    //      false：  未检测到重命名
+    bool RenameCheck(const std::filesystem::path& file_path, const std::filesystem::path& target_path, const bool& parent_check_flag)
+    {
+        std::filesystem::path file_to_target_path = target_path;
+        // 判断是在哪种情况下的检测parent_check_flag=1则在第二种情况下检测
+        // 默认是在第一种情况下检测
+        if (parent_check_flag)
+            file_to_target_path = target_path.parent_path() / file_path.filename();
+        else
+            file_to_target_path /= file_path.filename();
+
+        if (std::filesystem::exists(file_to_target_path))
+        {
+            if (parent_check_flag)
+                LOG_INFO("文件名：{0}，在路径：{1}中存在同名文件", file_path.filename().generic_string(), target_path.parent_path().generic_string());
+            else
+                LOG_INFO("文件名：{0}，在路径：{1}中存在同名文件", file_path.filename().generic_string(), target_path.generic_string());
+            return true;
+        }
+        else
+        {
+            LOG_INFO("RenameCheck：未发现重命名");
+            return false;
+        }
+    }
+
     // 新建文件夹
+    // 输入： file_name：完整的文件名（带扩展名），如果是文件则可以不带
+    //        target_path：要放新建文件的文件夹路径，一定要是文件夹
+    //        forced_flag：发生重命名后，1强制建立文件，名字会有系统进行更改（加“副本”）
+    //                     0 则不强制建立，但是一定要确保输入的file_name在target_path
+    //                     文件夹下不存在重命名
+    // 返回值：
+    //      返回新建文件夹的完整路径
+    // 
+    //std::filesystem::path AddFile(const std::filesystem::path& file_name, const std::filesystem::path& target_path)
+    //{
+    //    std::filesystem::path new_file_name = file_name.stem();
+    //    std::filesystem::path new_file_extension = file_name.extension();
+    //    if (RenameCheck(new_file_name.generic_string() + new_file_extension.generic_string(), target_path))
+    //    {
+    //        LOG_INFO("AddFile：存在重命名，进行系统重命名");
+    //        new_file_name += "-副本";
+    //        while (RenameCheck(new_file_name.generic_string() + new_file_extension.generic_string(), target_path))
+    //        {
+    //            new_file_name += "-副本";
+    //        }
+    //    }
+    //   
+    //    std::filesystem::path new_path = target_path / (new_file_name.generic_string() + new_file_extension.generic_string());
+    //    if (new_file_extension == FILE_EXTENSION_FOLDER)
+    //    {
+    //        std::filesystem::create_directory(new_path);
+    //        LOG_INFO("AddFile：新建文件夹成功");
+    //    }
+    //    else
+    //    {
+    //        std::ofstream in(new_path, std::ios::out);
+    //        if (new_file_extension == FILE_EXTENSION_TXT)           LOG_INFO("AddFile：新建文本文件成功");
+    //        else if (new_file_extension == FILE_EXTENSION_WORD)     LOG_INFO("AddFile：新建Word文档成功");
+    //        else if (new_file_extension == FILE_EXTENSION_PPT)      LOG_INFO("AddFile：新建PPT文件成功");
+    //    }
+    //    return new_path;
+    //}
+    std::filesystem::path AddFile(const std::filesystem::path& file_name, const std::filesystem::path& target_path, const bool& forced_flag)
+    {
+        std::filesystem::path new_file_name = file_name.stem();
+        std::filesystem::path new_file_extension = file_name.extension();
+        if (forced_flag)
+        {
+            if (new_file_extension == FILE_EXTENSION_FOLDER)        LOG_INFO("AddFile：强制新建文件夹");
+            else if (new_file_extension == FILE_EXTENSION_TXT)      LOG_INFO("AddFile：强制新建文本文件");
+            else if (new_file_extension == FILE_EXTENSION_WORD)     LOG_INFO("AddFile：强制新建Word文档");
+            else if (new_file_extension == FILE_EXTENSION_PPT)      LOG_INFO("AddFile：强制新建PPT文件");
+            while (RenameCheck(new_file_name.generic_string() + new_file_extension.generic_string(), target_path))
+            {
+                new_file_name += "-副本";
+            }
+        }
+        std::filesystem::path new_path = target_path / (new_file_name.generic_string() + new_file_extension.generic_string());
+        if (new_file_extension == FILE_EXTENSION_FOLDER)
+        {
+            std::filesystem::create_directory(new_path);
+            LOG_INFO("AddFile：新建文件夹成功");
+        }
+        else
+        {
+            std::ofstream in(new_path, std::ios::out);
+            if (new_file_extension == FILE_EXTENSION_TXT)           LOG_INFO("AddFile：新建文本文件成功");
+            else if (new_file_extension == FILE_EXTENSION_WORD)     LOG_INFO("AddFile：新建Word文档成功");
+            else if (new_file_extension == FILE_EXTENSION_PPT)      LOG_INFO("AddFile：新建PPT文件成功");
+        }
+        return new_path;
+    }
+
     std::filesystem::path AddFolder(const std::string& file_name, const std::filesystem::path& target_path, const bool& forced_flag)
     {
         std::string new_file_name = file_name;
@@ -313,7 +433,7 @@ namespace FileOperate {
         }
         std::filesystem::path new_path = target_path / new_file_name;
         std::filesystem::create_directory(new_path);
-        LOG_INFO("新建文件夹成功");
+        LOG_INFO("AddFolder:新建文件夹成功");
         return new_path;
     }
     
@@ -339,53 +459,42 @@ namespace FileOperate {
         return new_path;
     }
 
-    // 重命名检测
-    // 返回false可以是重命名也可以是重命名检测失败，返回true说明存在重命名
-    bool RenameCheck(const std::filesystem::path& file_path, const std::filesystem::path& target_path)
+    // 粘贴文件
+    // 输入： from_path：完整的路径，即要粘贴的文件
+    //        to_path：要放文件的文件夹路径，一定要是文件夹
+    // 该函数不做文件路径以及文件重命名检测，因此一定要确保输
+    // 入的from_path在target_path文件夹下不存在重命名
+    // 返回值：
+    //      true：   粘贴成功
+    //      false：  粘贴失败
+    std::filesystem::path PasteFile(const std::filesystem::path& from_path, const std::filesystem::path& to_path, const bool& forced_flag)
     {
-        if (!PathCheck({ file_path,target_path }))
+        LOG_INFO("PasteFile：粘贴文件中......");
+        std::filesystem::path new_file_name = from_path.stem();
+        std::filesystem::path new_file_extension = from_path.extension();
+        if (forced_flag == true)
         {
-            LOG_ERROR("存在路径不存在，导致重命名检测失败！");
-            return false;
+            LOG_INFO("PasteFile：强制重命名中......");
+            while (RenameCheck(new_file_name.generic_string() + new_file_extension.generic_string(), to_path))
+            {
+                new_file_name += "-副本";
+            }
         }
-
-        std::filesystem::path file_to_target_path = target_path;
-        file_to_target_path /= file_path.filename();
-        if (std::filesystem::exists(file_to_target_path))
+        std::filesystem::path new_path = from_path.parent_path() / (new_file_name.generic_string() + new_file_extension.generic_string());
+        if (std::filesystem::is_directory(from_path))
         {
-            LOG_INFO("文件名：{0}，在路径：{1}中存在同名文件", file_path.filename().generic_string(), target_path.generic_string());
-            return true;
+            // 执行文件夹复制操作
+            std::filesystem::copy(from_path, to_path / new_path.filename(), std::filesystem::copy_options::recursive);
+            
+            LOG_INFO("PasteFile：成功粘贴文件夹 from_path:{0}--to_path:{1}", from_path.generic_string(), to_path.generic_string());
         }
-        else
+        else if (std::filesystem::is_regular_file(from_path))
         {
-            LOG_INFO("未发现重命名");
-            return false;
+            // 执行文件复制操作
+            std::filesystem::copy(from_path, to_path / new_path.filename());
+            LOG_INFO("PasteFile：成功粘贴文件 from_path:{0}--to_path:{1}", from_path.generic_string(), to_path.generic_string());
         }
-        LOG_ERROR("重命名检测失败！");
-        return false;
-    }
-    // 重命名检测重载
-    bool RenameCheck(const std::string& rename, const std::filesystem::path& target_path)
-    {
-        if (!PathCheck({ target_path }))
-        {
-            LOG_ERROR("存在路径不存在，导致重命名检测失败！");
-            return false;
-        }
-        std::filesystem::path file_to_target_path = target_path;
-        file_to_target_path /= rename;
-        if (std::filesystem::exists(file_to_target_path))
-        {
-            LOG_INFO("文件名：{0}，在路径：{1}中存在同名文件", rename, target_path.generic_string());
-            return true;
-        }
-        else
-        {
-            LOG_INFO("未发现重命名");
-            return false;
-        }
-        LOG_ERROR("重命名检测失败！");
-        return false;
+        return new_path;
     }
     // 复制粘贴文件到文件夹
     void CopyFolderAndFile(const std::filesystem::path& from_path, const std::filesystem::path& to_path)
@@ -464,6 +573,30 @@ namespace FileOperate {
     }
 
     // 完全删除文件
+    // 输入： filepath：要删除的文件路径
+    // 该函数不做文件路径是否存在检测，因此一定要确保输
+    // 入的filepath路径存在
+    // 返回值：
+    //      true：   完全删除成功
+    //      false：  完全删除失败
+    bool CompleteDeleteFile(const std::filesystem::path& filepath)
+    {
+        if (std::filesystem::is_directory(filepath))
+        {
+            std::filesystem::remove_all(filepath);
+            LOG_INFO("CompleteDeleteFile：成功删除文件夹 path:{}", filepath.generic_string());
+            return true;
+        }
+        else if (std::filesystem::is_regular_file(filepath))
+        {
+            std::filesystem::remove(filepath);
+            LOG_INFO("CompleteDeleteFile：成功删除文件 path:{}", filepath.generic_string());
+            return true;
+        }
+
+        LOG_ERROR("CompleteDeleteFile：删除失败！");
+        return false;
+    }
     void DeleteFolderOrFile(const std::filesystem::path& filepath)
     {
         if (!PathCheck({ filepath }))
@@ -486,6 +619,42 @@ namespace FileOperate {
 
         LOG_ERROR("删除操作失败！");
         return;
+    }
+
+
+
+    // 重命名文件
+    // 注意replace_filename函数会对名字和扩展名进行全部替换
+    // 该函数执行强制重命名，并不对重命名进行检测，检测部分需要自己调用
+    // 
+    // 该函数会自动检测是否重命名如果，则会进行系统重命名
+    // 
+    // 输入： rename：完整的文件名（带扩展名），同时需要注意输入的新的rename不能与旧的old_path的文件名一样，这样就没有意义
+    //        old_path：就的文件路径
+    // 返回值：
+    //      返回重命名后的文件完整路径
+    std::filesystem::path RenameFile(const std::filesystem::path& rename, const std::filesystem::path& old_path)
+    {
+        LOG_INFO("RenameFile：重命名操作中......");
+        std::filesystem::path new_file_path = old_path;
+        std::filesystem::path new_file_name = rename.stem();
+        std::filesystem::path new_file_extension = rename.extension();
+
+        std::filesystem::path file_to_target_path = old_path.parent_path() / rename;
+
+        if (std::filesystem::exists(file_to_target_path))
+        {
+            LOG_INFO("RenameFile:文件存在重命名文件");
+
+            while (std::filesystem::exists(file_to_target_path.parent_path() / (new_file_name.generic_string() + new_file_extension.generic_string())))
+            {
+                new_file_name += "-副本";
+            }
+        }
+        new_file_path.replace_filename(new_file_name.generic_string() + new_file_extension.generic_string());
+        std::filesystem::rename(old_path, new_file_path);
+        LOG_INFO("RenameFile：重命名操作成功");
+        return new_file_path;
     }
     // 重命名文件夹或文件
     // 注意如果是对文件进行改名输入的rename一定要带扩展名，

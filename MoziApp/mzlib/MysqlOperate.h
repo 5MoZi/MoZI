@@ -6,11 +6,13 @@
 #define DATABASE_NAME					"modata01"			//数据库名
 
 #define DATABASE_FILETABLE_NAME			"fileinfo"			//文件数据表名
-
+#define DATABASE_TEMP_FILETABLE_NAME	"tempfileinfo"		//文件数据中转表名
 
 namespace MysqlOperate {
 
 	MYSQL* GetMysqlIo();
+	void CreateDataTable(const char* database_table_name);
+
 
 	class FileDataStream
 	{
@@ -40,17 +42,13 @@ namespace MysqlOperate {
 			const char* c_database_name);
 		void ConnectDatabase();
 		void CloseDatabase();
-
-		//void AddMysqlFileData(const std::filesystem::path& file_path);
-		//void DeleteMysqlFileData(const std::filesystem::path& delete_path);
-		//void ChangeMysqlFileData(const std::filesystem::path& old_path, const MysqlOperate::FileDataStream& file_data);
-		//bool MysqlFilePathCheck(const std::filesystem::path& file_path);
 		friend MYSQL* GetMysqlIo();
+		friend void CreateDataTable(const char* database_table_name);
+
 	protected:
 		static MYSQL mysql;		// 数据库类
 		static MYSQL_RES* res;	// 查询结果集
 		static MYSQL_ROW row;	// 记录结构体
-
 	private:
 		static const char* database_user_name;
 		static const char* database_password;
@@ -69,6 +67,7 @@ namespace MysqlOperate {
 		void AddMysqlFileData(const std::filesystem::path& file_path);
 		void DeleteMysqlFileData(const std::filesystem::path& delete_path);
 		void CopyPasteMysqlFileData(const std::filesystem::path& from_path, const std::filesystem::path& to_path);
+		void PasteMysqlFileData(const std::filesystem::path& from_path, const std::filesystem::path& to_path);
 		void ChangeMysqlFileData(const std::filesystem::path& old_path, const MysqlOperate::FileDataStream& file_data);
 		void ChangeMysqlFileData(const std::filesystem::path& old_path, const std::filesystem::path& new_path);
 		bool MysqlFilePathCheck(const std::filesystem::path& file_path);

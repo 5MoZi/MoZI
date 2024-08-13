@@ -58,6 +58,8 @@ namespace MoziPage{
         LOG_INFO("MOUI初始化完成");
         // 数据库连接
         LOG_INFO("Mysql数据库初始设置中...");
+        //MysqlOperate::ConnectDatabase();
+        //MysqlOperate::CreateFileDataTable({ DATABASE_FILETABLE_NAME,DATABASE_TEMP_FILETABLE_NAME });
         MysqlOperate::MysqlData mysql_data_base(DATABASE_USER_NAME, DATABASE_PASSWORD, DATABASE_NAME);
     }
 

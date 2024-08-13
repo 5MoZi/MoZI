@@ -193,7 +193,7 @@ namespace FileManage {
 				return false;
 			}
 			FileOperate::PasteFile(from_path, to_path);
-			fileinfo_mysql_table.CopyPasteMysqlFileData(from_path, to_path);
+			fileinfo_mysql_table.PasteMysqlFileData(from_path, to_path);
 			// 复制操作不需要删除原文件，而剪切操作需要
 			if(copy_cut_flag == true)
 			{
@@ -204,7 +204,7 @@ namespace FileManage {
 		else if (force_flag == true)
 		{
 			std::filesystem::path new_file_path = FileOperate::PasteFile(from_path, to_path, true);
-			fileinfo_mysql_table.CopyPasteMysqlFileData(new_file_path, to_path);
+			fileinfo_mysql_table.PasteMysqlFileData(new_file_path, to_path);
 			// 复制操作不需要删除原文件，而剪切操作需要
 			if (copy_cut_flag == true)
 			{

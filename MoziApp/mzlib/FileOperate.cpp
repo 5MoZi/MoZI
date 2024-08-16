@@ -412,6 +412,7 @@ namespace FileOperate {
         }
         else
         {
+            std::cout << "1x" << std::endl;
             std::ofstream in(new_path, std::ios::out);
             if (new_file_extension == FILE_EXTENSION_TXT)           LOG_INFO("AddFile：新建文本文件成功");
             else if (new_file_extension == FILE_EXTENSION_WORD)     LOG_INFO("AddFile：新建Word文档成功");

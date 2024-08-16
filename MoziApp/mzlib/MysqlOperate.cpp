@@ -118,7 +118,7 @@ namespace MysqlOperate {
 			database_table_name, new_file_data.GetName().c_str(), new_file_data.GetCreateDate().c_str(), new_file_data.GetPath().c_str());
 		mysql_query(&mysql, sql_cmd);
 		// 注意：文件不需要进行该操作，因为文件下没有其余的文件
-		// 由于在更改mysql之前以及修改了文件名所以不能用std::filesystem::is_directory进行判断
+		// 由于在更改std::filesysmysql之前以及修改了文件名所以不能用tem::is_directory进行判断
 		if (from_path.extension() == "")
 		{
 			LOG_INFO("PasteMysqlFileData：文件递归粘贴中......");

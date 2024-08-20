@@ -4,11 +4,8 @@
 #include "FileOperate.h"
 #include "MysqlOperate.h"
 #include "MoObject.h"
-
 #include "Moui.h"
 #include "MoIcon.h"
-
-
 #include "FileManage.h"
 #include "MoziPage.h"
 
@@ -38,6 +35,8 @@ namespace MoziPage{
     // 包含：新建、复制、粘贴、剪切、重命名、完全删除、删除至回收站
     static FileOperate::FileFormat add_new_file_fileformat;     // 新建文件类型
     static bool add_new_file_flag = false;                      // 新建文件标志位
+    static bool open_file_flag = false;                         // 打开文件标志位
+
     static bool complete_delete_file_flag = false;              // 完全删除文件标志位
     static bool delete_file_to_bin_flag = false;                // 删除文件至回收站标志位
     static bool copy_file_flag = false;                         // 复制文件标志位
@@ -332,10 +331,14 @@ namespace MoziPage{
         if (cut_file_flag && paste_file_flag)
         {
             Moui::PasteFilePopup(paste_file_flag, u8"剪切粘贴文件", last_click_get_path, right_click_get_path, 0.f, true);
-            //Moui::CutPasteFilePopup(paste_file_flag, u8"剪切粘贴文件", last_click_get_path, right_click_get_path, 0.f);
-
             // 当执行完粘贴后，使剪切标志位恢复，即一次剪切只能有一次粘贴
             if (!paste_file_flag)cut_file_flag = false;
+        }
+
+        if (open_file_flag)
+        {
+            ShellExecute(NULL, L"open", right_click_get_path.generic_wstring().c_str(), NULL, NULL, SW_SHOW);
+            open_file_flag = false;
         }
 
         // 删除文件
@@ -411,6 +414,16 @@ namespace MoziPage{
                     }
                 }
 
+                // 只有文件才有的操作
+                if (!foler_flag)
+                {
+                    // 打开文件
+                    if (ImGui::MenuItem(SOURSEPAGE_FOLDER_POPUP_OPEN)) {
+                        right_click_get_path = current_path;
+                        open_file_flag = true;
+                    }
+                }
+
                 // 剪切和复制操作同一时刻只能存在一个，不能共存
                 // 剪切操作
                 if (ImGui::MenuItem(SOURSEPAGE_FOLDER_POPUP_CUT)) {
@@ -479,12 +492,9 @@ namespace MoziPage{
             // 由于文件的路径是唯一的，因此使用路径作为文件树文件的唯一标识符，即：folder_path[i].generic_string()
             std::string folder_only_flag = folder_path[i].generic_string();
             bool node_open = ImGui::TreeNodeEx(folder_only_flag.c_str(), tree_flag, FileOperate::TreeFileIconConnect(folder_path[i]).c_str());
-            //if (bin_flag == 1)RightRecycleBinPopup(tree_flag_name.c_str(), ImGuiPopupFlags_MouseButtonRight, folder_path[i]);
-            //else 
             RightFolderPopup(folder_only_flag.c_str(), ImGuiPopupFlags_MouseButtonRight, folder_path[i], bin_file_flag);
 
             // 双击获取当前文件夹的路径
-            //double_click_current_path = folder_maper.BuildFolderTree(folder_path[i], node_open);
             folder_maper.BuildFolderTree(folder_path[i], node_open, double_click_get_path);
             if (node_open)
             {

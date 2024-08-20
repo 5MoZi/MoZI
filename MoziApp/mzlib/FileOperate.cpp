@@ -269,6 +269,11 @@ namespace FileOperate {
                 folder_map.at(current_path) = tree_node_open;   // 更新打开关闭节点
                 LOG_INFO("BuildFolderTree：文件夹打开，抓取到当前文件夹路径为：{}", current_path.generic_string());
                 double_click_get_path = current_path;
+                // 双击打开文件
+                if (!std::filesystem::is_directory(current_path))
+                {
+                    ShellExecute(NULL, L"open", current_path.generic_wstring().c_str(), NULL, NULL, SW_SHOW);
+                }
                 return;
             }
             // 状态由1->0即文件打开
@@ -278,6 +283,11 @@ namespace FileOperate {
                 folder_map.at(current_path) = tree_node_open;   // 更新打开关闭节点
                 LOG_INFO("BuildFolderTree：文件夹关闭，抓取到当前文件夹路径为：{}", current_path.generic_string());
                 double_click_get_path = current_path;
+                // 双击打开文件
+                if (!std::filesystem::is_directory(current_path))
+                {
+                    ShellExecute(NULL, L"open", current_path.generic_wstring().c_str(), NULL, NULL, SW_SHOW);
+                }
                 return;
             }
         }
@@ -412,7 +422,6 @@ namespace FileOperate {
         }
         else
         {
-            std::cout << "1x" << std::endl;
             std::ofstream in(new_path, std::ios::out);
             if (new_file_extension == FILE_EXTENSION_TXT)           LOG_INFO("AddFile：新建文本文件成功");
             else if (new_file_extension == FILE_EXTENSION_WORD)     LOG_INFO("AddFile：新建Word文档成功");

@@ -93,7 +93,7 @@
 #define SOURSEPAGE_FOLDER_POPUP_SUBADD_NEW_PPTFILE		Moui::IconAndChinese(ICON_FA_FILE_POWERPOINT, u8"新建PPT文件").c_str()
 #define SOURSEPAGE_FOLDER_POPUP_SUBADD_ADDFILE			Moui::IconAndChinese(ICON_FA_FILE_ARROW_UP, u8"现有文件").c_str()
 
-
+#define SOURSEPAGE_FOLDER_POPUP_OPEN					Moui::IconAndChinese(ICON_FA_FACE_FROWN_OPEN, u8"打开").c_str()
 #define SOURSEPAGE_FOLDER_POPUP_CUT						Moui::IconAndChinese(ICON_FA_SCISSORS, u8"剪切").c_str()
 #define SOURSEPAGE_FOLDER_POPUP_COPY					Moui::IconAndChinese(ICON_FA_COPY, u8"复制").c_str()
 #define SOURSEPAGE_FOLDER_POPUP_PASTE					Moui::IconAndChinese(ICON_FA_PASTE, u8"粘贴").c_str()

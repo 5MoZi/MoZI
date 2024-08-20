@@ -149,6 +149,54 @@ namespace MysqlOperate {
 		return;
 	}
 
+	// 重命名时强制粘贴数据
+	void PasteMysqlFileData(const std::filesystem::path& old_path, const std::filesystem::path& new_path, const std::filesystem::path& to_path, const char* database_table_name, const char* temp_table_name)
+	{
+		LOG_INFO("PasteMysqlFileData：在Mysql粘贴文件中......");
+
+		if (MysqlFilePathCheck(to_path / new_path.filename(), database_table_name))
+		{
+			LOG_WARN("PasteMysqlFileData：粘贴Mysql数据：存在同路径的数据，无法进行复制粘贴数据操作");
+			return;
+		}
+		FileDataStream new_file_data(to_path / new_path.filename());
+		char sql_cmd[2000];
+
+		snprintf(sql_cmd, 2000, "insert into %s(file_name,create_date,file_path)values('%s','%s','%s');",
+			database_table_name, new_file_data.GetName().c_str(), new_file_data.GetCreateDate().c_str(), new_file_data.GetPath().c_str());
+		mysql_query(&mysql, sql_cmd);
+		// 注意：文件不需要进行该操作，因为文件下没有其余的文件
+		// 由于在更改std::filesysmysql之前以及修改了文件名所以不能用tem::is_directory进行判断
+		if (new_path.extension() == "")
+		{
+			LOG_INFO("PasteMysqlFileData：文件递归粘贴中......");
+			// 第一步：如果文件夹from_path下有文件，则将其下的所有文件复制到临时表中
+			snprintf(sql_cmd, 2000, "insert into %s select * from %s where file_path like '%%%s/%%';",
+				temp_table_name, database_table_name, old_path.generic_u8string().c_str());
+			mysql_query(&mysql, sql_cmd);
+			// 第二步：修改路径，利用字符串替换，将原有的文件路径的一部分替换为新路径
+			snprintf(sql_cmd, 2000, "update %s set file_path=replace(file_path,'%s','%s') where file_path like '%%%s%%';",
+				temp_table_name, old_path.generic_u8string().c_str(),
+				new_file_data.GetPath().c_str(), old_path.generic_u8string().c_str());
+			mysql_query(&mysql, sql_cmd);
+			// 第三步：更新所有文件的日期，全部变为new_file_data创建日期
+			snprintf(sql_cmd, 2000, "update %s set create_date = '%s';",
+				temp_table_name, new_file_data.GetCreateDate().c_str());
+			mysql_query(&mysql, sql_cmd);
+			// 第四步：将临时表的数据复制回原表中
+			snprintf(sql_cmd, 2000, "insert into %s select * from %s;",
+				database_table_name, temp_table_name);
+			mysql_query(&mysql, sql_cmd);
+			// 第五步：清空临时表，以备下一次使用
+			snprintf(sql_cmd, 2000, "truncate table %s;", temp_table_name);
+			mysql_query(&mysql, sql_cmd);
+			LOG_INFO("PasteMysqlFileData：文件递归粘贴完成");
+		}
+
+		LOG_INFO("PasteMysqlFileData：粘贴Mysql数据：数据粘贴成功");
+		return;
+	}
+
 	// 删除数据
 	void DeleteMysqlFileData(const std::filesystem::path& delete_path, const char* database_table_name)
 	{

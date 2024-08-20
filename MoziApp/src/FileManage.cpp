@@ -68,8 +68,6 @@ namespace FileManage {
 	// 由于需要对文件进行重命名则，输入的目标文件target_path不能为常量
 	bool FileManageRenameFile(const std::filesystem::path& file_name, const std::filesystem::path& target_path, const bool& forced_flag)
 	{
-		//static MysqlOperate::MysqlTable fileinfo_mysql_table(DATABASE_FILETABLE_NAME);
-
 		FileOperate::FileFormat file_format = FileOperate::CheckFileFormat(target_path);
 
 		if (forced_flag == false)LOG_INFO("RenameFolderAndFile:重命名文件中...");
@@ -106,7 +104,7 @@ namespace FileManage {
 			// 强制创建文本文件
 			if (forced_flag)
 			{
-				FileOperate::RenameFile(file_name.generic_string() + file_extension, target_path);
+				new_file_path = FileOperate::RenameFile(file_name.generic_string() + file_extension, target_path);
 				MysqlOperate::ChangeMysqlFileData(target_path, new_file_path, DATABASE_FILETABLE_NAME);
 				folder_maper.ChangeFolderPath(target_path, new_file_path);
 				return true;
@@ -115,7 +113,7 @@ namespace FileManage {
 			{
 				return false;
 			}
-			FileOperate::RenameFile(file_name.generic_string() + file_extension, target_path);
+			new_file_path = FileOperate::RenameFile(file_name.generic_string() + file_extension, target_path);
 			MysqlOperate::ChangeMysqlFileData(target_path, new_file_path, DATABASE_FILETABLE_NAME);
 			folder_maper.ChangeFolderPath(target_path, new_file_path);
 			return true;
@@ -126,7 +124,6 @@ namespace FileManage {
 		const bool& copy_cut_flag, const bool& force_flag)
 	{
 		LOG_INFO("FileManagePasteFile：粘贴文件中...");
-		//static MysqlOperate::MysqlTable fileinfo_mysql_table(DATABASE_FILETABLE_NAME);
 
 		if (force_flag == false)
 		{
@@ -146,7 +143,7 @@ namespace FileManage {
 		else if (force_flag == true)
 		{
 			std::filesystem::path new_file_path = FileOperate::PasteFile(from_path, to_path, true);
-			MysqlOperate::PasteMysqlFileData(new_file_path, to_path, DATABASE_FILETABLE_NAME, DATABASE_TEMP_FILETABLE_NAME);
+			MysqlOperate::PasteMysqlFileData(from_path, new_file_path, to_path, DATABASE_FILETABLE_NAME, DATABASE_TEMP_FILETABLE_NAME);
 			// 复制操作不需要删除原文件，而剪切操作需要
 			if (copy_cut_flag == true)
 			{

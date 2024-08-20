@@ -48,4 +48,5 @@ namespace MoObject
 		// Ë¢ÐÂ¹æÄ£
 		scale = change_scale;
 	}
+
 }

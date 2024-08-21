@@ -134,6 +134,16 @@ namespace MoziPage{
         }
     }
 
+    // 窗口栏
+    static void HomePageMainMenuBarWindows()
+    {
+        if (ImGui::BeginMenu(HONEPAGENAME_WINDOWS))
+        {
+            ImGui::MenuItem(HONEPAGENAME_SUBWINDOWS_SOURSEPAGE, NULL, &sourse_open);
+            ImGui::EndMenu();
+        }
+    }
+
     // 帮助栏
     static void HomePageMainMenuBarHelp()
     {
@@ -205,6 +215,7 @@ namespace MoziPage{
         {
             HomePageMainMenuBarFile();
             HomePageMainMenuBarSettings();
+            HomePageMainMenuBarWindows();
             HomePageMainMenuBarHelp();
 
             ImGui::EndMainMenuBar();
@@ -229,7 +240,7 @@ namespace MoziPage{
             if (ImGui::MenuItem(HOMEPAGE_IOCN_FA_PLAY)) {}
             if (ImGui::MenuItem(HOMEPAGE_IOCN_FA_DOWNLOAD)) {}
             if (ImGui::MenuItem(HOMEPAGE_IOCN_FA_UPLOAD)) {
-                //MzFile::SelectDirectoryAndNew(STORAGE_PATH);
+                FileManage::SelectFile(STORAGE_PATH);
             }
             ImGui::EndMenuBar();
         }
@@ -325,7 +336,6 @@ namespace MoziPage{
         if (copy_file_flag && paste_file_flag)
         {
             Moui::PasteFilePopup(paste_file_flag, u8"复制粘贴文件", last_click_get_path, right_click_get_path, 0.f, false);
-            //Moui::CopyPasteFilePopup(paste_file_flag, u8"复制粘贴文件", last_click_get_path, right_click_get_path, 0.f);
         }
         // 剪切粘贴操作，一次剪切只能有一次粘贴
         if (cut_file_flag && paste_file_flag)
@@ -374,7 +384,9 @@ namespace MoziPage{
                 // 一键清空删除
                 if (ImGui::MenuItem(SOURSEPAGE_RECYCLE_BIN_POPUP_DELETE)) 
                 {
-                    std::filesystem::remove_all(MOZI_RECYCLE_BIN_PATH);
+                    right_click_get_path = MOZI_RECYCLE_BIN_PATH;
+                    // 回收站内的文件彻底删除，不是回收站的文件使用删除移动入回收站中
+                    complete_delete_file_flag = true;
                     LOG_INFO("一键清空回收站完成");
                 }
             }

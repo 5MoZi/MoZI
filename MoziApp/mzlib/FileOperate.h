@@ -114,9 +114,6 @@ namespace FileOperate {
 
 	// 文件树前的图标
 	const std::string TreeFileIconConnect(const std::filesystem::path& file_path);
-	// 扫描文件夹函数，放回其下第一层的文件夹路径和文件路径
-	void ScanDirectory(std::vector<std::filesystem::path>& folder_path, std::vector<std::filesystem::path>& file_path, const std::filesystem::path& current_path);
-
 	// 字符串与UTF8互转
 	std::string UTF8_To_string(const std::string& str);
 	std::string string_To_UTF8(const std::string& str);
@@ -126,42 +123,26 @@ namespace FileOperate {
 //-----------------------------------------------------------------------------
 //                   文件复制(粘贴)、剪切、删除、新建立等相关操作
 //-----------------------------------------------------------------------------
-
+	// 扫描文件夹函数，放回其下第一层的文件夹路径和文件路径
+	void ScanDirectory(std::vector<std::filesystem::path>& folder_path, std::vector<std::filesystem::path>& file_path,
+		const std::filesystem::path& current_path);
 	// 路径是否存在检测
 	bool PathCheck(const std::vector<std::filesystem::path>& file_path);
 	// 重命名检测
-	bool RenameCheck(const std::filesystem::path& file_path, const std::filesystem::path& target_path, const bool& parent_check_flag = false);
+	bool RenameCheck(const std::filesystem::path& file_path, const std::filesystem::path& target_path,
+		const bool& parent_check_flag = false);
 	// 新建文件
-	std::filesystem::path AddFile(const std::filesystem::path& file_name, const std::filesystem::path& target_path, const bool& forced_flag = false);
+	std::filesystem::path AddFile(const std::filesystem::path& file_name, 
+		const std::filesystem::path& target_path, const bool& forced_flag = false);
 	// 粘贴文件
-	//bool PasteFile(const std::filesystem::path& from_path, const std::filesystem::path& to_path);
-	std::filesystem::path PasteFile(const std::filesystem::path& from_path, const std::filesystem::path& to_path, const bool& forced_flag = false);
+	std::filesystem::path PasteFile(const std::filesystem::path& from_path,
+		const std::filesystem::path& to_path, const bool& forced_flag = false);
 	// 完全删除文件
 	bool CompleteDeleteFile(const std::filesystem::path& filepath);
 	// 重命名文件
-	std::filesystem::path RenameFile(const std::filesystem::path& rename, const std::filesystem::path& old_path);
-
-	// 新建文件夹
-	std::filesystem::path AddFolder(const std::string& file_name, const std::filesystem::path& target_path, const bool& forced_flag = false);
-	// 新建文本文件
-	std::filesystem::path AddTextFile(const std::string& file_name, const std::string& file_extension,
-		const std::filesystem::path& target_path, const bool& forced_flag = false);
-
-
-	// 复制粘贴文件
-	void CopyFolderAndFile(const std::filesystem::path& from_path, const std::filesystem::path& to_path);
-	// 专有的复制粘贴文件
-	FileOperate::FileOperateReturnFlag SpecialCopyFolderAndFile(const std::filesystem::path& from_path, const std::filesystem::path& to_path);
-
+	std::filesystem::path RenameFile(const std::filesystem::path& rename, 
+		const std::filesystem::path& old_path);
 	// 完全删除文件
 	void DeleteFolderOrFile(const std::filesystem::path& filepath);
-	// 重命名文件夹或文件
-	// 注意如果是对文件进行改名输入的rename一定要带扩展名，
-	// 因为replace_filename函数会对名字和扩展名进行全部替换
-	// 该函数执行强制重命名，并不对重命名进行检测，检测部分需要自己调用
-	std::filesystem::path RenameFile(const std::string& rename, std::filesystem::path& old_path, const bool& forced_flag = false);
-
-
-	std::filesystem::path CopyAndCutForcedRenameFile(const std::filesystem::path& from_path, const std::filesystem::path& to_path);
 }
 

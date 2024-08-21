@@ -168,14 +168,42 @@ namespace FileManage {
 	{
 		LOG_INFO("CompleteDeleteFile:正在删除文件：{}...", target_path.generic_string());
 		static FileOperate::FolderMap folder_maper;
-		//static MysqlOperate::MysqlTable fileinfo_mysql_table(DATABASE_FILETABLE_NAME);
 
 		// 需要注意文件删除顺序，资源管理器页面要在最后删除
 		LOG_INFO("CompleteDeleteFile：在FileMap删除文件中...");
 		folder_maper.DeleteFolderPath(target_path);
 		LOG_INFO("CompleteDeleteFile：在Mysql数据表：{}，删除文件中...", DATABASE_FILETABLE_NAME);
-		MysqlOperate::DeleteMysqlFileData(target_path, DATABASE_FILETABLE_NAME);
+		if (target_path == MOZI_RECYCLE_BIN_PATH)
+			MysqlOperate::DeleteMysqlFileData(target_path, DATABASE_FILETABLE_NAME, 1);
+		else
+			MysqlOperate::DeleteMysqlFileData(target_path, DATABASE_FILETABLE_NAME);
 		LOG_INFO("CompleteDeleteFile：在资源管理页面删除文件中...");
 		FileOperate::DeleteFolderOrFile(target_path);
+	}
+
+	// 从其他地方添加文件至资源管理器中
+	void SelectFile(const std::filesystem::path& current)
+	{
+		std::filesystem::path choice_path;
+		wchar_t szPath[MAX_PATH];
+		memset(szPath, 0, MAX_PATH);	//清零操作
+
+		BROWSEINFO bi;
+		bi.hwndOwner = NULL; // 拥有该对话框的窗口句柄
+		bi.pidlRoot = NULL;
+		bi.pszDisplayName = szPath;
+		bi.lpszTitle = L"请选择需要的文件：";
+		bi.ulFlags = BIF_BROWSEINCLUDEFILES;
+		bi.lpfn = NULL;
+		bi.lParam = 0;
+		bi.iImage = 0;
+
+		//弹出选择目录对话框 
+		LPITEMIDLIST lp = SHBrowseForFolder(&bi);
+		if (lp && SHGetPathFromIDList(lp, szPath))
+		{
+			choice_path = szPath;
+			FileManagePasteFile(choice_path, current, 0, 1);
+		}
 	}
 }

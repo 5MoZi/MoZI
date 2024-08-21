@@ -16,4 +16,6 @@ namespace FileManage {
 
 	void DeleteFileToBin(const std::filesystem::path& file_path);
 
+	void SelectFile(const std::filesystem::path& current);
+
 }

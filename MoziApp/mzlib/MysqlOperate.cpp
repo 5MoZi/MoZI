@@ -198,14 +198,19 @@ namespace MysqlOperate {
 	}
 
 	// 删除数据
-	void DeleteMysqlFileData(const std::filesystem::path& delete_path, const char* database_table_name)
+	void DeleteMysqlFileData(const std::filesystem::path& delete_path, const char* database_table_name,const bool& bin_flag)
 	{
 		LOG_INFO("DeleteMysqlFileData：在Mysql删除文件中......");
-		if (!MysqlFilePathCheck(delete_path, database_table_name))
+		if (!bin_flag) 
 		{
-			LOG_WARN("DeleteMysqlFileData：删除Mysql数据：不存在该路径的数据，无法进行删除数据操作");
-			return;
+			if (!MysqlFilePathCheck(delete_path, database_table_name))
+			{
+				LOG_WARN("DeleteMysqlFileData：删除Mysql数据：不存在该路径的数据，无法进行删除数据操作");
+				return;
+			}
 		}
+		else LOG_INFO("DeleteMysqlFileData：在Mysql中清空回收站......");
+
 		char sql[2000];
 		snprintf(sql, 2000, "delete from %s where file_path like'%%%s%%';", database_table_name, delete_path.generic_u8string().c_str());
 		mysql_query(&mysql, sql);

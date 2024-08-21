@@ -93,14 +93,14 @@ namespace Moui {
 
             // 编辑确认按键
             ImGui::SetCursorPos(ImVec2(win_w - button_size.x - element_pos.x, win_h - element_pos.y * 2));
-            if (ImGui::Button(u8"确定", button_size)) 
+            if (ImGui::Button(u8"确定", button_size) || ImGui::IsKeyDown(ImGuiKey_Enter))
             {
                 confirm_flag = true;
                 ImGui::CloseCurrentPopup();
             }
 
             ImGui::SetCursorPos(ImVec2(button_size.x - element_pos.x*1.5, win_h - element_pos.y * 2));
-            if (ImGui::Button(u8"取消", button_size))
+            if (ImGui::Button(u8"取消", button_size) || ImGui::IsKeyPressed((ImGuiKey_Delete, ImGuiKey_Escape), u8"RemindPopup-取消"))
             {
                 confirm_flag = false;;
                 ImGui::CloseCurrentPopup();
@@ -276,7 +276,8 @@ namespace Moui {
 
 
             ImGui::SetCursorPos(ImVec2(win_w - button_size.x - element_pos.x, win_h - button_size.y - element_pos.y*2));
-            if (ImGui::Button(u8"确定", button_size))
+
+            if (ImGui::Button(u8"确定", button_size) || ImGui::IsKeyPressed((ImGuiKey_Enter, ImGuiKey_KeypadEnter),u8"AddNewFilePopup-确认"))
             {
                 // 调用新建文件函数
                 if (!FileManage::NewBuildFile(FileOperate::UTF8_To_string(name_buff), file_format, current_path))
@@ -347,9 +348,9 @@ namespace Moui {
         }
 
         /*-------------------------窗口信息设置----------------------------*/
-        //static float next_scale = 0.f;              // 保证尺寸只进行一次变化
         //scale(c_scale), window_hight(w_h), window_width(w_w), element_pos(c_pos), element_space(c_space), bar_size(c_bar), button_size(c_button) {};
-        static MoObject::MouiPopupStyle current_popup_style(0.f, 300, 250, ImVec2(50, 30), ImVec2(20, 200), ImVec2(800.0f, 30.0f), ImVec2(200, 0));
+        static MoObject::MouiPopupStyle current_popup_style(0.f, 300, 250, ImVec2(50, 30), 
+            ImVec2(20, 200), ImVec2(800.0f, 30.0f), ImVec2(200, 0));
         // 窗口信息
         // 不同规模变化不同的尺寸
         float window_hight = current_popup_style.window_hight;
@@ -488,8 +489,12 @@ namespace Moui {
             ImGui::SeparatorEx(ImGuiSeparatorFlags_Horizontal, 5.0);
 
             ImGui::SetCursorPos(ImVec2(win_w - button_size.x - element_pos.x, win_h - button_size.y - element_pos.y * 2));
-            if (ImGui::Button(u8"确定", button_size))
+            if (ImGui::Button(u8"确定", button_size) || ImGui::IsKeyDown(ImGuiKey_Enter))
             {
+                std::cout << ImGui::IsKeyPressed(ImGuiKey_Enter, false) << std::endl;
+                bool f = ImGui::IsKeyReleased(ImGuiKey_Enter);
+                bool ff = ImGui::IsKeyPressed(ImGuiKey_Enter);
+                std::cout << ff << std::endl;
                 // 调用新建文件函数
                 if (!FileManage::FileManageRenameFile(FileOperate::UTF8_To_string(name_buff), current_path))
                 {

@@ -21,7 +21,7 @@ namespace MysqlOperate {
 	void PasteMysqlFileData(const std::filesystem::path& old_path, const std::filesystem::path& new_path, 
 		const std::filesystem::path& to_path, const char* database_table_name, const char* temp_table_name);
 
-	void DeleteMysqlFileData(const std::filesystem::path& delete_path, const char* database_table_name);
+	void DeleteMysqlFileData(const std::filesystem::path& delete_path, const char* database_table_name, const bool& bin_flag = false);
 	void ChangeMysqlFileData(const std::filesystem::path& old_path, const std::filesystem::path& new_path, const char* database_table_name);
 
 	class FileDataStream

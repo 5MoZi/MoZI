@@ -8,6 +8,7 @@
 #include "MoIcon.h"
 #include "FileManage.h"
 #include "MoziPage.h"
+#include "MoDubug.h"
 
 namespace MoziPage{
 
@@ -16,9 +17,8 @@ namespace MoziPage{
 //                                  全局参数
 //-----------------------------------------------------------------------------
     // 界面打开标志位
-    static bool sourse_open = true;             // 资源管理器页面
-    static bool property_open = false;          // 详细页面
-    static bool content_open = true;            // 显示页面
+    static bool sourse_open = true;             // 资源管理器页面开启标志位
+    static bool debug_display_open = false;           // debug显示页面开启标志位
 
 
     // 路径参数
@@ -43,6 +43,9 @@ namespace MoziPage{
     static bool cut_file_flag = false;                          // 剪切文件标志位
     static bool paste_file_flag = false;                        // 粘贴文件标志位
     static bool rename_file_flag = false;                       // 重命名文件标志位
+
+
+    static MoDebug::DubugDisplay debug_display;
 
 
     // MoZIApp初始化
@@ -140,6 +143,7 @@ namespace MoziPage{
         if (ImGui::BeginMenu(HONEPAGENAME_WINDOWS))
         {
             ImGui::MenuItem(HONEPAGENAME_SUBWINDOWS_SOURSEPAGE, NULL, &sourse_open);
+            ImGui::MenuItem(HONEPAGENAME_SUBWINDOWS_DEBUG_DISPLAY, "F1", &debug_display_open);
             ImGui::EndMenu();
         }
     }
@@ -163,6 +167,13 @@ namespace MoziPage{
 
             ImGui::EndMenu();
         }
+    }
+
+    // 主页快捷键
+    static void HomePageHotKeys()
+    {
+        if (ImGui::IsKeyPressed(ImGuiKey_F1))debug_display_open = !debug_display_open;
+
     }
 
     // 主页
@@ -213,7 +224,7 @@ namespace MoziPage{
         // 主页主栏设置
         if (ImGui::BeginMainMenuBar())
         {
-            HomePageMainMenuBarFile();
+            //HomePageMainMenuBarFile();
             HomePageMainMenuBarSettings();
             HomePageMainMenuBarWindows();
             HomePageMainMenuBarHelp();
@@ -245,9 +256,12 @@ namespace MoziPage{
             ImGui::EndMenuBar();
         }
 
+        // 主页快捷键
+        HomePageHotKeys();
 
         // 其他页面调用
-        SoursePage();   // 资源管理器界面
+        if(sourse_open)             SoursePage();           // 资源管理器界面
+        if(debug_display_open)      DebugDisplayPage();     // debug显示页面
 
         ImGui::End();
 	}
@@ -290,11 +304,11 @@ namespace MoziPage{
                 if (ImGui::MenuItem(SOURSEPAGE_ICON_WINDOWS_NO_MOVE)) { no_move = false; }
             }
             // 文件夹刷新
-            if (ImGui::MenuItem(SOURSEPAGE_ICON_REFLASH_FOLDER)) { /*reflash_top_file = true;*/ }
+            //if (ImGui::MenuItem(SOURSEPAGE_ICON_REFLASH_FOLDER)) { /*reflash_top_file = true;*/ }
 
-            if (ImGui::MenuItem(SOURSEPAGE_ICON_EXPAND_FOLDERS)) { /*open_all_file_action = 1;*/ }
+            //if (ImGui::MenuItem(SOURSEPAGE_ICON_EXPAND_FOLDERS)) { /*open_all_file_action = 1;*/ }
 
-            if (ImGui::MenuItem(SOURSEPAGE_ICON_COLLAPSE_FOLDERS)) { /*open_all_file_action = 0;*/ }
+            //if (ImGui::MenuItem(SOURSEPAGE_ICON_COLLAPSE_FOLDERS)) { /*open_all_file_action = 0;*/ }
 
             ImGui::EndMenuBar();
         }
@@ -363,6 +377,11 @@ namespace MoziPage{
         {
             FileManage::CompleteDeleteFile(right_click_get_path);
             complete_delete_file_flag = false;
+        }
+
+        if (ImGui::IsKeyPressed(ImGuiKey_Enter))
+        {
+            debug_display.AddLog("hello");
         }
         ImGui::End();
     }
@@ -565,6 +584,84 @@ namespace MoziPage{
         }
     }
 
+//-----------------------------------------------------------------------------
+//                                  终端页面
+//-----------------------------------------------------------------------------
+
+    static void DebugDisplayPage()
+    {
+        static bool no_move = false;
+        ImGuiWindowFlags window_flags = ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_HorizontalScrollbar;
+
+        if (no_move)window_flags |= ImGuiWindowFlags_NoMove;
+
+        // sourse_open 为1时打开资源管理器页面，为0时关闭资源管理器页面
+        ImGui::SetNextWindowSize(ImVec2(520, 600));
+        if (debug_display_open)
+        {
+            ImGui::Begin(DEBUG_DISPLAY_PAGE_NAME, &debug_display_open, window_flags);
+        }
+        else
+        {
+            // 还原所有标志位
+            no_move = false;
+            return;
+        }
+
+        // 页面快捷栏
+        if (ImGui::BeginMenuBar())
+        {
+            if (no_move == false) {
+                if (ImGui::MenuItem(SOURSEPAGE_IOCN_WINDOWS_MOVE)) { no_move = true; }
+            }
+            else {
+                if (ImGui::MenuItem(SOURSEPAGE_ICON_WINDOWS_NO_MOVE)) { no_move = false; }
+            }
+            ImGui::EndMenuBar();
+        }
+        //const float footer_height_to_reserve = ImGui::GetStyle().ItemSpacing.y + ImGui::GetFrameHeightWithSpacing();
+        if (ImGui::BeginChild("ScrollingRegion", ImVec2(-FLT_MIN, 400), ImGuiChildFlags_None, ImGuiChildFlags_Border | ImGuiWindowFlags_HorizontalScrollbar))
+        {
+            // 前言区
+            ImGui::TextWrapped(u8"欢迎使用debug显示区！！！");
+
+
+            // 内容显示区
+            ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(4, 1)); // Tighten spacing
+            for (const char* item : debug_display.Items)
+            {
+                //if (!Filter.PassFilter(item))
+                //    continue;
+
+                // Normally you would store more information in your item than just a string.
+                // (e.g. make Items[] an array of structure, store color/type etc.)
+                ImVec4 color;
+                bool has_color = false;
+                if (strstr(item, "[error]")) { color = ImVec4(1.0f, 0.4f, 0.4f, 1.0f); has_color = true; }
+                else if (strncmp(item, "# ", 2) == 0) { color = ImVec4(1.0f, 0.8f, 0.6f, 1.0f); has_color = true; }
+                if (has_color)
+                    ImGui::PushStyleColor(ImGuiCol_Text, color);
+                ImGui::TextUnformatted(item);
+                if (has_color)
+                    ImGui::PopStyleColor();
+            }
+
+            // Keep up at the bottom of the scroll region if we were already at the bottom at the beginning of the frame.
+            // Using a scrollbar or mouse-wheel will take away from the bottom edge.
+            if (debug_display.ScrollToBottom || (debug_display.AutoScroll && ImGui::GetScrollY() >= ImGui::GetScrollMaxY()))
+                ImGui::SetScrollHereY(1.0f);
+            debug_display.ScrollToBottom = false;
+
+
+            ImGui::PopStyleVar();
+            ImGui::Separator();
+            // 按钮区
+            if (ImGui::SmallButton("Clear")) { debug_display.ClearLog(); }
+        }
+        ImGui::EndChild();
+
+        ImGui::End();
+    }
 
 }
 

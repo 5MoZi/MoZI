@@ -164,6 +164,16 @@ namespace FileManage {
 		LOG_INFO("DeleteFileToBin：删除文件至回收站完成");
 	}
 
+	// 回收站编号命名开发中
+	//void DeleteFileToBin(const std::filesystem::path& file_path)
+	//{
+	//	LOG_INFO("DeleteFileToBin：删除文件至回收站中...");
+	//	std::filesystem::path new_file_path = FileOperate::PasteFile(file_path, MOZI_RECYCLE_BIN_PATH, true);
+	//	MysqlOperate::PasteMysqlFileData(file_path, new_file_path, MOZI_RECYCLE_BIN_PATH, DATABASE_FILETABLE_NAME, DATABASE_TEMP_FILETABLE_NAME);
+	//	// 复制操作不需要删除原文件，而剪切操作需要
+	//	CompleteDeleteFile(file_path);
+	//	LOG_INFO("DeleteFileToBin：删除文件至回收站完成");
+	//}
 	void CompleteDeleteFile(const std::filesystem::path& target_path)
 	{
 		LOG_INFO("CompleteDeleteFile:正在删除文件：{}...", target_path.generic_string());

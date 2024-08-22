@@ -93,7 +93,7 @@ namespace Moui {
 
             // 编辑确认按键
             ImGui::SetCursorPos(ImVec2(win_w - button_size.x - element_pos.x, win_h - element_pos.y * 2));
-            if (ImGui::Button(u8"确定", button_size) || ImGui::IsKeyDown(ImGuiKey_Enter))
+            if (ImGui::Button(u8"确定", button_size))
             {
                 confirm_flag = true;
                 ImGui::CloseCurrentPopup();
@@ -262,12 +262,12 @@ namespace Moui {
 
             if (file_format == FileOperate::FileFormat_Directory)
             {
-                DoubleElementSimpleWrite(FILETREE_ICON_FOLDER, name_buff, IM_ARRAYSIZE(name_buff),
+                DoubleElementSimpleWrite(FileOperate::GetFileIcon(file_format), name_buff, IM_ARRAYSIZE(name_buff),
                     element_pos.x, element_space.x, win_w - element_pos.x, "##新建文件夹名称", element_pos.y, 1);
             }
             else
             {
-                DoubleElementSimpleWrite(FILETREE_ICON_TEXTFILE, name_buff, IM_ARRAYSIZE(name_buff),
+                DoubleElementSimpleWrite(FileOperate::GetFileIcon(file_format), name_buff, IM_ARRAYSIZE(name_buff),
                     element_pos.x, element_space.x, win_w - element_pos.x, "##新建文件名称", element_pos.y, 1);
             }
 
@@ -277,7 +277,7 @@ namespace Moui {
 
             ImGui::SetCursorPos(ImVec2(win_w - button_size.x - element_pos.x, win_h - button_size.y - element_pos.y*2));
 
-            if (ImGui::Button(u8"确定", button_size) || ImGui::IsKeyPressed((ImGuiKey_Enter, ImGuiKey_KeypadEnter),u8"AddNewFilePopup-确认"))
+            if (ImGui::Button(u8"确定", button_size) || ImGui::IsKeyPressed(ImGuiKey_Enter) || ImGui::IsKeyPressed(ImGuiKey_KeypadEnter))
             {
                 // 调用新建文件函数
                 if (!FileManage::NewBuildFile(FileOperate::UTF8_To_string(name_buff), file_format, current_path))
@@ -433,7 +433,6 @@ namespace Moui {
         // 编辑确认按键
         static bool rename_flag = false;
 
-
         /*-------------------------窗口信息设置----------------------------*/
         static MoObject::MouiPopupStyle current_popup_style(0.f, 300, 500, ImVec2(30, 30), ImVec2(20, 200), ImVec2(800.0f, 30.0f), ImVec2(150, 0));
         // 窗口信息
@@ -483,18 +482,17 @@ namespace Moui {
             float win_h = ImGui::GetWindowHeight(), win_w = ImGui::GetWindowWidth();        // 窗口的实时大小
             if (win_h < window_hight || win_w < window_width)flag_ones = false;
 
-            DoubleElementSimpleWrite(FILETREE_ICON_TEXTFILE, name_buff, IM_ARRAYSIZE(name_buff),
+            //std::string File_Icon = FileOperate::TreeFileIconConnect(current_path);
+
+
+            DoubleElementSimpleWrite(FileOperate::GetFileIcon(current_path), name_buff, IM_ARRAYSIZE(name_buff),
                 element_pos.x, element_space.x, win_w - element_pos.x, "##重命名名称", element_pos.y, 1);
             ImGui::Dummy(ImVec2(0, element_pos.y));        // 与上面的距离
             ImGui::SeparatorEx(ImGuiSeparatorFlags_Horizontal, 5.0);
 
             ImGui::SetCursorPos(ImVec2(win_w - button_size.x - element_pos.x, win_h - button_size.y - element_pos.y * 2));
-            if (ImGui::Button(u8"确定", button_size) || ImGui::IsKeyDown(ImGuiKey_Enter))
+            if (ImGui::Button(u8"确定", button_size) || ImGui::IsKeyPressed(ImGuiKey_Enter) || ImGui::IsKeyPressed(ImGuiKey_KeypadEnter))
             {
-                std::cout << ImGui::IsKeyPressed(ImGuiKey_Enter, false) << std::endl;
-                bool f = ImGui::IsKeyReleased(ImGuiKey_Enter);
-                bool ff = ImGui::IsKeyPressed(ImGuiKey_Enter);
-                std::cout << ff << std::endl;
                 // 调用新建文件函数
                 if (!FileManage::FileManageRenameFile(FileOperate::UTF8_To_string(name_buff), current_path))
                 {

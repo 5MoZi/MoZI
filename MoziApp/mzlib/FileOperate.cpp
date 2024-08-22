@@ -91,6 +91,68 @@ namespace FileOperate {
         return "";
     }
 
+    // 设置对应文件夹前面的图标
+    const std::string GetFileIcon(const std::filesystem::path& file_path)
+    {
+        // 文件使用图标
+        FileOperate::FileFormat file_format = FileOperate::CheckFileFormat(file_path);
+        switch (file_format)
+        {
+        case FileOperate::FileFormat_UnknownFileFormat:
+            return FILETREE_ICON_NOFILE;
+        case FileOperate::FileFormat_Directory:
+            return FILETREE_ICON_FOLDER;
+        case FileOperate::FileFormat_TextFile:
+            return FILETREE_ICON_TEXTFILE;
+        case FileOperate::FileFormat_WordFile:
+            return FILETREE_ICON_WORD;
+        case FileOperate::FileFormat_PdfFile:
+            return FILETREE_ICON_PDF;
+        case FileOperate::FileFormat_PngFile:
+            return FILETREE_ICON_PNG;
+        case FileOperate::FileFormat_JpgFile:
+            return FILETREE_ICON_JPG;
+        case FileOperate::FileFormat_XlsxFile:
+            return FILETREE_ICON_XLSX;
+        case FileOperate::FileFormat_PptFile:
+            return FILETREE_ICON_PPT;
+        case FileOperate::FileFormat_Mp3File:
+            return FILETREE_ICON_VOICE;
+        case FileOperate::FileFormat_Mp4File:
+            return FILETREE_ICON_VIDEO;
+        }
+        return "";
+    }
+
+    const std::string GetFileIcon(const FileOperate::FileFormat& file_format)
+    {
+        switch (file_format)
+        {
+        case FileOperate::FileFormat_UnknownFileFormat:
+            return FILETREE_ICON_NOFILE;
+        case FileOperate::FileFormat_Directory:
+            return FILETREE_ICON_FOLDER;
+        case FileOperate::FileFormat_TextFile:
+            return FILETREE_ICON_TEXTFILE;
+        case FileOperate::FileFormat_WordFile:
+            return FILETREE_ICON_WORD;
+        case FileOperate::FileFormat_PdfFile:
+            return FILETREE_ICON_PDF;
+        case FileOperate::FileFormat_PngFile:
+            return FILETREE_ICON_PNG;
+        case FileOperate::FileFormat_JpgFile:
+            return FILETREE_ICON_JPG;
+        case FileOperate::FileFormat_XlsxFile:
+            return FILETREE_ICON_XLSX;
+        case FileOperate::FileFormat_PptFile:
+            return FILETREE_ICON_PPT;
+        case FileOperate::FileFormat_Mp3File:
+            return FILETREE_ICON_VOICE;
+        case FileOperate::FileFormat_Mp4File:
+            return FILETREE_ICON_VIDEO;
+        }
+        return "";
+    }
     // 扫描文件夹函数，返回其下第一层的文件夹路径和文件路径
     void ScanDirectory(std::vector<std::filesystem::path>& folder_path, std::vector<std::filesystem::path>& file_path, const std::filesystem::path& current_path)
     {
@@ -521,4 +583,59 @@ namespace FileOperate {
         return new_file_path;
     }
 
+
+//-----------------------------------------------------------------------------
+//								回收站文件编号
+//-----------------------------------------------------------------------------
+    // 编号使用标志位
+    // 如果为true则说明编号被使用，否则编号未被使用
+    static bool BinCoder[BIN_CODER_AMOUNT] = { 0 };
+
+    // 当前文件的编号的下一个未使用编号，即：
+    // bin_coder刚刚使用，则next_bin_coder=bin_coder+1；
+    // 用于减少循环数。
+    // 编号-1，用作编号全被使用的标志位
+    // 只使用正数作为编号
+    static int next_bin_coder = 0;
+    int SetBinFileCoder()
+    {
+        LOG_INFO("SetFileCoder：设置回收站文件编号中......");
+        // 循环65536次，如果循环满了后没有返回值
+        // 则说明编号全部被使用，返回-1；
+        for (int i = 0; i < BIN_CODER_AMOUNT; i++)
+        {
+            // 编号超出边界，回归至0
+            if (next_bin_coder >= BIN_CODER_AMOUNT)next_bin_coder = 0;
+
+            if (BinCoder[next_bin_coder] == false)
+            {
+                BinCoder[next_bin_coder] = true;
+                LOG_INFO("SetFileCoder：回收站文件编号设置完成");
+                return next_bin_coder++;
+            }
+            next_bin_coder++;
+        }
+        LOG_ERROR("SetFileCoder：回收站文件编号已全部被使用，请进行扩容");
+        return -1;
+    }
+    // 归还编号，当回收站文件被清除或则被剪切还原，则归还编号
+    bool ReturnBinFileCoder(const int& current_bin_coder)
+    {
+        LOG_INFO("ReturnFileCoder：归还回收站文件编号中......");
+
+        if (current_bin_coder < 0 || current_bin_coder>65535)
+        {
+            LOG_ERROR("ReturnFileCoder：编号超出范围");
+            return false;
+        }
+        else if(BinCoder[current_bin_coder] == false)
+        {
+            LOG_WARN("ReturnFileCoder：编号已归还");
+            return false;
+        }
+
+        BinCoder[current_bin_coder] = false;
+        LOG_INFO("ReturnFileCoder：归还回收站文件编号完成");
+        return true;
+    }
 }

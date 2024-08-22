@@ -169,6 +169,9 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="mzlib\MoDubug.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Use</PrecompiledHeader>
+    </ClCompile>
     <ClCompile Include="mzlib\MoObject.cpp" />
     <ClCompile Include="mzlib\MysqlOperate.cpp" />
     <ClCompile Include="mzlib\FileOperate.cpp" />
@@ -207,6 +210,7 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="mzlib\MoDubug.h" />
     <ClInclude Include="mzlib\MoObject.h" />
     <ClInclude Include="mzlib\MysqlOperate.h" />
     <ClInclude Include="mzlib\FileOperate.h" />

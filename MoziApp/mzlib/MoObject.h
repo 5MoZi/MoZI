@@ -13,10 +13,8 @@ namespace MoObject
 		std::string month;		// 月
 		std::string day;		// 日
 	};
-
     // 获取当前日期函数
 	std::string GetCurrentDate();
-
 
     // moui 弹窗格式
     typedef struct MouiPopupStyle
@@ -58,6 +56,9 @@ namespace MoObject
         ImVec2 button_size;          // 按钮尺寸
 
     }MouiPopupStyle;
+
+
+
 
 }
 

@@ -37,6 +37,9 @@
 
 #endif
 
+#define BIN_CODER_AMOUNT 65536
+
+
 // 专有文件
 #define MOZI_EXTENSION_Plan ".mzplan"		// 目标信息扩展名
 #define MOZI_EXTENSION_PLAN ".mzplan"		// 目标信息扩展名
@@ -114,6 +117,9 @@ namespace FileOperate {
 
 	// 文件树前的图标
 	const std::string TreeFileIconConnect(const std::filesystem::path& file_path);
+
+	const std::string GetFileIcon(const std::filesystem::path& file_path);
+	const std::string GetFileIcon(const FileOperate::FileFormat& file_format);
 	// 字符串与UTF8互转
 	std::string UTF8_To_string(const std::string& str);
 	std::string string_To_UTF8(const std::string& str);
@@ -144,5 +150,9 @@ namespace FileOperate {
 		const std::filesystem::path& old_path);
 	// 完全删除文件
 	void DeleteFolderOrFile(const std::filesystem::path& filepath);
+
+	int SetBinFileCoder();
+	bool ReturnBinFileCoder(const int& current_bin_coder);
+
 }
 

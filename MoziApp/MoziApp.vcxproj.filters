@@ -63,6 +63,9 @@
     <ClCompile Include="mzlib\MoObject.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="mzlib\MoDubug.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="mzlib\IconsFontAwesome6.h">
@@ -120,6 +123,9 @@
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="mzlib\MoObject.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="mzlib\MoDubug.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>

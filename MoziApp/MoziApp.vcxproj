@@ -78,6 +78,8 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
+    <OutDir>$(SolutionDir)bin\$(Configuration)-$(Platform)\</OutDir>
+    <IntDir>$(SolutionDir)bin-int\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
@@ -117,12 +119,17 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <AdditionalIncludeDirectories>$(SolutionDir)lib\fonts;$(SolutionDir)lib\GLFW\include;$(SolutionDir)MoziApp\imgui;$(SolutionDir)MoziApp\mzlib;$(SolutionDir)lib\MySQL\include;$(SolutionDir)MoziApp;</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
-      <SubSystem>Console</SubSystem>
+      <SubSystem>Windows</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>$(SolutionDir)lib\GLFW\lib_vc2022;$(SolutionDir)lib\MySQL\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>glfw3.lib;opengl32.lib;libmysql.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <EntryPointSymbol>mainCRTStartup</EntryPointSymbol>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -155,20 +162,20 @@
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;PUBLIC_VERSION;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>$(SolutionDir)lib\fonts;$(SolutionDir)lib\GLFW\include;$(SolutionDir)MoziApp\imgui;$(SolutionDir)MoziApp\mzlib;$(SolutionDir)lib\MySQL\include;$(SolutionDir)MoziApp;$(SolutionDir)lib\spdlog\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)lib\fonts;$(SolutionDir)lib\GLFW\include;$(SolutionDir)MoziApp\imgui;$(SolutionDir)MoziApp\mzlib;$(SolutionDir)lib\MySQL\include;$(SolutionDir)MoziApp;$(SolutionDir)lib\fonts;$(SolutionDir)lib\GLFW\include;$(SolutionDir)MoziApp\imgui;$(SolutionDir)MoziApp\mzlib;$(SolutionDir)lib\MySQL\include;$(SolutionDir)MoziApp;$(SolutionDir)lib\spdlog\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
-      <SubSystem>Console</SubSystem>
+      <SubSystem>Windows</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>$(SolutionDir)lib\GLFW\lib_vc2022;$(SolutionDir)lib\MySQL\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>glfw3.lib;opengl32.lib;libmysql.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <EntryPointSymbol>
-      </EntryPointSymbol>
+      <EntryPointSymbol>mainCRTStartup</EntryPointSymbol>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="mzlib\MoImage.cpp" />
     <ClCompile Include="mzlib\MoDubug.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Use</PrecompiledHeader>
     </ClCompile>
@@ -210,6 +217,7 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="mzlib\MoImage.h" />
     <ClInclude Include="mzlib\MoDubug.h" />
     <ClInclude Include="mzlib\MoObject.h" />
     <ClInclude Include="mzlib\MysqlOperate.h" />
@@ -230,6 +238,7 @@
     <ClInclude Include="src\FileManage.h" />
     <ClInclude Include="src\Moui.h" />
     <ClInclude Include="src\MoziPage.h" />
+    <ClInclude Include="mzlib\stb_image.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

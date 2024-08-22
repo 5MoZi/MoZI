@@ -3,9 +3,14 @@
 #define MOZI_VERSION "0.1"
 
 #define SOURSE_PAGE_NAME			u8"文件资源管理器"
-#define DEBUG_DISPLAY_PAGE_NAME	    u8"debug显示页面"
+#define DEBUG_DISPLAY_PAGE_NAME	    u8"Debug显示页面"
 #define PROPERTY_PAGE_NAME			u8"详情页面"
 #define CONTENT_PAGE_NAME			u8"显示页面"
+
+
+//extern int my_image_width;
+//extern int my_image_height;
+//extern GLuint my_image_texture;
 
 namespace MoziPage {
 

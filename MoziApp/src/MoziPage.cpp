@@ -10,6 +10,11 @@
 #include "MoziPage.h"
 #include "MoDubug.h"
 
+
+//int my_image_width = 0;
+//int my_image_height = 0;
+//GLuint my_image_texture = 0;
+//ImGui::Image((void*)(intptr_t)my_image_texture, ImVec2(my_image_width, my_image_height));
 namespace MoziPage{
 
 
@@ -18,7 +23,7 @@ namespace MoziPage{
 //-----------------------------------------------------------------------------
     // 界面打开标志位
     static bool sourse_open = true;             // 资源管理器页面开启标志位
-    static bool debug_display_open = false;           // debug显示页面开启标志位
+    static bool debug_display_open = true;           // debug显示页面开启标志位
 
 
     // 路径参数
@@ -45,7 +50,7 @@ namespace MoziPage{
     static bool rename_file_flag = false;                       // 重命名文件标志位
 
 
-    static MoDebug::DubugDisplay debug_display;
+    //static MoDebug::DubugDisplay debug_display;
 
 
     // MoZIApp初始化
@@ -208,6 +213,7 @@ namespace MoziPage{
 
 
         ImGui::Begin("MoziApp DockSpace", 0, window_flags);
+
         if (!opt_padding)
             ImGui::PopStyleVar();
         if (opt_fullscreen)
@@ -274,7 +280,7 @@ namespace MoziPage{
     static void SoursePage()
     {
         static bool no_move = false;
-        ImGuiWindowFlags window_flags = ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_HorizontalScrollbar;
+        ImGuiWindowFlags window_flags = ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_HorizontalScrollbar| ImGuiWindowFlags_NoBackground;
 
         if (no_move)window_flags |= ImGuiWindowFlags_NoMove;
 
@@ -379,9 +385,9 @@ namespace MoziPage{
             complete_delete_file_flag = false;
         }
 
-        if (ImGui::IsKeyPressed(ImGuiKey_Enter))
+        if (ImGui::IsKeyPressed(ImGuiKey_Keypad0))
         {
-            debug_display.AddLog("hello");
+            mde::ddp("hello%s", "asfas");
         }
         ImGui::End();
     }
@@ -585,18 +591,25 @@ namespace MoziPage{
     }
 
 //-----------------------------------------------------------------------------
-//                                  终端页面
+//                                  debug显示页面
 //-----------------------------------------------------------------------------
 
     static void DebugDisplayPage()
     {
+        static bool is_display = true;
         static bool no_move = false;
-        ImGuiWindowFlags window_flags = ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_HorizontalScrollbar;
+        ImGuiWindowFlags window_flags = ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_HorizontalScrollbar | ImGuiWindowFlags_NoBackground;
 
         if (no_move)window_flags |= ImGuiWindowFlags_NoMove;
 
         // sourse_open 为1时打开资源管理器页面，为0时关闭资源管理器页面
-        ImGui::SetNextWindowSize(ImVec2(520, 600));
+        // 最小弹窗大小设置
+        static bool flag_ones = false;
+        if (flag_ones == false)
+        {
+            ImGui::SetNextWindowSize(ImVec2(700, 500));
+            flag_ones = true;
+        }
         if (debug_display_open)
         {
             ImGui::Begin(DEBUG_DISPLAY_PAGE_NAME, &debug_display_open, window_flags);
@@ -607,38 +620,35 @@ namespace MoziPage{
             no_move = false;
             return;
         }
+        // 窗口最小的大小为1000*1000
+        float win_h = ImGui::GetWindowHeight(), win_w = ImGui::GetWindowWidth();        // 窗口的实时大小
+        if (win_h < 400 || win_w < 700)flag_ones = false;
 
-        // 页面快捷栏
-        if (ImGui::BeginMenuBar())
+        // 前言区
+        ImGui::TextWrapped(u8"欢迎使用MoZI中的debug显示区！！！");
+        ImGui::Separator();
+        //ImGui::SameLine();
+        // 过滤器使用
+        mde::ddp.Filter.Draw("Filter##DebugDisplayPage", win_w - 70);
+        ImGui::Separator();
+
+
+        // 内容显示区
+        const float footer_height_to_reserve = ImGui::GetStyle().ItemSpacing.y + ImGui::GetFrameHeightWithSpacing();
+        if (ImGui::BeginChild("##DebugDisplayPage_DisplayRegion", ImVec2(0, -footer_height_to_reserve), ImGuiChildFlags_None, ImGuiChildFlags_Border | ImGuiWindowFlags_HorizontalScrollbar))
         {
-            if (no_move == false) {
-                if (ImGui::MenuItem(SOURSEPAGE_IOCN_WINDOWS_MOVE)) { no_move = true; }
-            }
-            else {
-                if (ImGui::MenuItem(SOURSEPAGE_ICON_WINDOWS_NO_MOVE)) { no_move = false; }
-            }
-            ImGui::EndMenuBar();
-        }
-        //const float footer_height_to_reserve = ImGui::GetStyle().ItemSpacing.y + ImGui::GetFrameHeightWithSpacing();
-        if (ImGui::BeginChild("ScrollingRegion", ImVec2(-FLT_MIN, 400), ImGuiChildFlags_None, ImGuiChildFlags_Border | ImGuiWindowFlags_HorizontalScrollbar))
-        {
-            // 前言区
-            ImGui::TextWrapped(u8"欢迎使用debug显示区！！！");
-
-
-            // 内容显示区
             ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(4, 1)); // Tighten spacing
-            for (const char* item : debug_display.Items)
+            for (const char* item : mde::ddp.Items)
             {
-                //if (!Filter.PassFilter(item))
-                //    continue;
+                // 过滤器使用
+                if (!mde::ddp.Filter.PassFilter(item))
+                    continue;
 
-                // Normally you would store more information in your item than just a string.
-                // (e.g. make Items[] an array of structure, store color/type etc.)
                 ImVec4 color;
                 bool has_color = false;
                 if (strstr(item, "[error]")) { color = ImVec4(1.0f, 0.4f, 0.4f, 1.0f); has_color = true; }
-                else if (strncmp(item, "# ", 2) == 0) { color = ImVec4(1.0f, 0.8f, 0.6f, 1.0f); has_color = true; }
+                else if (strncmp(item, "Mozi->: ", 8) == 0) { color = ImVec4(0.807f, 0.014f, 1.0f, 0.784f); has_color = true; }
+                //else if (strncmp(item, "Mozi->: ", 8) == 0) { color = ImVec4(1.0f, 0.8f, 0.6f, 1.0f); has_color = true; }
                 if (has_color)
                     ImGui::PushStyleColor(ImGuiCol_Text, color);
                 ImGui::TextUnformatted(item);
@@ -646,20 +656,56 @@ namespace MoziPage{
                     ImGui::PopStyleColor();
             }
 
-            // Keep up at the bottom of the scroll region if we were already at the bottom at the beginning of the frame.
-            // Using a scrollbar or mouse-wheel will take away from the bottom edge.
-            if (debug_display.ScrollToBottom || (debug_display.AutoScroll && ImGui::GetScrollY() >= ImGui::GetScrollMaxY()))
+            if (mde::ddp.ScrollToBottom || (mde::ddp.AutoScroll && ImGui::GetScrollY() >= ImGui::GetScrollMaxY()))
                 ImGui::SetScrollHereY(1.0f);
-            debug_display.ScrollToBottom = false;
+            mde::ddp.ScrollToBottom = false;
 
 
             ImGui::PopStyleVar();
-            ImGui::Separator();
-            // 按钮区
-            if (ImGui::SmallButton("Clear")) { debug_display.ClearLog(); }
+
         }
         ImGui::EndChild();
+        ImGui::Separator();
+        // Command-line
+        bool reclaim_focus = false;
+        ImGuiInputTextFlags input_text_flags = ImGuiInputTextFlags_EnterReturnsTrue | ImGuiInputTextFlags_EscapeClearsAll | ImGuiInputTextFlags_CallbackCompletion | ImGuiInputTextFlags_CallbackHistory;
+        if (ImGui::InputText("##DebugDisplayPage_Input", mde::ddp.InputBuf, IM_ARRAYSIZE(mde::ddp.InputBuf), input_text_flags, &mde::ddp.TextEditCallbackStub, &mde::ddp))
+        {
+            char* s = mde::ddp.InputBuf;
+            mde::ddp.Strtrim(s);
+            if (s[0])
+                mde::ddp.ExecCommand(s);
+            strcpy_s(s, 256, "");
+            reclaim_focus = true;
+        }
 
+        // Auto-focus on window apparition
+        ImGui::SetItemDefaultFocus();
+        if (reclaim_focus)
+            ImGui::SetKeyboardFocusHere(-1); // Auto focus previous widget
+
+        // 按钮区
+        ImGui::SameLine(0, 10);
+        ImGui::SetCursorPosX(ImGui::GetWindowWidth()-220);
+        if (is_display)
+        {
+            if (ImGui::Button("Stop##debug_display", ImVec2(100, 0))) 
+            { 
+                mde::ddp.StopDisplay();
+                is_display = false;
+            }
+        }
+        else
+        {
+            if (ImGui::Button("Begin##debug_display", ImVec2(100, 0)))
+            {
+                mde::ddp.BeginDisplay();
+                is_display = true;
+            }
+        }
+        
+        ImGui::SameLine(0, 10);
+        if (ImGui::Button("Clear##debug_display", ImVec2(100, 0))) { mde::ddp.ClearLog(); }
         ImGui::End();
     }
 

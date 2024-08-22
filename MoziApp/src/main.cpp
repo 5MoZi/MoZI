@@ -9,6 +9,7 @@
 
 #include "Log.h"
 
+#include "MoImage.h"
 #define APP_NAME u8"MoZI"
 
 /*************************关闭终端的方法*******************************/
@@ -71,6 +72,11 @@ int main()
 
     MoziPage::MoziAppInit();
 
+    //int my_image_width = 0;
+    //int my_image_height = 0;
+    //GLuint my_image_texture = 0;
+    //bool ret = MoImage::LoadTextureFromFile("C:\\Users\\MoZI\\Desktop\\x.jpg", &my_image_texture, &my_image_width, &my_image_height);
+    //IM_ASSERT(ret);
     //-----------------------------------------------------------------------------
     //                               循环主体
     //-----------------------------------------------------------------------------
@@ -85,10 +91,18 @@ int main()
 
         //// 前面都是初始化操作与设定，下面才是程序运行部分
         ///*******************UI运行与程序部分***********************/
+
         MoziPage::HomePage();
         if (show_demo_window)
             ImGui::ShowDemoWindow(&show_demo_window);
 
+ 
+
+        //ImGui::Begin("OpenGL Texture Text");
+        //ImGui::Text("pointer = %x", my_image_texture);
+        //ImGui::Text("size = %d x %d", my_image_width, my_image_height);
+        //ImGui::Image((void*)(intptr_t)my_image_texture, ImVec2(my_image_width, my_image_height));
+        //ImGui::End();
         ///********************************************************/
 
         // Rendering

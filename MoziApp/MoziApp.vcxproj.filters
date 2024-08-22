@@ -66,6 +66,9 @@
     <ClCompile Include="mzlib\MoDubug.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="mzlib\MoImage.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="mzlib\IconsFontAwesome6.h">
@@ -126,6 +129,12 @@
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="mzlib\MoDubug.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="mzlib\MoImage.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="mzlib\stb_image.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>

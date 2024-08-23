@@ -69,6 +69,9 @@
     <ClCompile Include="mzlib\MoImage.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="mzlib\markdown.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="mzlib\IconsFontAwesome6.h">
@@ -135,6 +138,12 @@
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="mzlib\stb_image.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="imgui\imgui_markdown.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="mzlib\markdown.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>

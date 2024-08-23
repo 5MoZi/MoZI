@@ -280,7 +280,7 @@ namespace MoziPage{
     static void SoursePage()
     {
         static bool no_move = false;
-        ImGuiWindowFlags window_flags = ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_HorizontalScrollbar| ImGuiWindowFlags_NoBackground;
+        ImGuiWindowFlags window_flags = ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_HorizontalScrollbar;
 
         if (no_move)window_flags |= ImGuiWindowFlags_NoMove;
 
@@ -598,7 +598,7 @@ namespace MoziPage{
     {
         static bool is_display = true;
         static bool no_move = false;
-        ImGuiWindowFlags window_flags = ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_HorizontalScrollbar | ImGuiWindowFlags_NoBackground;
+        ImGuiWindowFlags window_flags = ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_HorizontalScrollbar;
 
         if (no_move)window_flags |= ImGuiWindowFlags_NoMove;
 

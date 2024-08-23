@@ -10,6 +10,9 @@
 #include "Log.h"
 
 #include "MoImage.h"
+
+#include "markdown.h"
+
 #define APP_NAME u8"MoZI"
 
 /*************************关闭终端的方法*******************************/
@@ -95,7 +98,7 @@ int main()
         MoziPage::HomePage();
         if (show_demo_window)
             ImGui::ShowDemoWindow(&show_demo_window);
-
+        MarkdownExample();
  
 
         //ImGui::Begin("OpenGL Texture Text");

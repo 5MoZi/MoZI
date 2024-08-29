@@ -140,7 +140,7 @@
     <ClInclude Include="mzlib\stb_image.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="imgui\imgui_markdown.h">
+    <ClInclude Include="Markdown\imgui_markdown.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="mzlib\markdown.h">

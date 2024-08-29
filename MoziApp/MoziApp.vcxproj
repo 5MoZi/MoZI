@@ -99,7 +99,7 @@
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>$(SolutionDir)lib\fonts;$(SolutionDir)lib\GLFW\include;$(SolutionDir)MoziApp\imgui;$(SolutionDir)MoziApp\mzlib;$(SolutionDir)lib\MySQL\include;$(SolutionDir)MoziApp;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)lib\fonts;$(SolutionDir)lib\GLFW\include;$(SolutionDir)MoziApp\imgui;$(SolutionDir)MoziApp\mzlib;$(SolutionDir)lib\MySQL\include;$(SolutionDir)MoziApp\Markdown;$(SolutionDir)MoziApp;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>mzpch.h</PrecompiledHeaderFile>
     </ClCompile>
@@ -120,7 +120,7 @@
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>$(SolutionDir)lib\fonts;$(SolutionDir)lib\GLFW\include;$(SolutionDir)MoziApp\imgui;$(SolutionDir)MoziApp\mzlib;$(SolutionDir)lib\MySQL\include;$(SolutionDir)MoziApp;</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)lib\fonts;$(SolutionDir)lib\GLFW\include;$(SolutionDir)MoziApp\imgui;$(SolutionDir)MoziApp\mzlib;$(SolutionDir)lib\MySQL\include;$(SolutionDir)MoziApp\Markdown;$(SolutionDir)MoziApp;</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -139,7 +139,7 @@
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;BETA_VERSION;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>$(SolutionDir)lib\fonts;$(SolutionDir)lib\GLFW\include;$(SolutionDir)MoziApp\imgui;$(SolutionDir)MoziApp\mzlib;$(SolutionDir)lib\MySQL\include;$(SolutionDir)MoziApp;$(SolutionDir)lib\spdlog\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)lib\fonts;$(SolutionDir)lib\GLFW\include;$(SolutionDir)MoziApp\imgui;$(SolutionDir)MoziApp\mzlib;$(SolutionDir)lib\MySQL\include;$(SolutionDir)MoziApp\Markdown;$(SolutionDir)MoziApp;$(SolutionDir)lib\spdlog\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>mopch.h</PrecompiledHeaderFile>
     </ClCompile>
@@ -162,7 +162,7 @@
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;PUBLIC_VERSION;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>$(SolutionDir)lib\fonts;$(SolutionDir)lib\GLFW\include;$(SolutionDir)MoziApp\imgui;$(SolutionDir)MoziApp\mzlib;$(SolutionDir)lib\MySQL\include;$(SolutionDir)MoziApp;$(SolutionDir)lib\fonts;$(SolutionDir)lib\GLFW\include;$(SolutionDir)MoziApp\imgui;$(SolutionDir)MoziApp\mzlib;$(SolutionDir)lib\MySQL\include;$(SolutionDir)MoziApp;$(SolutionDir)lib\spdlog\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)lib\fonts;$(SolutionDir)lib\GLFW\include;$(SolutionDir)MoziApp\imgui;$(SolutionDir)MoziApp\mzlib;$(SolutionDir)lib\MySQL\include;$(SolutionDir)MoziApp\Markdown;$(SolutionDir)MoziApp;$(SolutionDir)lib\fonts;$(SolutionDir)lib\GLFW\include;$(SolutionDir)MoziApp\imgui;$(SolutionDir)MoziApp\mzlib;$(SolutionDir)lib\MySQL\include;$(SolutionDir)MoziApp;$(SolutionDir)lib\spdlog\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -218,7 +218,7 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="imgui\imgui_markdown.h" />
+    <ClInclude Include="Markdown\imgui_markdown.h" />
     <ClInclude Include="mzlib\markdown.h" />
     <ClInclude Include="mzlib\MoImage.h" />
     <ClInclude Include="mzlib\MoDubug.h" />

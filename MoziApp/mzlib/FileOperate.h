@@ -48,11 +48,11 @@
 
 
 // 文件扩展名宏定义
-#define FILE_EXTENSION_FOLDER	""			// 文本夹扩展名（文件夹则为空值）
-#define FILE_EXTENSION_TXT		".txt"		// 文本文件扩展名
-#define FILE_EXTENSION_WORD		".docx"		// word文档扩展名
-#define FILE_EXTENSION_PPT		".pptx"		// ppt扩展名
-
+#define FILE_EXTENSION_FOLDER		""			// 文本夹扩展名（文件夹则为空值）
+#define FILE_EXTENSION_TXT			".txt"		// 文本文件扩展名
+#define FILE_EXTENSION_WORD			".docx"		// word文档扩展名
+#define FILE_EXTENSION_PPT			".pptx"		// ppt扩展名
+#define FILE_EXTENSION_MARKDOWN		".md"		// Markdown扩展名
 namespace FileOperate {
 
 	enum FileFormat
@@ -71,6 +71,7 @@ namespace FileOperate {
 		FileFormat_TextFile,
 		FileFormat_WordFile,
 		FileFormat_PdfFile,
+		FileFormat_MarkdownFile,
 		// 图片类文件
 		FileFormat_PngFile,
 		FileFormat_JpgFile,
@@ -103,10 +104,11 @@ namespace FileOperate {
 		void LookFolderMap();
 
 		// 获取双击后的文件夹路径
-		void BuildFolderTree(const std::filesystem::path& current_path,
-			const bool& tree_node_open, std::filesystem::path& double_click_get_path);
+		void BuildFolderTree(const std::filesystem::path& current_path, const bool& tree_node_open,
+			std::filesystem::path& double_click_get_path, std::filesystem::path& temp_markdown_path);
 	private:
 		static std::map<std::filesystem::path, bool> folder_map;
+		std::filesystem::path file_path;
 	};
 
 

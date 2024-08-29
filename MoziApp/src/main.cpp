@@ -98,7 +98,6 @@ int main()
         MoziPage::HomePage();
         if (show_demo_window)
             ImGui::ShowDemoWindow(&show_demo_window);
-        MarkdownExample();
  
 
         //ImGui::Begin("OpenGL Texture Text");

@@ -24,8 +24,9 @@ namespace FileOperate {
     }
     // 文件格式的映射
     const static std::map<std::filesystem::path, FileFormat> file_format
-    {
+    { 
         {"",FileFormat_Directory},
+        {".md",FileFormat_MarkdownFile},
         {".txt",FileFormat_TextFile},
         {".docx",FileFormat_WordFile},
         {".pdf",FileFormat_PdfFile},
@@ -51,10 +52,11 @@ namespace FileOperate {
     {
         switch (file_format)
         {
-        case FileOperate::FileFormat_Directory:	return FILE_EXTENSION_FOLDER;
-        case FileOperate::FileFormat_TextFile:	return FILE_EXTENSION_TXT; 
-        case FileOperate::FileFormat_WordFile:	return FILE_EXTENSION_WORD;
-        case FileOperate::FileFormat_PptFile:	return FILE_EXTENSION_PPT;
+        case FileOperate::FileFormat_Directory:	        return FILE_EXTENSION_FOLDER;
+        case FileOperate::FileFormat_TextFile:	        return FILE_EXTENSION_TXT; 
+        case FileOperate::FileFormat_WordFile:	        return FILE_EXTENSION_WORD;
+        case FileOperate::FileFormat_PptFile:	        return FILE_EXTENSION_PPT;
+        case FileOperate::FileFormat_MarkdownFile:	    return FILE_EXTENSION_MARKDOWN;
         default: break;
         }
     }
@@ -87,6 +89,9 @@ namespace FileOperate {
             return IconAndChinese(FILETREE_ICON_VOICE, file_path.filename().generic_u8string(), 1);
         case FileOperate::FileFormat_Mp4File:
             return IconAndChinese(FILETREE_ICON_VIDEO, file_path.filename().generic_u8string(), 1);
+        case FileOperate::FileFormat_MarkdownFile:
+            return IconAndChinese(FILETREE_ICON_MARKDOWN, file_path.filename().generic_u8string(), 1);
+            
         }
         return "";
     }
@@ -120,6 +125,8 @@ namespace FileOperate {
             return FILETREE_ICON_VOICE;
         case FileOperate::FileFormat_Mp4File:
             return FILETREE_ICON_VIDEO;
+        case FileOperate::FileFormat_MarkdownFile:
+            return FILETREE_ICON_MARKDOWN;
         }
         return "";
     }
@@ -150,6 +157,8 @@ namespace FileOperate {
             return FILETREE_ICON_VOICE;
         case FileOperate::FileFormat_Mp4File:
             return FILETREE_ICON_VIDEO;
+        case FileOperate::FileFormat_MarkdownFile:
+            return FILETREE_ICON_MARKDOWN;
         }
         return "";
     }
@@ -302,7 +311,8 @@ namespace FileOperate {
         return;
     }
 
-    void FolderMap::BuildFolderTree(const std::filesystem::path& current_path, const bool& tree_node_open, std::filesystem::path& double_click_get_path)
+    void FolderMap::BuildFolderTree(const std::filesystem::path& current_path, const bool& tree_node_open,
+        std::filesystem::path& double_click_get_path, std::filesystem::path& temp_markdown_path)
     {
         // 初始化上一个路径
         static std::filesystem::path last_path = STORAGE_PATH;
@@ -334,8 +344,16 @@ namespace FileOperate {
                 // 双击打开文件
                 if (!std::filesystem::is_directory(current_path))
                 {
-                    ShellExecute(NULL, L"open", current_path.generic_wstring().c_str(), NULL, NULL, SW_SHOW);
+                    if ((CheckFileFormat(current_path) == FileFormat_MarkdownFile)||(CheckFileFormat(current_path) == FileFormat_TextFile))
+                    {
+                        temp_markdown_path = current_path;
+                    }
+                    else
+                    {
+                        ShellExecute(NULL, L"open", current_path.generic_wstring().c_str(), NULL, NULL, SW_SHOW);
+                    }
                 }
+
                 return;
             }
             // 状态由1->0即文件打开
@@ -348,7 +366,14 @@ namespace FileOperate {
                 // 双击打开文件
                 if (!std::filesystem::is_directory(current_path))
                 {
-                    ShellExecute(NULL, L"open", current_path.generic_wstring().c_str(), NULL, NULL, SW_SHOW);
+                    if ((CheckFileFormat(current_path) == FileFormat_MarkdownFile) || (CheckFileFormat(current_path) == FileFormat_TextFile))
+                    {
+                        temp_markdown_path = current_path;
+                    }
+                    else
+                    {
+                        ShellExecute(NULL, L"open", current_path.generic_wstring().c_str(), NULL, NULL, SW_SHOW);
+                    }
                 }
                 return;
             }

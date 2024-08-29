@@ -11,6 +11,8 @@
 #include "MoDubug.h"
 
 
+#include "Markdown.h"
+#include "TextEditor.h"
 //int my_image_width = 0;
 //int my_image_height = 0;
 //GLuint my_image_texture = 0;
@@ -23,9 +25,9 @@ namespace MoziPage{
 //-----------------------------------------------------------------------------
     // 界面打开标志位
     static bool sourse_open = true;             // 资源管理器页面开启标志位
-    static bool debug_display_open = true;           // debug显示页面开启标志位
-
-
+    static bool debug_display_open = false;      // debug显示页面开启标志位
+    static bool text_editor_open = true;        // 文本编辑页面
+    static bool markdown_display_open = true;   // markdown显示界面
     // 路径参数
     static std::filesystem::path double_click_get_path = STORAGE_PATH;       // 获取双击文件夹后，该文件夹的路径
     static std::filesystem::path right_click_get_path  = STORAGE_PATH;       // 获取右击文件夹后，该文件夹的路径
@@ -49,8 +51,37 @@ namespace MoziPage{
     static bool paste_file_flag = false;                        // 粘贴文件标志位
     static bool rename_file_flag = false;                       // 重命名文件标志位
 
+    
+    //static TextEditor text_editor("C:\\Users\\MoZI\\Desktop\\MoZI\\storage\\1\\123.md");          // 文本编辑器
+    static TextEditor text_editor(STORAGE_PATH);          // 文本编辑器
 
-    //static MoDebug::DubugDisplay debug_display;
+    static void TextEditorPage()
+    {
+        ImGui::SetNextWindowSize(ImVec2(700, 500), ImGuiCond_FirstUseEver);
+        if (text_editor_open)
+            ImGui::Begin(TEXT_EDITOR_PAGE_NAME, &text_editor_open, ImGuiWindowFlags_HorizontalScrollbar);
+        else return;
+
+        text_editor.TextEditorBegin();
+
+        ImGui::End();
+    }
+
+    static void MarkdownDisplayPage()
+    {
+
+        ImGui::SetNextWindowSize(ImVec2(700, 500), ImGuiCond_FirstUseEver);
+        if (markdown_display_open)
+            ImGui::Begin(MARKDOWN_DISPLAY_PAGE_NAME, &markdown_display_open, 
+                ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_HorizontalScrollbar);
+        else return;
+
+        // 如果文件是空的则不进行显示，并且文件需要问md后缀的文件才能使用
+        if (!text_editor.GetContent().empty() && (text_editor.file_extension_flag == TextEditor::TextExtensionFlag_Markdown))
+            Markdown::MarkdownBegin(text_editor.GetContent());
+
+        ImGui::End();
+    }
 
 
     // MoZIApp初始化
@@ -266,9 +297,10 @@ namespace MoziPage{
         HomePageHotKeys();
 
         // 其他页面调用
-        if(sourse_open)             SoursePage();           // 资源管理器界面
-        if(debug_display_open)      DebugDisplayPage();     // debug显示页面
-
+        if(sourse_open)             SoursePage();               // 资源管理器界面
+        if(debug_display_open)      DebugDisplayPage();         // debug显示页面
+        if(text_editor_open)        TextEditorPage();           // 文本编辑页面
+        if(markdown_display_open)   MarkdownDisplayPage();      // Markdown显示页面
         ImGui::End();
 	}
 
@@ -532,7 +564,8 @@ namespace MoziPage{
             RightFolderPopup(folder_only_flag.c_str(), ImGuiPopupFlags_MouseButtonRight, folder_path[i], bin_file_flag);
 
             // 双击获取当前文件夹的路径
-            folder_maper.BuildFolderTree(folder_path[i], node_open, double_click_get_path);
+            folder_maper.BuildFolderTree(folder_path[i], node_open, double_click_get_path, text_editor.file_path);
+
             if (node_open)
             {
                 OpenFolder(folder_path[i],0);
@@ -552,7 +585,7 @@ namespace MoziPage{
             RightFolderPopup(file_only_flag.c_str(), ImGuiPopupFlags_MouseButtonRight, file_path[i], bin_file_flag);
 
             // 双击获取当前文件夹的路径
-            folder_maper.BuildFolderTree(file_path[i], file_node_open, double_click_get_path);
+            folder_maper.BuildFolderTree(file_path[i], file_node_open, double_click_get_path, text_editor.file_path);
             // 关闭树节点
             if (file_node_open) ImGui::TreePop();
 

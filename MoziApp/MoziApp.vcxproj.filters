@@ -69,7 +69,10 @@
     <ClCompile Include="mzlib\MoImage.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="mzlib\markdown.cpp">
+    <ClCompile Include="Markdown\Markdown.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="TextEditor\TextEditor.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>
@@ -143,7 +146,10 @@
     <ClInclude Include="Markdown\imgui_markdown.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="mzlib\markdown.h">
+    <ClInclude Include="Markdown\Markdown.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="TextEditor\TextEditor.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>

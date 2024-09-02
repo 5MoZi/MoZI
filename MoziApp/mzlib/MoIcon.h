@@ -106,7 +106,7 @@
 #define SOURSEPAGE_FOLDER_POPUP_PASTE					Moui::IconAndChinese(ICON_FA_PASTE, u8"粘贴").c_str()
 #define SOURSEPAGE_FOLDER_POPUP_DELETE					Moui::IconAndChinese(ICON_FA_XMARK, u8"删除").c_str()	
 #define SOURSEPAGE_FOLDER_POPUP_RENAME					Moui::IconAndChinese(ICON_FA_FILE_SIGNATURE, u8"重命名").c_str()	
-#define SOURSEPAGE_FOLDER_POPUP_PROPERTY				Moui::IconAndChinese(ICON_FA_FILE_SIGNATURE, u8"属性").c_str()	
+#define SOURSEPAGE_FOLDER_POPUP_DOWNLOAD				Moui::IconAndChinese(ICON_FA_DOWNLOAD, u8"下载").c_str()	
 
 // 回收站右击操作
 #define SOURSEPAGE_RECYCLE_BIN_POPUP_EMPTY				Moui::IconAndChinese(ICON_FA_XMARK, u8"清空回收站").c_str()	

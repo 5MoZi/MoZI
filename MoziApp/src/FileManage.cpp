@@ -189,4 +189,30 @@ namespace FileManage {
 			FileManagePasteFile(choice_path, current, 0, 1);
 		}
 	}
+
+	// 从其他地方添加文件至资源管理器中
+	void DownloadFile(const std::filesystem::path& current)
+	{
+		std::filesystem::path choice_path;
+		wchar_t szPath[MAX_PATH];
+		memset(szPath, 0, MAX_PATH);	//清零操作
+
+		BROWSEINFO bi;
+		bi.hwndOwner = NULL; // 拥有该对话框的窗口句柄
+		bi.pidlRoot = NULL;
+		bi.pszDisplayName = szPath;
+		bi.lpszTitle = L"请选择需要的文件：";
+		bi.ulFlags = BIF_BROWSEINCLUDEFILES;
+		bi.lpfn = NULL;
+		bi.lParam = 0;
+		bi.iImage = 0;
+
+		//弹出选择目录对话框 
+		LPITEMIDLIST lp = SHBrowseForFolder(&bi);
+		if (lp && SHGetPathFromIDList(lp, szPath))
+		{
+			choice_path = szPath;
+			FileManagePasteFile(current, choice_path, 0, 1);
+		}
+	}
 }

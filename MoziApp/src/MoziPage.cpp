@@ -28,6 +28,7 @@ namespace MoziPage{
     static bool debug_display_open = false;      // debug显示页面开启标志位
     static bool text_editor_open = false;        // 文本编辑页面
     static bool markdown_display_open = false;   // markdown显示界面
+
     // 路径参数
     static std::filesystem::path double_click_get_path = STORAGE_PATH;       // 获取双击文件夹后，该文件夹的路径
     static std::filesystem::path right_click_get_path  = STORAGE_PATH;       // 获取右击文件夹后，该文件夹的路径
@@ -50,6 +51,10 @@ namespace MoziPage{
     static bool cut_file_flag = false;                          // 剪切文件标志位
     static bool paste_file_flag = false;                        // 粘贴文件标志位
     static bool rename_file_flag = false;                       // 重命名文件标志位
+
+    static bool add_now_file_flag = false;                      // 添加现有文件标志位
+    static bool download_file_flag = false;                     // 下载文件标志位
+
 
     static TextEditor text_editor(STORAGE_PATH);          // 文本编辑器
 
@@ -80,7 +85,6 @@ namespace MoziPage{
 
         ImGui::End();
     }
-
 
     // MoZIApp初始化
     void MoziAppInit()
@@ -354,7 +358,12 @@ namespace MoziPage{
 
 
         OpenFolder(STORAGE_PATH, true);
-
+        // 添加现有项
+        if (add_now_file_flag)
+        {
+            FileManage::SelectFile(right_click_get_path);
+            add_now_file_flag = false;
+        }
         // 打开新建文件夹弹窗
         if (add_new_file_flag)
         {
@@ -402,6 +411,13 @@ namespace MoziPage{
         {
             ShellExecute(NULL, L"open", right_click_get_path.generic_wstring().c_str(), NULL, NULL, SW_SHOW);
             open_file_flag = false;
+        }
+
+        // 下载文件
+        if (download_file_flag)
+        {
+            FileManage::DownloadFile(right_click_get_path);
+            download_file_flag = false;
         }
 
         // 删除文件
@@ -453,9 +469,14 @@ namespace MoziPage{
                 // 只有不是回收站内的文件夹才有的操作
                 if (foler_flag && !bin_file_flag)
                 {
-                    // 新建部分
+                    // 添加部分
                     if (ImGui::BeginMenu(SOURSEPAGE_FOLDER_POPUP_ADD))
                     {
+                        // 现有项
+                        if (ImGui::MenuItem(SOURSEPAGE_FOLDER_POPUP_SUBADD_ADDFILE)) {
+                            right_click_get_path = current_path;
+                            add_now_file_flag = true;
+                        }
                         // 新建文件夹
                         if (ImGui::MenuItem(SOURSEPAGE_FOLDER_POPUP_SUBADD_NEWFOLDER)) {
                             right_click_get_path = current_path;
@@ -482,6 +503,12 @@ namespace MoziPage{
                         }
                         ImGui::EndMenu();
                     }
+                }
+
+                // 文件下载操作
+                if (ImGui::MenuItem(SOURSEPAGE_FOLDER_POPUP_DOWNLOAD)) {
+                    right_click_get_path = current_path;
+                    download_file_flag = true;
                 }
 
                 // 只有文件才有的操作

@@ -22,6 +22,7 @@ namespace MoziPage {
 	static void TextEditorPage();
 	static void MarkdownDisplayPage();
 
+	static void DoubleClickedFile(const std::filesystem::path& current_path, std::filesystem::path& double_click_get_path);
 	// Ö÷Ò³²Ëµ¥À¸º¯Êý
 	static void HomePageMainMenuBarFile();
 	static void HomePageMainMenuBarSettings();

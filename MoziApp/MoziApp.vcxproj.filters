@@ -54,10 +54,10 @@
     <ClCompile Include="mzlib\Log.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="mzlib\FileOperate.cpp">
+    <ClCompile Include="FileOperate\FileOperate.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="mzlib\MysqlOperate.cpp">
+    <ClCompile Include="MysqlOperate\MysqlOperate.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="mzlib\MoObject.cpp">
@@ -125,10 +125,10 @@
     <ClInclude Include="mzlib\Log.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="mzlib\FileOperate.h">
+    <ClInclude Include="FileOperate\FileOperate.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="mzlib\MysqlOperate.h">
+    <ClInclude Include="MysqlOperate\MysqlOperate.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="mzlib\MoObject.h">
@@ -150,6 +150,9 @@
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="TextEditor\TextEditor.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="FileMacro.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>

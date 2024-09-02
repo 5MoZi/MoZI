@@ -7,7 +7,7 @@
 #include "Moui.h"
 #include "FileManage.h"
 
-
+#include "Markdown.h"
 namespace Moui {
 
 //-----------------------------------------------------------------------------
@@ -17,7 +17,9 @@ namespace Moui {
     // 字体参数
     static float current_scale = 0.f;           // 当前规模，用于处理不同dip时不同的字体大小
     static ImFont* big_font = NULL;             // 大号字体与图标，用于标题或其他需要大号字体的地方
-
+    static ImFont* markdown_H1 = NULL;
+    static ImFont* markdown_H2 = NULL;
+    static ImFont* markdown_H3 = NULL;
     // 主题参数
     static ThemeColor theme_color = Moui::ThemeColor_Light;                 // 页面默认色
     const static int theme_color_num = 3;                             // 主题颜色的数量
@@ -607,9 +609,9 @@ namespace Moui {
     {
         float xscale, yscale;
         glfwGetWindowContentScale(window, &xscale, &yscale);
-        if (xscale != current_scale) {
+        if (xscale != current_scale) 
+        {
             io.Fonts->Clear();                      // 清楚所有字体
-            //std::cout << xscale << std::endl;
             current_scale = xscale;
             /*************************** 初始字体 *****************************/
             float base_pixels = xscale * 16.0f;
@@ -630,13 +632,17 @@ namespace Moui {
             io.Fonts->AddFontFromFileTTF(ICON_BASE_FILE_PATH, base_pixels * 2.0f / 2.3f, &config, icons_ranges);
 
 
-            /*************************** 第一种字体-字体放大 *****************************/
-            float other_pixels = xscale * 35.0f;
-            big_font = io.Fonts->AddFontFromFileTTF(FONT_CHINESE_BASE_PATH, other_pixels, 0, io.Fonts->GetGlyphRangesChineseFull());
-            config.GlyphMinAdvanceX = other_pixels * 2.0f / 2.3f;
-            io.Fonts->AddFontFromFileTTF(ICON_BASE_FILE_PATH, other_pixels * 2.0f / 2.3f, &config, icons_ranges);
+            /*************************** Markdown-字体放大 *****************************/
+            float H1_pixels = xscale * 30.0f;
+            markdown_H1 = io.Fonts->AddFontFromFileTTF(FONT_CHINESE_BASE_PATH, H1_pixels, 0, io.Fonts->GetGlyphRangesChineseFull());
+            float H2_pixels = xscale * 25.0f;
+            markdown_H2 = io.Fonts->AddFontFromFileTTF(FONT_CHINESE_BASE_PATH, H2_pixels, 0, io.Fonts->GetGlyphRangesChineseFull());
+            float H3_pixels = xscale * 20.0f;
+            markdown_H3= io.Fonts->AddFontFromFileTTF(FONT_CHINESE_BASE_PATH, H3_pixels, 0, io.Fonts->GetGlyphRangesChineseFull());
             io.Fonts->Build();              // 建立字体
 
+
+            Markdown::LoadFonts(markdown_H1, markdown_H2, markdown_H3); // 将字体加载如markdown中
 
             ImGui_ImplOpenGL3_DestroyFontsTexture();
             ImGui_ImplOpenGL3_CreateFontsTexture();

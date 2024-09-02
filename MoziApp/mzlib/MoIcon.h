@@ -73,6 +73,8 @@
 #define HONEPAGENAME_WINDOWS						Moui::IconAndChinese(ICON_FA_LAYER_GROUP, u8"窗口", 1).c_str()
 #define HONEPAGENAME_SUBWINDOWS_SOURSEPAGE			Moui::IconAndChinese("", u8"文件资源管理器").c_str()
 #define HONEPAGENAME_SUBWINDOWS_DEBUG_DISPLAY		Moui::IconAndChinese("", u8"Debug显示页面").c_str()
+#define HONEPAGENAME_SUBWINDOWS_TEXT_EDITOR			Moui::IconAndChinese("", u8"文本编辑界面").c_str()
+#define HONEPAGENAME_SUBWINDOWS_MARKDOWN_DISPLAY	Moui::IconAndChinese("", u8"Markdown显示页面").c_str()
 
 // 帮助栏
 #define HONEPAGENAME_HELP			    Moui::IconAndChinese(ICON_FA_CIRCLE_QUESTION, u8"帮助", 1).c_str()

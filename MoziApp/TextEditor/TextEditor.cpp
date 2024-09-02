@@ -1,9 +1,6 @@
 #include "mopch.h"
 #include "TextEditor.h"
 
-
-
-
 void TextEditor::TextEditorBegin()
 {
     ImGui::BeginChild("MarkEditor", ImVec2(-FLT_MIN, -FLT_MIN), ImGuiChildFlags_Border, 
@@ -33,10 +30,8 @@ void TextEditor::ExtensionCheck()
     if (std::filesystem::is_regular_file(file_path))
     {
         std::filesystem::path text_extension = file_path.extension();
-        if (text_extension == TEXT_EXTENSION_TXT)
-            file_extension_flag = TextExtensionFlag_Txt;
-        else if (text_extension == TEXT_EXTENSION_MARKDOWN)
-            file_extension_flag = TextExtensionFlag_Markdown;
+        if (text_extension_map.count(text_extension) == 1)
+            file_extension_flag = text_extension_map.at(text_extension);
         else
             file_extension_flag = TextExtensionFlag_Null;
     }
@@ -70,7 +65,13 @@ std::string TextEditor::GetContent()
 {
     std::string Content;
     for (auto it = TextContent.begin(); it != TextContent.end(); it++)
-        Content += *it;
+    {
+        Content += *it; 
+        // 防止显示页面出现？？？，这是因为压入的终止符以后的字符
+        if (*it == '\0')
+            break;
+    }
+
     return Content;
 }
 

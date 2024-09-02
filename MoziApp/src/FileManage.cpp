@@ -7,12 +7,7 @@
 
 #include "MysqlOperate.h"
 
-
-
 namespace FileManage {
-	 
-
-	static FileOperate::FolderMap folder_maper;
 
 	bool NewBuildFile(const std::filesystem::path& file_name, const FileOperate::FileFormat& file_format,
 		const std::filesystem::path& target_path, const bool& forced_flag)
@@ -32,7 +27,6 @@ namespace FileManage {
 			if (forced_flag)
 			{
 				new_file_path = FileOperate::AddFile(file_name, target_path, forced_flag);
-				MysqlOperate::AddMysqlFileData(new_file_path, DATABASE_FILETABLE_NAME);
 				return true;
 			}
 			if (FileOperate::RenameCheck(file_name, target_path))
@@ -40,7 +34,6 @@ namespace FileManage {
 				return false;
 			}
 			new_file_path = FileOperate::AddFile(file_name, target_path);
-			MysqlOperate::AddMysqlFileData(new_file_path, DATABASE_FILETABLE_NAME);
 			return true;
 		}
 		// 创建文件
@@ -52,7 +45,6 @@ namespace FileManage {
 			if (forced_flag)
 			{
 				new_file_path = FileOperate::AddFile(file_name.generic_string() + file_extension, target_path, forced_flag);
-				MysqlOperate::AddMysqlFileData(new_file_path, DATABASE_FILETABLE_NAME);
 				return true;
 			}
 			if (FileOperate::RenameCheck(file_name.generic_string() + file_extension, target_path))
@@ -60,7 +52,6 @@ namespace FileManage {
 				return false;
 			}
 			new_file_path = FileOperate::AddFile(file_name.generic_string() + file_extension, target_path);
-			MysqlOperate::AddMysqlFileData(new_file_path, DATABASE_FILETABLE_NAME);
 			return true;
 		}
 	}
@@ -82,8 +73,6 @@ namespace FileManage {
 			if (forced_flag)
 			{
 				new_file_path = FileOperate::RenameFile(file_name, target_path);
-				MysqlOperate::ChangeMysqlFileData(target_path, new_file_path, DATABASE_FILETABLE_NAME);
-				folder_maper.ChangeFolderPath(target_path, new_file_path);
 				return true;
 			}
 			// 重命名检测
@@ -92,8 +81,6 @@ namespace FileManage {
 				return false;
 			}
 			new_file_path = FileOperate::RenameFile(file_name, target_path);
-			MysqlOperate::ChangeMysqlFileData(target_path, new_file_path, DATABASE_FILETABLE_NAME);
-			folder_maper.ChangeFolderPath(target_path, new_file_path);
 			return true;
 		}
 		else
@@ -105,8 +92,6 @@ namespace FileManage {
 			if (forced_flag)
 			{
 				new_file_path = FileOperate::RenameFile(file_name.generic_string() + file_extension, target_path);
-				MysqlOperate::ChangeMysqlFileData(target_path, new_file_path, DATABASE_FILETABLE_NAME);
-				folder_maper.ChangeFolderPath(target_path, new_file_path);
 				return true;
 			}
 			if (FileOperate::RenameCheck(file_name.generic_string() + file_extension, target_path, true))
@@ -114,8 +99,6 @@ namespace FileManage {
 				return false;
 			}
 			new_file_path = FileOperate::RenameFile(file_name.generic_string() + file_extension, target_path);
-			MysqlOperate::ChangeMysqlFileData(target_path, new_file_path, DATABASE_FILETABLE_NAME);
-			folder_maper.ChangeFolderPath(target_path, new_file_path);
 			return true;
 		}
 	}
@@ -132,7 +115,6 @@ namespace FileManage {
 				return false;
 			}
 			FileOperate::PasteFile(from_path, to_path);
-			MysqlOperate::PasteMysqlFileData(from_path, to_path, DATABASE_FILETABLE_NAME, DATABASE_TEMP_FILETABLE_NAME);
 			// 复制操作不需要删除原文件，而剪切操作需要
 			if(copy_cut_flag == true)
 			{
@@ -143,7 +125,6 @@ namespace FileManage {
 		else if (force_flag == true)
 		{
 			std::filesystem::path new_file_path = FileOperate::PasteFile(from_path, to_path, true);
-			MysqlOperate::PasteMysqlFileData(from_path, new_file_path, to_path, DATABASE_FILETABLE_NAME, DATABASE_TEMP_FILETABLE_NAME);
 			// 复制操作不需要删除原文件，而剪切操作需要
 			if (copy_cut_flag == true)
 			{
@@ -177,16 +158,8 @@ namespace FileManage {
 	void CompleteDeleteFile(const std::filesystem::path& target_path)
 	{
 		LOG_INFO("CompleteDeleteFile:正在删除文件：{}...", target_path.generic_string());
-		static FileOperate::FolderMap folder_maper;
 
 		// 需要注意文件删除顺序，资源管理器页面要在最后删除
-		LOG_INFO("CompleteDeleteFile：在FileMap删除文件中...");
-		folder_maper.DeleteFolderPath(target_path);
-		LOG_INFO("CompleteDeleteFile：在Mysql数据表：{}，删除文件中...", DATABASE_FILETABLE_NAME);
-		if (target_path == MOZI_RECYCLE_BIN_PATH)
-			MysqlOperate::DeleteMysqlFileData(target_path, DATABASE_FILETABLE_NAME, 1);
-		else
-			MysqlOperate::DeleteMysqlFileData(target_path, DATABASE_FILETABLE_NAME);
 		LOG_INFO("CompleteDeleteFile：在资源管理页面删除文件中...");
 		FileOperate::DeleteFolderOrFile(target_path);
 	}

@@ -5,16 +5,11 @@
 //-----------------------------------------------------------------------------
 
 
-//#define BETA_VERSION			// 内测版宏定义
-//#define PUBLIC_VERSION		// 公测版宏定义
-
 /*****解决方案与项目路径*****/
 #ifdef BETA_VERSION
 #define SOLUTION_PATH           std::filesystem::current_path().parent_path()			// 解决方案路径
 #define PROJECT_PATH			std::filesystem::current_path()							// 项目路径
 
-//#define STORAGE_PATH			"C:\\Users\\MoZI\\Desktop\\MoZI\\MoZI0.1\\storage"
-//#define MoZI_RECYCLE_BIN_PATH	"C:\\Users\\MoZI\\Desktop\\MoZI\\MoZI0.1\\storage\\回收站"		// 回收站路径
 #define STORAGE_PATH			(SOLUTION_PATH/"storage").generic_u8string().c_str()			// 存储文件路径
 #define MOZI_RECYCLE_BIN_PATH	(SOLUTION_PATH/"RecyleBin").generic_u8string().c_str()			// 回收站路径
 
@@ -39,13 +34,16 @@
 
 #define BIN_CODER_AMOUNT 65536
 
-
 // 专有文件
-#define MOZI_EXTENSION_Plan ".mzplan"		// 目标信息扩展名
-#define MOZI_EXTENSION_PLAN ".mzplan"		// 目标信息扩展名
-#define MOZI_EXTENSION_TARGET ".mztarget"	// 目标信息扩展名
 #define MOZI_RECYCLE_BIN "回收站"
 
+
+// 添加新文件后缀的操作
+// 1、利用#define的添加相对于的文件扩展
+// 2、enum FileFormat添加对应的枚举类型
+// 3、在static std::map<std::filesystem::path, FileFormat> file_format_map中添加对应的映射
+// 4、在const std::string TreeFileIconConnect函数、const std::string GetFileIcon以及其重载函数中添加相对应的功能
+// 5、在Moicon.h中添加对应的文件的icon图标
 
 // 文件扩展名宏定义
 #define FILE_EXTENSION_FOLDER		""			// 文本夹扩展名（文件夹则为空值）
@@ -53,6 +51,14 @@
 #define FILE_EXTENSION_WORD			".docx"		// word文档扩展名
 #define FILE_EXTENSION_PPT			".pptx"		// ppt扩展名
 #define FILE_EXTENSION_MARKDOWN		".md"		// Markdown扩展名
+#define FILE_EXTENSION_PDF		    ".pdf"		// pdf扩展名
+#define FILE_EXTENSION_PNG		    ".png"		// png图片扩展名
+#define FILE_EXTENSION_JPG		    ".jpg"		// jpg图片扩展名
+#define FILE_EXTENSION_EXCEL	    ".xlsx"		// excel表格扩展名
+#define FILE_EXTENSION_MP3	        ".mp3"		// mp3扩展名
+#define FILE_EXTENSION_MP4	        ".mp4"		// mp4扩展名
+
+
 namespace FileOperate {
 
 	enum FileFormat
@@ -87,31 +93,6 @@ namespace FileOperate {
 		FileFormat_MzTargetFile
 	};
 
-
-	enum FileOperateReturnFlag
-	{
-		FileOperateReturnFlag_ExistRename,
-		FileOperateReturnFlag_OperateSuccess,
-		FileOperateReturnFlag_OperateFailure
-	};
-
-	class FolderMap
-	{
-	public:
-		void AddFolderPath(const std::filesystem::path& current_path, const bool& tree_node_open);
-		void DeleteFolderPath(const std::filesystem::path& current_path);
-		void ChangeFolderPath(const std::filesystem::path& old_path, const std::filesystem::path& new_path);
-		void LookFolderMap();
-
-		// 获取双击后的文件夹路径
-		void BuildFolderTree(const std::filesystem::path& current_path, const bool& tree_node_open,
-			std::filesystem::path& double_click_get_path, std::filesystem::path& temp_markdown_path);
-	private:
-		static std::map<std::filesystem::path, bool> folder_map;
-		std::filesystem::path file_path;
-	};
-
-
 	// 识别文件格式
 	FileOperate::FileFormat CheckFileFormat(const std::filesystem::path& file_path);
 	// 识别文件后缀
@@ -120,8 +101,10 @@ namespace FileOperate {
 	// 文件树前的图标
 	const std::string TreeFileIconConnect(const std::filesystem::path& file_path);
 
+	// 获得对应文件类型的图标
 	const std::string GetFileIcon(const std::filesystem::path& file_path);
 	const std::string GetFileIcon(const FileOperate::FileFormat& file_format);
+
 	// 字符串与UTF8互转
 	std::string UTF8_To_string(const std::string& str);
 	std::string string_To_UTF8(const std::string& str);
@@ -153,6 +136,9 @@ namespace FileOperate {
 	// 完全删除文件
 	void DeleteFolderOrFile(const std::filesystem::path& filepath);
 
+//-----------------------------------------------------------------------------
+//								回收站重名编号问题
+//-----------------------------------------------------------------------------
 	int SetBinFileCoder();
 	bool ReturnBinFileCoder(const int& current_bin_coder);
 

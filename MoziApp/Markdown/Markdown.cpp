@@ -8,9 +8,6 @@
 
 namespace Markdown
 {
-    static ImFont* H1 = NULL;
-    static ImFont* H2 = NULL;
-    static ImFont* H3 = NULL;
     static ImGui::MarkdownConfig mdConfig;
 
     //void GetUrlImage(const char* url, int& len)
@@ -62,19 +59,11 @@ namespace Markdown
 
         return imageData;
     }
-
-    void LoadFonts(float fontSize_ = 12.0f)
+    void LoadFonts(ImFont* H1, ImFont* H2, ImFont* H3)
     {
-        ImGuiIO& io = ImGui::GetIO();
-        io.Fonts->Clear();
-        // Base font
-        io.Fonts->AddFontFromFileTTF("myfont.ttf", fontSize_);
-        // Bold headings H2 and H3
-        H2 = io.Fonts->AddFontFromFileTTF("myfont-bold.ttf", fontSize_);
-        H3 = mdConfig.headingFormats[1].font;
-        // bold heading H1
-        float fontSizeH1 = fontSize_ * 1.1f;
-        H1 = io.Fonts->AddFontFromFileTTF("myfont-bold.ttf", fontSizeH1);
+        mdConfig.headingFormats[0] = { H1, true };
+        mdConfig.headingFormats[1] = { H2, true };
+        mdConfig.headingFormats[2] = { H3, false };
     }
 
     void ExampleMarkdownFormatCallback(const ImGui::MarkdownFormatInfo& markdownFormatInfo_, bool start_)
@@ -111,37 +100,12 @@ namespace Markdown
 
     void MarkdownBegin(const std::string& markdown_)
     {
-
         mdConfig.linkCallback = MarkdownLinkCallback;
         mdConfig.tooltipCallback = NULL;
         mdConfig.imageCallback = MarkdownImageCallback;
         mdConfig.linkIcon = ICON_FA_LINK;
-        mdConfig.headingFormats[0] = { H1, true };
-        mdConfig.headingFormats[1] = { H2, true };
-        mdConfig.headingFormats[2] = { H3, false };
         mdConfig.userData = NULL;
         mdConfig.formatCallback = ExampleMarkdownFormatCallback;
         ImGui::Markdown(markdown_.c_str(), markdown_.length(), mdConfig);
-    }
-
-    void MarkdownExample()
-    {
-            const std::string markdownText = u8R"(
-        # H1 Header: Text and Links
-        You can add [links like this one to enkisoftware](https://www.enkisoftware.com/) and lines will wrap well.
-        You can also insert images ![image alt text](image identifier e.g. filename)
-        Horizontal rules:
-        ***
-        ___
-        *Emphasis* and **strong emphasis** change the appearance of the text.
-        ## H2 Header: indented text.
-          This text has an indent (two leading spaces).
-            This one has two.
-        ### H3 Header: Lists
-          * Unordered lists
-            * Lists can be indented with two extra spaces.
-          * Lists can have [links like this one to Avoyd](https://www.avoyd.com/) and *emphasized text*
-        )";
-            MarkdownBegin(markdownText);
     }
 }

@@ -26,8 +26,8 @@ namespace MoziPage{
     // 界面打开标志位
     static bool sourse_open = true;             // 资源管理器页面开启标志位
     static bool debug_display_open = false;      // debug显示页面开启标志位
-    static bool text_editor_open = true;        // 文本编辑页面
-    static bool markdown_display_open = true;   // markdown显示界面
+    static bool text_editor_open = false;        // 文本编辑页面
+    static bool markdown_display_open = false;   // markdown显示界面
     // 路径参数
     static std::filesystem::path double_click_get_path = STORAGE_PATH;       // 获取双击文件夹后，该文件夹的路径
     static std::filesystem::path right_click_get_path  = STORAGE_PATH;       // 获取右击文件夹后，该文件夹的路径
@@ -35,7 +35,7 @@ namespace MoziPage{
 
 
     // 用于建立文件树的FolerMap
-    static FileOperate::FolderMap folder_maper;
+    //static FileOperate::FolderMap folder_maper;
 
 
     // 文件相关操作标志位
@@ -51,8 +51,6 @@ namespace MoziPage{
     static bool paste_file_flag = false;                        // 粘贴文件标志位
     static bool rename_file_flag = false;                       // 重命名文件标志位
 
-    
-    //static TextEditor text_editor("C:\\Users\\MoZI\\Desktop\\MoZI\\storage\\1\\123.md");          // 文本编辑器
     static TextEditor text_editor(STORAGE_PATH);          // 文本编辑器
 
     static void TextEditorPage()
@@ -178,8 +176,11 @@ namespace MoziPage{
     {
         if (ImGui::BeginMenu(HONEPAGENAME_WINDOWS))
         {
+            // 路径参数
             ImGui::MenuItem(HONEPAGENAME_SUBWINDOWS_SOURSEPAGE, NULL, &sourse_open);
             ImGui::MenuItem(HONEPAGENAME_SUBWINDOWS_DEBUG_DISPLAY, "F1", &debug_display_open);
+            ImGui::MenuItem(HONEPAGENAME_SUBWINDOWS_TEXT_EDITOR, "F2", &text_editor_open);
+            ImGui::MenuItem(HONEPAGENAME_SUBWINDOWS_MARKDOWN_DISPLAY, "F3", &markdown_display_open);
             ImGui::EndMenu();
         }
     }
@@ -557,15 +558,14 @@ namespace MoziPage{
 
             //if (ignore_folder.count(folder_path[i].filename().generic_string()))continue;// 跳过对应文件夹
 
-
             // 由于文件的路径是唯一的，因此使用路径作为文件树文件的唯一标识符，即：folder_path[i].generic_string()
             std::string folder_only_flag = folder_path[i].generic_string();
             bool node_open = ImGui::TreeNodeEx(folder_only_flag.c_str(), tree_flag, FileOperate::TreeFileIconConnect(folder_path[i]).c_str());
+  
             RightFolderPopup(folder_only_flag.c_str(), ImGuiPopupFlags_MouseButtonRight, folder_path[i], bin_file_flag);
-
             // 双击获取当前文件夹的路径
-            folder_maper.BuildFolderTree(folder_path[i], node_open, double_click_get_path, text_editor.file_path);
-
+            DoubleClickedFile(folder_path[i], double_click_get_path);
+            
             if (node_open)
             {
                 OpenFolder(folder_path[i],0);
@@ -576,19 +576,11 @@ namespace MoziPage{
         for (int i = 0; i < file_path.size(); i++)
         {
             //if (ignore_extension.count(file_path[i].extension().generic_string()))continue;// 跳过mozi后缀信息文件
-            //ImGui::BulletText(FileManage::TreeFileIconConnect(file_path[i]).c_str());
-            //RightFolderPopup(file_path[i].filename().generic_string().c_str(), ImGuiPopupFlags_MouseButtonRight, file_path[i]);
-            std::string file_only_flag = file_path[i].generic_string();
-            bool file_node_open = ImGui::TreeNodeEx(file_only_flag.c_str(), tree_flag, FileOperate::TreeFileIconConnect(file_path[i]).c_str());
-            //if (bin_flag == 1)RightRecycleBinPopup(tree_flag_name.c_str(), ImGuiPopupFlags_MouseButtonRight, folder_path[i]);
-            //else 
-            RightFolderPopup(file_only_flag.c_str(), ImGuiPopupFlags_MouseButtonRight, file_path[i], bin_file_flag);
-
-            // 双击获取当前文件夹的路径
-            folder_maper.BuildFolderTree(file_path[i], file_node_open, double_click_get_path, text_editor.file_path);
-            // 关闭树节点
-            if (file_node_open) ImGui::TreePop();
-
+            // 建立树节点
+            ImGui::TreeNodeEx(file_path[i].c_str(), ImGuiTreeNodeFlags_Leaf, FileOperate::TreeFileIconConnect(file_path[i]).c_str());
+            // 双击文件操作
+            DoubleClickedFile(file_path[i], double_click_get_path);
+            ImGui::TreePop();
         }
 
         // 只有第0层有回收站，即顶层目录
@@ -622,7 +614,36 @@ namespace MoziPage{
             }
         }
     }
-
+    
+    // 双击文件操作
+    static void DoubleClickedFile(const std::filesystem::path& current_path, std::filesystem::path& double_click_get_path)
+    {
+        //static std::filesystem::path last_path = STORAGE_PATH;
+        if (ImGui::IsItemClicked(ImGuiMouseButton_Left) && ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left))
+        {
+            // 文件夹双击操作
+            if (std::filesystem::is_directory(current_path))
+            {
+                
+            }
+            // 文件双击操作
+            else if (std::filesystem::is_regular_file(current_path))
+            {
+                double_click_get_path = current_path;
+                if ((FileOperate::CheckFileFormat(current_path) == FileOperate::FileFormat_MarkdownFile) ||
+                    (FileOperate::CheckFileFormat(current_path) == FileOperate::FileFormat_TextFile))
+                {
+                    text_editor.SetEditorFilePath(current_path);
+                    markdown_display_open = true;       // 双击markdown文件后优先打开显示界面
+                    text_editor_open = true;
+                }
+                else
+                {
+                    ShellExecute(NULL, L"open", current_path.generic_wstring().c_str(), NULL, NULL, SW_SHOW);
+                }
+            }
+        }
+    }
 //-----------------------------------------------------------------------------
 //                                  debug显示页面
 //-----------------------------------------------------------------------------

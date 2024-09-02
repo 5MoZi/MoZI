@@ -5,9 +5,9 @@
 #include "MoObject.h"
 
 namespace FileOperate {
-    //-----------------------------------------------------------------------------
-    //                               file基础操作
-    //-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+//                               file基础操作
+//-----------------------------------------------------------------------------
     // 连接图标和汉字
     const std::string IconAndChinese(const std::string str1, const std::string str2, const int type)
     {
@@ -23,44 +23,38 @@ namespace FileOperate {
         return temp_str;
     }
     // 文件格式的映射
-    const static std::map<std::filesystem::path, FileFormat> file_format
+    static std::map<std::filesystem::path, FileFormat> file_format_map
     { 
-        {"",FileFormat_Directory},
-        {".md",FileFormat_MarkdownFile},
-        {".txt",FileFormat_TextFile},
-        {".docx",FileFormat_WordFile},
-        {".pdf",FileFormat_PdfFile},
-        {".png",FileFormat_PngFile},
-        {".jpg",FileFormat_JpgFile},
-        {".xlsx",FileFormat_XlsxFile},
-        {".pptx",FileFormat_PptFile},
-        {".mp3",FileFormat_Mp3File},
-        {".mp4",FileFormat_Mp4File},
+        {FILE_EXTENSION_FOLDER,     FileFormat_Directory},
+        {FILE_EXTENSION_MARKDOWN,   FileFormat_MarkdownFile},
+        {FILE_EXTENSION_TXT,        FileFormat_TextFile},
+        {FILE_EXTENSION_WORD,       FileFormat_WordFile},
+        {FILE_EXTENSION_PDF,        FileFormat_PdfFile},
+        {FILE_EXTENSION_PNG,        FileFormat_PngFile},
+        {FILE_EXTENSION_JPG,        FileFormat_JpgFile},
+        {FILE_EXTENSION_EXCEL,      FileFormat_XlsxFile},
+        {FILE_EXTENSION_PPT,        FileFormat_PptFile},
+        {FILE_EXTENSION_MP3,        FileFormat_Mp3File},
+        {FILE_EXTENSION_MP4,        FileFormat_Mp4File},
     };
 
     // 检查文件类型
     FileOperate::FileFormat CheckFileFormat(const std::filesystem::path& file_path)
     {
         std::filesystem::path file_extension = file_path.extension();
-        if (file_format.count(file_extension))
-            return file_format.at(file_extension);
+        if (file_format_map.count(file_extension))
+            return file_format_map.at(file_extension);
         return FileFormat::FileFormat_UnknownFileFormat;
     }
 
     // 检查文件类型
     const std::string CheckFileExtension(const FileOperate::FileFormat& file_format)
     {
-        switch (file_format)
-        {
-        case FileOperate::FileFormat_Directory:	        return FILE_EXTENSION_FOLDER;
-        case FileOperate::FileFormat_TextFile:	        return FILE_EXTENSION_TXT; 
-        case FileOperate::FileFormat_WordFile:	        return FILE_EXTENSION_WORD;
-        case FileOperate::FileFormat_PptFile:	        return FILE_EXTENSION_PPT;
-        case FileOperate::FileFormat_MarkdownFile:	    return FILE_EXTENSION_MARKDOWN;
-        default: break;
-        }
+        for (std::map<std::filesystem::path, FileFormat>::iterator it = file_format_map.begin(); it != file_format_map.end(); it++)
+            if (it->second == file_format)
+                return it->first.generic_string();
     }
-    // 设置对应文件夹前面的图标
+    // 设置对应文件树前面的图标
     const std::string TreeFileIconConnect(const std::filesystem::path& file_path)
     {
         // 文件使用图标
@@ -162,6 +156,8 @@ namespace FileOperate {
         }
         return "";
     }
+
+
     // 扫描文件夹函数，返回其下第一层的文件夹路径和文件路径
     void ScanDirectory(std::vector<std::filesystem::path>& folder_path, std::vector<std::filesystem::path>& file_path, const std::filesystem::path& current_path)
     {
@@ -240,150 +236,6 @@ namespace FileOperate {
 
         return retStr;
     }
-
-//-----------------------------------------------------------------------------
-//                               FolderMap相关操作
-//-----------------------------------------------------------------------------
-    // 初始化FolderMap
-    std::map<std::filesystem::path, bool> FolderMap::folder_map;
-
-    void FolderMap::AddFolderPath(const std::filesystem::path& current_path, const bool& tree_node_open)
-    {
-        if (folder_map.count(current_path) == 0)          // 判断map中是否有该节点,如果没有则添加进去
-        {
-            folder_map.insert({ current_path ,tree_node_open });
-            LOG_INFO("AddFolderPath：添加新文件至FolderMap中：{}", current_path.generic_string());
-            return;
-        }
-        LOG_WARN("AddFolderPath：文件已存在，无需添加");
-        return;
-    }
-
-    void FolderMap::DeleteFolderPath(const std::filesystem::path& current_path)
-    {
-        if (folder_map.count(current_path) != 0)          // 判断map中是否有该节点
-        {
-            folder_map.erase(current_path);
-            LOG_INFO("从FolderMap删除文件地址：{}", current_path.generic_string());
-            return;
-        }
-        LOG_WARN("在FolderMap中无文件夹可删除：{}", current_path.generic_string());
-        return;
-    }
-
-
-    void FolderMap::ChangeFolderPath(const std::filesystem::path& old_path, const std::filesystem::path& new_path)
-    {
-        if (folder_map.count(old_path) == 0)          // 判断map中是否有该节点,如果没有则添加进去
-        {
-            LOG_ERROR("在FolderMap中不存在该路径，修改失败，path：{}", old_path.generic_string());
-            return;
-        }
-        else
-        {
-            const bool tree_node_open = folder_map.at(old_path);
-            folder_map.erase(old_path);
-            folder_map.insert({ new_path ,tree_node_open });
-            LOG_INFO("在FolderMap中修改文件路径成功path：{0}->{1}", old_path.generic_string(), new_path.generic_string());
-            return;
-        }
-        LOG_ERROR("在FolderMap中修改文件路径失败");
-        return;
-    }
-
-    void FolderMap::LookFolderMap()
-    {
-        if (folder_map.empty())
-        {
-            LOG_INFO("FolderMap为空，无存储");
-            return;
-        }
-        else
-        {
-            LOG_INFO("查看FolderMap存储内容...");
-            for (std::map<std::filesystem::path, bool>::iterator it = folder_map.begin(); it != folder_map.end(); ++it)
-            {
-                if (it->second == false) LOG_INFO("文件开关状态：关闭，文件路径：{}", it->first.generic_string());
-                else if (it->second == true) LOG_INFO("文件开关状态：打开，文件路径：{}", it->first.generic_string());
-            }
-            return;
-        }
-        return;
-    }
-
-    void FolderMap::BuildFolderTree(const std::filesystem::path& current_path, const bool& tree_node_open,
-        std::filesystem::path& double_click_get_path, std::filesystem::path& temp_markdown_path)
-    {
-        // 初始化上一个路径
-        static std::filesystem::path last_path = STORAGE_PATH;
-        // 判断map中是否有该节点,如果没有则添加进去
-        if (folder_map.count(current_path) == 0)
-        {
-            folder_map.insert({ current_path ,tree_node_open });
-            LOG_INFO("BuildFolderTree：文件树建立，新添加文件夹：{}", current_path.generic_string());
-            double_click_get_path = last_path;
-            return;
-        }
-        // 如果该节点存在，则判断该节点上一个tree_node_open状态与当前的是否一样
-        else
-        {
-            // 一样则说明没有进行操作，返回上一个操作的路径
-            if (folder_map.at(current_path) == tree_node_open)
-            {
-                double_click_get_path = last_path;
-                return;
-            }
-            // 其实可以用一个异或来进行判断的，但是为了区别打开和关闭的操作用了两个if
-            // 状态由0->1即文件打开
-            else if (folder_map.at(current_path) == 0 && tree_node_open == 1)
-            {
-                last_path = current_path;                       // 刷新上一个文件夹路径
-                folder_map.at(current_path) = tree_node_open;   // 更新打开关闭节点
-                LOG_INFO("BuildFolderTree：文件夹打开，抓取到当前文件夹路径为：{}", current_path.generic_string());
-                double_click_get_path = current_path;
-                // 双击打开文件
-                if (!std::filesystem::is_directory(current_path))
-                {
-                    if ((CheckFileFormat(current_path) == FileFormat_MarkdownFile)||(CheckFileFormat(current_path) == FileFormat_TextFile))
-                    {
-                        temp_markdown_path = current_path;
-                    }
-                    else
-                    {
-                        ShellExecute(NULL, L"open", current_path.generic_wstring().c_str(), NULL, NULL, SW_SHOW);
-                    }
-                }
-
-                return;
-            }
-            // 状态由1->0即文件打开
-            else if (folder_map.at(current_path) == 1 && tree_node_open == 0)
-            {
-                last_path = current_path;                       // 刷新上一个文件夹路径
-                folder_map.at(current_path) = tree_node_open;   // 更新打开关闭节点
-                LOG_INFO("BuildFolderTree：文件夹关闭，抓取到当前文件夹路径为：{}", current_path.generic_string());
-                double_click_get_path = current_path;
-                // 双击打开文件
-                if (!std::filesystem::is_directory(current_path))
-                {
-                    if ((CheckFileFormat(current_path) == FileFormat_MarkdownFile) || (CheckFileFormat(current_path) == FileFormat_TextFile))
-                    {
-                        temp_markdown_path = current_path;
-                    }
-                    else
-                    {
-                        ShellExecute(NULL, L"open", current_path.generic_wstring().c_str(), NULL, NULL, SW_SHOW);
-                    }
-                }
-                return;
-            }
-        }
-
-        LOG_CRITICAL("BuildFolderTree：文件数建立失败");
-        double_click_get_path = last_path;
-        return;
-    }
-
 
 //-----------------------------------------------------------------------------
 //                   文件复制(粘贴)、剪切、删除、新建立等相关操作
@@ -610,7 +462,7 @@ namespace FileOperate {
 
 
 //-----------------------------------------------------------------------------
-//								回收站文件编号
+//								回收站重名编号问题
 //-----------------------------------------------------------------------------
     // 编号使用标志位
     // 如果为true则说明编号被使用，否则编号未被使用

@@ -1,5 +1,9 @@
 #include "mopch.h"
 #include "TextEditor.h"
+#include "fonts.h"
+
+
+static float font_scale = 1.0f;
 
 void TextEditor::TextEditorBegin()
 {
@@ -13,14 +17,18 @@ void TextEditor::TextEditorBegin()
         ImGui::EndChild();
         return;
     }
-    
+
+
     SetContent();               // 设定文本内容
+    ImGui::PushFont((*Fonts::GetTextEditorFonts())[Fonts::TextEditorFonts_XiaoXing]);
+    ImGui::SetWindowFontScale(font_scale);
     TextEditorHotKeys();        // 快捷键设置
+
 
     if (TextContent.empty())
         TextContent.push_back(0);
     TextEditor::TextEditorFuncs::MyInputTextMultiline("##TextEditor", &TextContent, ImVec2(-FLT_MIN, -FLT_MIN));
-
+    ImGui::PopFont();
 
     ImGui::EndChild();
 }
@@ -90,6 +98,7 @@ void TextEditor::SaveText()
 
 void TextEditor::TextEditorHotKeys()
 {
+
     ImGuiIO& io = ImGui::GetIO();
     auto shift = io.KeyShift;
     auto ctrl = io.ConfigMacOSXBehaviors ? io.KeySuper : io.KeyCtrl;
@@ -101,6 +110,14 @@ void TextEditor::TextEditorHotKeys()
             ImGui::SetMouseCursor(ImGuiMouseCursor_TextInput);
         if (ctrl && !shift && !alt && ImGui::IsKeyPressed(ImGuiKey_S))
             SaveText();
+        else if (ctrl && ImGui::IsKeyPressed(ImGuiKey_MouseWheelY))
+        {
+            if(io.MouseWheel==1)
+                font_scale += 0.1;
+            else 
+                font_scale -= 0.1;
+        }
+
     }
 }
 

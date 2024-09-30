@@ -8,6 +8,9 @@
 #include "FileManage.h"
 
 #include "Markdown.h"
+
+#include "fonts.h"
+
 namespace Moui {
 
 //-----------------------------------------------------------------------------
@@ -26,7 +29,7 @@ namespace Moui {
     static bool* theme_color_register = new bool[theme_color_num]();  // 主题颜色变换器：当启用某个颜色主题时，该颜色下标置为1其余为0;
 
     // moui格式参数
-    static MoObject::MouiPopupStyle popup_base_style;
+    //static MoObject::MouiPopupStyle popup_base_style;
 
     
 //-----------------------------------------------------------------------------
@@ -112,92 +115,92 @@ namespace Moui {
         }
     }
 
-    // 错误窗口
-    bool ErrorPopup(const std::string& text, bool& confirm_flag, const float& current_scale)
-    {
-        // 弹窗建立一次标志位
-        static bool ones_open_popup = true;
+    //// 错误窗口
+    //bool ErrorPopup(const std::string& text, bool& confirm_flag, const float& current_scale)
+    //{
+    //    // 弹窗建立一次标志位
+    //    static bool ones_open_popup = true;
 
-        /*-------------------------窗口信息设置----------------------------*/
-        static MoObject::MouiPopupStyle current_popup_style = popup_base_style;
-        // 窗口信息
-        static float window_hight = current_popup_style.window_hight;
-        static float window_width = current_popup_style.window_width;
-        // 设置弹窗的尺寸和确定按钮的大小
-        static ImVec2 element_pos = current_popup_style.element_pos;
-        static ImVec2 element_space = current_popup_style.element_space;
-        static ImVec2 bar_size = current_popup_style.bar_size;
-        static ImVec2 button_size = current_popup_style.button_size;
-        // 不同规模变化不同的尺寸
-        static float next_scale = 0.f;              // 保证尺寸只进行一次变化
-        if (next_scale != current_scale && current_scale != current_popup_style.scale)
-        {
+    //    /*-------------------------窗口信息设置----------------------------*/
+    //    static MoObject::MouiPopupStyle current_popup_style = popup_base_style;
+    //    // 窗口信息
+    //    static float window_hight = current_popup_style.window_hight;
+    //    static float window_width = current_popup_style.window_width;
+    //    // 设置弹窗的尺寸和确定按钮的大小
+    //    static ImVec2 element_pos = current_popup_style.element_pos;
+    //    static ImVec2 element_space = current_popup_style.element_space;
+    //    static ImVec2 bar_size = current_popup_style.bar_size;
+    //    static ImVec2 button_size = current_popup_style.button_size;
+    //    // 不同规模变化不同的尺寸
+    //    static float next_scale = 0.f;              // 保证尺寸只进行一次变化
+    //    if (next_scale != current_scale && current_scale != current_popup_style.scale)
+    //    {
 
-            next_scale = current_scale;
-            current_popup_style.ChangeStlyeSize(current_scale);
+    //        next_scale = current_scale;
+    //        current_popup_style.ChangeStlyeSize(current_scale);
 
-            window_hight = current_popup_style.window_hight;
-            window_width = current_popup_style.window_width;
-            element_pos = current_popup_style.element_pos;         // 元素位置
-            element_space = current_popup_style.element_space;     // 元素间距
-            bar_size = current_popup_style.bar_size;               // 进度条尺寸
-            button_size = current_popup_style.button_size;         // 按钮尺寸
-        }
+    //        window_hight = current_popup_style.window_hight;
+    //        window_width = current_popup_style.window_width;
+    //        element_pos = current_popup_style.element_pos;         // 元素位置
+    //        element_space = current_popup_style.element_space;     // 元素间距
+    //        bar_size = current_popup_style.bar_size;               // 进度条尺寸
+    //        button_size = current_popup_style.button_size;         // 按钮尺寸
+    //    }
 
-        // 保证只建立一次弹窗
-        if (ones_open_popup)
-        {
-            ImGui::OpenPopup(u8"MoZI小提示"); // 建立弹窗
-            ones_open_popup = false;
-        }
+    //    // 保证只建立一次弹窗
+    //    if (ones_open_popup)
+    //    {
+    //        ImGui::OpenPopup(u8"MoZI小提示"); // 建立弹窗
+    //        ones_open_popup = false;
+    //    }
 
-        /*-------------------------弹窗位置与大小设置----------------------------*/
-        ImVec2 center = ImGui::GetMainViewport()->GetCenter();
-        ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
+    //    /*-------------------------弹窗位置与大小设置----------------------------*/
+    //    ImVec2 center = ImGui::GetMainViewport()->GetCenter();
+    //    ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
 
-        // 最小弹窗大小设置
-        static bool flag_ones = false;
-        if (flag_ones == false)
-        {
-            ImGui::SetNextWindowSize(ImVec2(window_width * 0.8, window_hight * 0.5));
-            flag_ones = true;
-        }
-        /*-------------------------弹窗内容部分----------------------------*/
-        if (ImGui::BeginPopupModal(u8"MoZI小提示", 0, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse))  // 打开弹窗
-        {
-            // 窗口最小的大小为1000*1000
-            float win_h = ImGui::GetWindowHeight(), win_w = ImGui::GetWindowWidth();        // 窗口的实时大小
+    //    // 最小弹窗大小设置
+    //    static bool flag_ones = false;
+    //    if (flag_ones == false)
+    //    {
+    //        ImGui::SetNextWindowSize(ImVec2(window_width * 0.8, window_hight * 0.5));
+    //        flag_ones = true;
+    //    }
+    //    /*-------------------------弹窗内容部分----------------------------*/
+    //    if (ImGui::BeginPopupModal(u8"MoZI小提示", 0, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse))  // 打开弹窗
+    //    {
+    //        // 窗口最小的大小为1000*1000
+    //        float win_h = ImGui::GetWindowHeight(), win_w = ImGui::GetWindowWidth();        // 窗口的实时大小
 
-            // 显示错误内容
-            ImGui::TextWrapped(text.c_str());
+    //        // 显示错误内容
+    //        ImGui::TextWrapped(text.c_str());
 
-            // 编辑确认按键
-            ImGui::SetCursorPos(ImVec2(win_w - element_pos.x * 4, win_h - element_pos.y * 2.5));
-            if (ImGui::Button(u8"确定", button_size)) 
-            {
-                ones_open_popup = true;
-                confirm_flag =true;
-                ImGui::CloseCurrentPopup();
-                ImGui::SetItemDefaultFocus();
-                ImGui::EndPopup();
-                return true;
-            }
-            // 编辑取消按键
-            ImGui::SetCursorPos(ImVec2(win_w - element_pos.x * 8, win_h - element_pos.y * 2.5));
-            if (ImGui::Button(u8"取消", button_size)) 
-            {
-                ones_open_popup = true;
-                ImGui::CloseCurrentPopup();
-                confirm_flag = false;
-                ImGui::SetItemDefaultFocus();
-                ImGui::EndPopup();
-                return false;
-            }
-            ImGui::SetItemDefaultFocus();
-            ImGui::EndPopup();
-            return false;
-        }
-    }
+    //        // 编辑确认按键
+    //        ImGui::SetCursorPos(ImVec2(win_w - element_pos.x * 4, win_h - element_pos.y * 2.5));
+    //        if (ImGui::Button(u8"确定", button_size)) 
+    //        {
+    //            ones_open_popup = true;
+    //            confirm_flag =true;
+    //            ImGui::CloseCurrentPopup();
+    //            ImGui::SetItemDefaultFocus();
+    //            ImGui::EndPopup();
+    //            return true;
+    //        }
+    //        // 编辑取消按键
+    //        ImGui::SetCursorPos(ImVec2(win_w - element_pos.x * 8, win_h - element_pos.y * 2.5));
+    //        if (ImGui::Button(u8"取消", button_size)) 
+    //        {
+    //            ones_open_popup = true;
+    //            ImGui::CloseCurrentPopup();
+    //            confirm_flag = false;
+    //            ImGui::SetItemDefaultFocus();
+    //            ImGui::EndPopup();
+    //            return false;
+    //        }
+    //        ImGui::SetItemDefaultFocus();
+    //        ImGui::EndPopup();
+    //        return false;
+    //    }
+    //}
 //-----------------------------------------------------------------------------
 //                                弹窗函数
 //-----------------------------------------------------------------------------
@@ -234,10 +237,12 @@ namespace Moui {
         // 保证只建立一次弹窗
         if (ones_open_popup)
         {
-            if (file_format == FileOperate::FileFormat_Directory)        strcpy_s(name_buff, u8"新建文件夹");
-            else if (file_format == FileOperate::FileFormat_TextFile)    strcpy_s(name_buff, u8"新建文本文件");
-            else if (file_format == FileOperate::FileFormat_WordFile)   strcpy_s(name_buff, u8"新建Word文档");
-            else if (file_format == FileOperate::FileFormat_PptFile)    strcpy_s(name_buff, u8"新建PPT文件");
+            // 添加新建文件格式请在这里写上，其他地方不需要改
+            if (file_format == FileOperate::FileFormat_Directory)           strcpy_s(name_buff, u8"新建文件夹");
+            else if (file_format == FileOperate::FileFormat_TextFile)       strcpy_s(name_buff, u8"新建文本文件");
+            else if (file_format == FileOperate::FileFormat_WordFile)       strcpy_s(name_buff, u8"新建Word文档");
+            else if (file_format == FileOperate::FileFormat_PptFile)        strcpy_s(name_buff, u8"新建PPT文件");
+            else if (file_format == FileOperate::FileFormat_MarkdownFile)   strcpy_s(name_buff, u8"新建Markdown文件");
             ImGui::OpenPopup(popup_name); // 建立弹窗
             ones_open_popup = false;
         }
@@ -580,17 +585,18 @@ namespace Moui {
         }
     }
 
-    // MouiPopup格式初始化
-    static void MouiPopupStyleInit()
-    {
-        popup_base_style.scale = 1.5f;        // 2K显示器尺寸
-        popup_base_style.window_hight = 800;
-        popup_base_style.window_width = 1000;
-        popup_base_style.element_pos = ImVec2(50, 30);
-        popup_base_style.element_space = ImVec2(20, 200);
-        popup_base_style.bar_size = ImVec2(800.0f, 30.0f);
-        popup_base_style.button_size = ImVec2(150, 0);
-    }
+    //// MouiPopup格式初始化
+    //static void MouiPopupStyleInit()
+    //{
+    //    // scale=1 1.5 2分别表示1k，2k，4k显示器
+    //    popup_base_style.scale = 1.5f;        // 2K显示器尺寸
+    //    popup_base_style.window_hight = 800;
+    //    popup_base_style.window_width = 1000;
+    //    popup_base_style.element_pos = ImVec2(50, 30);
+    //    popup_base_style.element_space = ImVec2(20, 200);
+    //    popup_base_style.bar_size = ImVec2(800.0f, 30.0f);
+    //    popup_base_style.button_size = ImVec2(150, 0);
+    //}
 
     // MouiApp初始化程序
     void MouiInit()
@@ -600,54 +606,56 @@ namespace Moui {
         LOG_INFO("Moui格式初始化完成");
         Moui::ThemeColorInit(theme_color);
         LOG_INFO("Moui主题初始化完成");
-        Moui::MouiPopupStyleInit();
-        LOG_INFO("Moui弹窗初始化完成");
+        //Moui::MouiPopupStyleInit();
+        //LOG_INFO("Moui弹窗初始化完成");
     }
 
     // 动态DPI
-    void DynamicDPI(GLFWwindow* window, ImGuiIO& io)
-    {
-        float xscale, yscale;
-        glfwGetWindowContentScale(window, &xscale, &yscale);
-        if (xscale != current_scale) 
-        {
-            io.Fonts->Clear();                      // 清楚所有字体
-            current_scale = xscale;
-            /*************************** 初始字体 *****************************/
-            float base_pixels = xscale * 16.0f;
-            // 合成字体参数设置
-            ImFontConfig config;
-            config.MergeMode = true;    // 开启字体合成
-            config.GlyphExtraSpacing.y = 50.0f;
-            // 图标相关参数设置
-            static const ImWchar icons_ranges[] = { ICON_MIN_FA, ICON_MAX_FA, 0 };
-            config.PixelSnapH = true;
-            config.GlyphMinAdvanceX = base_pixels * 2.0f / 2.3f;
+    //void DynamicDPI(GLFWwindow* window, ImGuiIO& io)
+    //{
+    //    float xscale, yscale;
+    //    glfwGetWindowContentScale(window, &xscale, &yscale);
+    //    if (xscale != current_scale) 
+    //    {
+    //        io.Fonts->Clear();                      // 清楚所有字体
+    //        current_scale = xscale;
+    //        /*************************** 初始字体 *****************************/
+    //        float base_pixels = xscale * 15.0f;
+    //        // 合成字体参数设置
+    //        ImFontConfig config;
+    //        config.MergeMode = true;    // 开启字体合成
+    //        config.GlyphExtraSpacing.y = 50.0f;
+    //        // 图标相关参数设置
+    //        static const ImWchar icons_ranges[] = { ICON_MIN_FA, ICON_MAX_FA, 0 };
+    //        config.PixelSnapH = true;
+    //        config.GlyphMinAdvanceX = base_pixels * 2.0f / 2.3f;
 
-            // 初始字体
-            io.Fonts->AddFontFromFileTTF(FONT_ENGLISH_BASE_PATH, base_pixels, 0, io.Fonts->GetGlyphRangesDefault());
-            // 汉字字体
-            io.Fonts->AddFontFromFileTTF(FONT_CHINESE_BASE_PATH, base_pixels, &config, io.Fonts->GetGlyphRangesChineseFull());
-            // 图标字体
-            io.Fonts->AddFontFromFileTTF(ICON_BASE_FILE_PATH, base_pixels * 2.0f / 2.3f, &config, icons_ranges);
-
-
-            /*************************** Markdown-字体放大 *****************************/
-            float H1_pixels = xscale * 30.0f;
-            markdown_H1 = io.Fonts->AddFontFromFileTTF(FONT_CHINESE_BASE_PATH, H1_pixels, 0, io.Fonts->GetGlyphRangesChineseFull());
-            float H2_pixels = xscale * 25.0f;
-            markdown_H2 = io.Fonts->AddFontFromFileTTF(FONT_CHINESE_BASE_PATH, H2_pixels, 0, io.Fonts->GetGlyphRangesChineseFull());
-            float H3_pixels = xscale * 20.0f;
-            markdown_H3= io.Fonts->AddFontFromFileTTF(FONT_CHINESE_BASE_PATH, H3_pixels, 0, io.Fonts->GetGlyphRangesChineseFull());
-            io.Fonts->Build();              // 建立字体
+    //        // 初始字体
+    //        io.Fonts->AddFontFromFileTTF(FONT_ENGLISH_BASE_PATH, base_pixels, 0, io.Fonts->GetGlyphRangesDefault());
+    //        // 汉字字体
+    //        io.Fonts->AddFontFromFileTTF(FONT_CHINESE_BASE_PATH, base_pixels, &config, io.Fonts->GetGlyphRangesChineseFull());
+    //        // 图标字体
+    //        io.Fonts->AddFontFromFileTTF(ICON_BASE_FILE_PATH, base_pixels * 2.0f / 2.3f, &config, icons_ranges);
 
 
-            Markdown::LoadFonts(markdown_H1, markdown_H2, markdown_H3); // 将字体加载如markdown中
+    //        /*************************** Markdown-字体放大 *****************************/
+    //        // 这个xscale乘以的系数不能太大，目前测试超过30就会时app黑屏
+    //        // 同时需要注意，一定不能压缩内存太大的字体，测试超过9M就会卡死
+    //        float H1_pixels = xscale * 25.0f;
+    //        markdown_H1 = io.Fonts->AddFontFromFileTTF(FONT_CHINESE_SIMHEI_PATH, H1_pixels, 0, io.Fonts->GetGlyphRangesChineseFull());
+    //        float H2_pixels = xscale * 20.0f;
+    //        markdown_H2 = io.Fonts->AddFontFromFileTTF(FONT_CHINESE_SIMHEI_PATH, H2_pixels, 0, io.Fonts->GetGlyphRangesChineseFull());
+    //        float H3_pixels = xscale * 15.0f;
+    //        markdown_H3= io.Fonts->AddFontFromFileTTF(FONT_CHINESE_SIMHEI_PATH, H3_pixels, 0, io.Fonts->GetGlyphRangesChineseFull());
+    //        io.Fonts->Build();              // 建立字体
 
-            ImGui_ImplOpenGL3_DestroyFontsTexture();
-            ImGui_ImplOpenGL3_CreateFontsTexture();
-        }
-    }
+
+    //        Markdown::LoadFonts(markdown_H1, markdown_H2, markdown_H3); // 将字体加载如markdown中
+
+    //        ImGui_ImplOpenGL3_DestroyFontsTexture();
+    //        ImGui_ImplOpenGL3_CreateFontsTexture();
+    //    }
+    //}
 
     // 连接图标和汉字
     const std::string IconAndChinese(const std::string str1, const std::string str2, const int type)

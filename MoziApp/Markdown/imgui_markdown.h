@@ -956,6 +956,7 @@ namespace ImGui
 				    if( fmt.font )
 				    {
 					    ImGui::PushFont( fmt.font );
+                        ImGui::SetWindowFontScale(0.75f);
 				    }
 			    }
                 else
@@ -984,6 +985,12 @@ namespace ImGui
                 if( fmt.font  )
                 {
                     ImGui::PushFont( fmt.font );
+                    if(markdownFormatInfo_.level==1)
+                        ImGui::SetWindowFontScale(1.25f);
+                    else if(markdownFormatInfo_.level == 2)
+                        ImGui::SetWindowFontScale(1.0f);
+                    else if (markdownFormatInfo_.level == 3)
+                        ImGui::SetWindowFontScale(0.8f);
                 }
                 ImGui::NewLine();
             }
@@ -1001,6 +1008,7 @@ namespace ImGui
                 if( fmt.font )
                 {
                     ImGui::PopFont();
+                    ImGui::SetWindowFontScale(1.0f);
                 }
             }
             break;

@@ -12,7 +12,7 @@
 #include "MoImage.h"
 
 #include "markdown.h"
-
+#include "fonts.h"
 #define APP_NAME u8"MoZI"
 
 /*************************关闭终端的方法*******************************/
@@ -69,7 +69,7 @@ int main()
     //                               MOZI初始化设置
     //-----------------------------------------------------------------------------
 
- 
+
     bool show_demo_window = true;
     ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
 
@@ -87,7 +87,7 @@ int main()
     {
         glfwPollEvents();
         // 动态DIP，依据屏幕的DIP来设定字体
-        Moui::DynamicDPI(window, io);
+        Fonts::DynamicDPI(window, io);
         ImGui_ImplOpenGL3_NewFrame();
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();

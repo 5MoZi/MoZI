@@ -81,7 +81,7 @@ namespace MoziPage{
 
         // 如果文件是空的则不进行显示，并且文件需要问md后缀的文件才能使用
         if (!text_editor.GetContent().empty() && (text_editor.file_extension_flag == TextEditor::TextExtensionFlag_Markdown))
-            Markdown::MarkdownBegin(text_editor.GetContent());
+            Markdown::MarkdownBegin(text_editor.GetContent(), text_editor.file_path);
 
         ImGui::End();
     }
@@ -97,9 +97,9 @@ namespace MoziPage{
         Moui::MouiInit();              // UI初始化
         LOG_INFO("MOUI初始化完成");
         // 数据库连接
-        LOG_INFO("Mysql数据库初始设置中...");
-        MysqlOperate::ConnectDatabase();
-        MysqlOperate::CreateFileDataTable({ DATABASE_FILETABLE_NAME,DATABASE_TEMP_FILETABLE_NAME });
+        //LOG_INFO("Mysql数据库初始设置中...");
+        //MysqlOperate::ConnectDatabase();
+        //MysqlOperate::CreateFileDataTable({ DATABASE_FILETABLE_NAME,DATABASE_TEMP_FILETABLE_NAME });
         //MysqlOperate::MysqlData mysql_data_base(DATABASE_USER_NAME, DATABASE_PASSWORD, DATABASE_NAME);
     }
 
@@ -367,6 +367,8 @@ namespace MoziPage{
         // 打开新建文件夹弹窗
         if (add_new_file_flag)
         {
+            // 当需要添加新的类型文件时，只需要在这个switch中写上，并在RightFolderPopup函数中将图标加上，
+            // 同时在Moui::AddNewFilePopup函数中加上一处就行，其他地方不需要改（前提是以及在FileOperate.h中添加的新文件类型的后缀）
             switch (add_new_file_fileformat)
             {
             case FileOperate::FileFormat_Directory:
@@ -379,11 +381,15 @@ namespace MoziPage{
                 break;
             case FileOperate::FileFormat_WordFile:
                 Moui::AddNewFilePopup(add_new_file_flag,
-                    u8"新建文本文件", FileOperate::FileFormat_WordFile, right_click_get_path, 0.f);
+                    u8"新建Word文件", FileOperate::FileFormat_WordFile, right_click_get_path, 0.f);
                 break;
             case FileOperate::FileFormat_PptFile:
                 Moui::AddNewFilePopup(add_new_file_flag,
-                    u8"新建文本文件", FileOperate::FileFormat_PptFile, right_click_get_path, 0.f);
+                    u8"新建PPT文件", FileOperate::FileFormat_PptFile, right_click_get_path, 0.f);
+                break;
+            case FileOperate::FileFormat_MarkdownFile:
+                Moui::AddNewFilePopup(add_new_file_flag,
+                    u8"新建Markdown文件", FileOperate::FileFormat_MarkdownFile, right_click_get_path, 0.f);
                 break;
             default:break;
             }
@@ -500,6 +506,12 @@ namespace MoziPage{
                             right_click_get_path = current_path;
                             add_new_file_flag = true;
                             add_new_file_fileformat = FileOperate::FileFormat_PptFile;
+                        }
+                        // 新建Markdown文件
+                        if (ImGui::MenuItem(SOURSEPAGE_FOLDER_POPUP_SUBADD_NEW_Markdown)) {
+                            right_click_get_path = current_path;
+                            add_new_file_flag = true;
+                            add_new_file_fileformat = FileOperate::FileFormat_MarkdownFile;
                         }
                         ImGui::EndMenu();
                     }

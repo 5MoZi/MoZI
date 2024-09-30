@@ -94,11 +94,11 @@
 // 文件右击操作
 #define SOURSEPAGE_FOLDER_POPUP_ADD						Moui::IconAndChinese(ICON_FA_CIRCLE_QUESTION, u8"添加").c_str()
 #define SOURSEPAGE_FOLDER_POPUP_SUBADD_NEWFOLDER		Moui::IconAndChinese(ICON_FA_FOLDER_PLUS, u8"新建文件夹").c_str()
-#define SOURSEPAGE_FOLDER_POPUP_SUBADD_ADDPLAN			Moui::IconAndChinese(ICON_FA_FILE_ARROW_UP, u8"新建计划").c_str()
+#define SOURSEPAGE_FOLDER_POPUP_SUBADD_ADDFILE			Moui::IconAndChinese(ICON_FA_FILE_ARROW_UP, u8"现有文件").c_str()
 #define SOURSEPAGE_FOLDER_POPUP_SUBADD_NEW_TEXTFILE		Moui::IconAndChinese(ICON_FA_FILE_LINES, u8"新建文本文件").c_str()
 #define SOURSEPAGE_FOLDER_POPUP_SUBADD_NEW_WORDFILE		Moui::IconAndChinese(ICON_FA_FILE_WORD, u8"新建Word文档").c_str()
 #define SOURSEPAGE_FOLDER_POPUP_SUBADD_NEW_PPTFILE		Moui::IconAndChinese(ICON_FA_FILE_POWERPOINT, u8"新建PPT文件").c_str()
-#define SOURSEPAGE_FOLDER_POPUP_SUBADD_ADDFILE			Moui::IconAndChinese(ICON_FA_FILE_ARROW_UP, u8"现有文件").c_str()
+#define SOURSEPAGE_FOLDER_POPUP_SUBADD_NEW_Markdown		Moui::IconAndChinese(ICON_FA_FILE_POWERPOINT, u8"新建Markdown").c_str()
 
 #define SOURSEPAGE_FOLDER_POPUP_OPEN					Moui::IconAndChinese(ICON_FA_FACE_FROWN_OPEN, u8"打开").c_str()
 #define SOURSEPAGE_FOLDER_POPUP_CUT						Moui::IconAndChinese(ICON_FA_SCISSORS, u8"剪切").c_str()

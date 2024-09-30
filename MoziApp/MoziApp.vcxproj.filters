@@ -75,6 +75,9 @@
     <ClCompile Include="TextEditor\TextEditor.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="Fonts\fonts.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="mzlib\IconsFontAwesome6.h">
@@ -153,6 +156,9 @@
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="FileMacro.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Fonts\fonts.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>

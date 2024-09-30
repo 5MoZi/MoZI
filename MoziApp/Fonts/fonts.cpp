@@ -8,12 +8,19 @@
 
 
 namespace Fonts {
-    static std::vector<ImFont*> all_fonts;
-    static std::vector<ImFont*> text_editor_fonts;
-    static std::vector<ImFont*> markdown_fonts;
-    static float current_scale = 0;
 
-    void InitFonts(const float& scale, ImGuiIO& io)
+
+    static std::vector<ImFont*> all_fonts;
+
+    static SetFonts reset_fonts;
+    static SetFonts all_fonts_set;
+
+    static ImFont* text_editor_fonts;
+    static ImFont* markdown_heading_fonts;
+    static ImFont* markdown_content_fonts;
+
+    static float current_scale = 0;
+    void InitLoadFonts(const float& scale, ImGuiIO& io)
     {
         float fonts_size = scale * 20.0f;
         for (int i = 0; i < FontsNumbers; i++)
@@ -35,79 +42,22 @@ namespace Fonts {
             }
         }
     }
-
-    //void InitTextEditorFonts(const float& scale, ImGuiIO& io)
-    //{
-    //    float fonts_size = scale * 30.0f;
-    //    for (int i = 0; i < TextEditorFontsNumbers; i++)
-    //    {
-    //        switch (i)
-    //        {
-    //        //case 0: 
-    //        //    text_editor_fonts.push_back(io.Fonts->AddFontFromFileTTF(FONT_CHINESE_BASE_PATH, fonts_size, 0, io.Fonts->GetGlyphRangesChineseFull()));
-    //        //    break;
-    //        case 1:
-    //            text_editor_fonts.push_back(io.Fonts->AddFontFromFileTTF(FONT_CHINESE_SONGTI_PATH, fonts_size, 0, io.Fonts->GetGlyphRangesChineseFull()));
-    //            break;
-    //        }
-    //    }
-    //}
-
-    //void InitMarkdownFonts(const float& scale, ImGuiIO& io)
-    //{
-    //    float fonts_size = scale * 20.0f;
-    //    for (int i = 0; i < MarkdownFontsNumbers; i++)
-    //    {
-    //        switch (i)
-    //        {
-    //        case 0:
-    //            markdown_fonts.push_back(io.Fonts->AddFontFromFileTTF(FONT_CHINESE_SIMHEI_PATH, fonts_size * 1.25, 0, io.Fonts->GetGlyphRangesChineseFull()));
-    //            break;
-    //        case 1:
-    //            markdown_fonts.push_back(io.Fonts->AddFontFromFileTTF(FONT_CHINESE_SIMHEI_PATH, fonts_size, 0, io.Fonts->GetGlyphRangesChineseFull()));
-    //            break;
-    //        case 2:
-    //            markdown_fonts.push_back(io.Fonts->AddFontFromFileTTF(FONT_CHINESE_SIMHEI_PATH, fonts_size / 1.25, 0, io.Fonts->GetGlyphRangesChineseFull()));
-    //            break;
-    //        }
-    //    }
-    //}
+    void InitSetFonts()
+    {
+        all_fonts_set.SetTextEditorFont(all_fonts[AllFonts_XiaoXing]);
+        all_fonts_set.SetMarkdownHeadFont(all_fonts[AllFonts_SimHei]);
+        all_fonts_set.SetMarkdownContentFont(all_fonts[AllFonts_BaseChinese]);
+    }
 
     float* ReturnCurrentScale() { return &current_scale; }
 
-    std::vector<ImFont*>* GetTextEditorFonts()
-    {
-        for (int i = 0; i < TextEditorFontsNumbers; i++)
-        {
-            switch (i)
-            {
-            case TextEditorFonts_ZhoneHei:
-                text_editor_fonts.push_back(all_fonts[AllFonts_BaseChinese]);
-                break;
-            case TextEditorFonts_XiaoXing:
-                text_editor_fonts.push_back(all_fonts[AllFonts_XiaoXing]);
-                break;
-            }
-        }
-        return &text_editor_fonts;
-    }
-    std::vector<ImFont*>* GetMarkdownFonts()
-    {
-        for (int i = 0; i < MarkdownFontsNumbers; i++)
-        {
-            switch (i)	
-            {
-            case MarkdownFonts_SimHei:
-                markdown_fonts.push_back(all_fonts[AllFonts_SimHei]);
-                break;
-            case MarkdownFonts_XiaoXing:
-                markdown_fonts.push_back(all_fonts[AllFonts_XiaoXing]);
-                break;
-            }
-        }
-        return &markdown_fonts;
-    }
+    ImFont* GetTextEditorFonts() { return all_fonts_set.GetTextEditorFont(); }
+    ImFont* GetMarkdownHeadingFonts() { return all_fonts_set.GetMarkdownHeadFont(); }
+    ImFont* GetMarkdownContentFonts() { return all_fonts_set.GetMarkdownContentFont(); }
 
+    void SetTextEditorFont(const AllFonts& choice_font) { all_fonts_set.SetTextEditorFont(all_fonts[choice_font]); }
+    void SetMarkdownHeadingFonts(const AllFonts& choice_font) { all_fonts_set.SetMarkdownHeadFont(all_fonts[choice_font]); }
+    void SetMarkdownContentFonts(const AllFonts& choice_font) { all_fonts_set.SetMarkdownContentFont(all_fonts[choice_font]); }
 
     // 动态DPI
     void DynamicDPI(GLFWwindow* window, ImGuiIO& io)
@@ -144,8 +94,8 @@ namespace Fonts {
 
             //InitMarkdownFonts(xscale, io);          // 加载markdown字体
             //InitTextEditorFonts(xscale, io);        // 加载文本编辑器字体
-            InitFonts(xscale, io);
-
+            InitLoadFonts(xscale, io);
+            InitSetFonts();
             ImGui_ImplOpenGL3_DestroyFontsTexture();
             ImGui_ImplOpenGL3_CreateFontsTexture();
         }

@@ -3,7 +3,7 @@
 #include "fonts.h"
 
 
-static float font_scale = 1.0f;
+
 
 void TextEditor::TextEditorBegin()
 {
@@ -20,7 +20,7 @@ void TextEditor::TextEditorBegin()
 
 
     SetContent();               // 设定文本内容
-    ImGui::PushFont((*Fonts::GetTextEditorFonts())[Fonts::TextEditorFonts_XiaoXing]);
+    ImGui::PushFont(Fonts::GetTextEditorFonts());
     ImGui::SetWindowFontScale(font_scale);
     TextEditorHotKeys();        // 快捷键设置
 
@@ -98,7 +98,6 @@ void TextEditor::SaveText()
 
 void TextEditor::TextEditorHotKeys()
 {
-
     ImGuiIO& io = ImGui::GetIO();
     auto shift = io.KeyShift;
     auto ctrl = io.ConfigMacOSXBehaviors ? io.KeySuper : io.KeyCtrl;
@@ -108,15 +107,10 @@ void TextEditor::TextEditorHotKeys()
     {
         if (ImGui::IsWindowHovered())
             ImGui::SetMouseCursor(ImGuiMouseCursor_TextInput);
-        if (ctrl && !shift && !alt && ImGui::IsKeyPressed(ImGuiKey_S))
-            SaveText();
-        else if (ctrl && ImGui::IsKeyPressed(ImGuiKey_MouseWheelY))
-        {
-            if(io.MouseWheel==1)
-                font_scale += 0.1;
-            else 
-                font_scale -= 0.1;
-        }
+        if (ctrl && !shift && !alt && ImGui::IsKeyPressed(ImGuiKey_S))                      // 保存
+            SaveText(); 
+        else if (io.MouseWheel!=0&&ctrl && ImGui::IsKeyPressed(ImGuiKey_MouseWheelY))       // crtl+wheel放大缩小字体
+            font_scale = font_scale + io.MouseWheel * 0.1;
 
     }
 }

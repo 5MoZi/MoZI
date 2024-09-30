@@ -228,6 +228,7 @@ ___
 
 #include <stdint.h>
 #include "imgui.h"
+#include "fonts.h"
 namespace ImGui
 {
     //-----------------------------------------------------------------------------
@@ -929,7 +930,19 @@ namespace ImGui
         switch( markdownFormatInfo_.type )
         {
         case MarkdownFormatType::NORMAL_TEXT:
+        {
+            if (start_)
+            {
+                ImFont* markdown_content_fonts = Fonts::GetMarkdownContentFonts();
+                ImGui::PushFont(markdown_content_fonts);
+                ImGui::SetWindowFontScale(0.75f);
+            }
+            else
+            {
+                ImGui::PopFont();
+            }
             break;
+        }
 		case MarkdownFormatType::EMPHASIS:
         {
             MarkdownHeadingFormat fmt;

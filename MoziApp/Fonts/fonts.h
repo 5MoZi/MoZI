@@ -26,9 +26,13 @@
 #define FontsNumbers				4
 #define TextEditorFontsNumbers		2
 #define MarkdownFontsNumbers		1
+
+
+#define FontNameHeiTi		u8"黑体"
+#define FontNameZhengHei	u8"宋体"
+#define FontNameXiaoXing	u8"小新字体"
+
 namespace Fonts {
-
-
 	enum AllFonts
 	{
 		AllFonts_Arial = 0,
@@ -49,10 +53,38 @@ namespace Fonts {
 		MarkdownFonts_XiaoXing = 1,
 	};
 
+	class SetFonts
+	{
+	public:
+		inline void SetTextEditorFont(ImFont* c_TextEditorFont) { TextEditorFont = c_TextEditorFont; }
+		inline void SetMarkdownHeadFont(ImFont* c_MarkdownHeadFont) { MarkdownHeadFont = c_MarkdownHeadFont; }
+		inline void SetMarkdownContentFont(ImFont* c_MarkdownContentFont) { MarkdownContentFont = c_MarkdownContentFont; }
+
+
+		inline ImFont* GetTextEditorFont() { return TextEditorFont; }
+		inline ImFont* GetMarkdownHeadFont() { return MarkdownHeadFont; }
+		inline ImFont* GetMarkdownContentFont() { return MarkdownContentFont; }
+
+	private:
+		ImFont* WindowsFont;
+		ImFont* TextEditorFont;
+
+		ImFont* MarkdownHeadFont;
+		ImFont* MarkdownContentFont;
+	};
+
+
+
 	void DynamicDPI(GLFWwindow* window, ImGuiIO& io);
 	float* ReturnCurrentScale();
 
-	std::vector<ImFont*>* GetTextEditorFonts();
-	std::vector<ImFont*>* GetMarkdownFonts();
+
+	ImFont* GetTextEditorFonts();
+	ImFont* GetMarkdownHeadingFonts();
+	ImFont* GetMarkdownContentFonts();
+
+	void SetMarkdownHeadingFonts(const AllFonts& choice_font);
+	void SetMarkdownContentFonts(const AllFonts& choice_font);
+	void SetTextEditorFont(const AllFonts& choice_font);
 
 }

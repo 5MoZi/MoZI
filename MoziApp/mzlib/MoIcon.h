@@ -69,6 +69,9 @@
 #define HONEPAGENAME_SUBVIEWS_CONTENTPAGE			Moui::IconAndChinese("", u8"显示页面").c_str()
 #define HONEPAGENAME_SUBVIEWS_SPACE					Moui::IconAndChinese("", u8"文件视窗").c_str()
 
+
+#define HONEPAGENAME_SUBSETTINGS_FONTS				Moui::IconAndChinese(ICON_FA_FONT, u8"字体").c_str()
+
 // 窗口栏
 #define HONEPAGENAME_WINDOWS						Moui::IconAndChinese(ICON_FA_LAYER_GROUP, u8"窗口", 1).c_str()
 #define HONEPAGENAME_SUBWINDOWS_SOURSEPAGE			Moui::IconAndChinese("", u8"文件资源管理器").c_str()

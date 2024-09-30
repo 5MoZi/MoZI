@@ -53,7 +53,7 @@ public:
 
     std::filesystem::path file_path;
     TextExtensionFlag file_extension_flag;
-
+    float font_scale = 1.0f;
 private:
     std::filesystem::path last_file_path;
     ImVector<char> TextContent;

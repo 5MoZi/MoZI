@@ -19,10 +19,10 @@ namespace Moui {
 
     // 字体参数
     static float current_scale = 0.f;           // 当前规模，用于处理不同dip时不同的字体大小
-    static ImFont* big_font = NULL;             // 大号字体与图标，用于标题或其他需要大号字体的地方
-    static ImFont* markdown_H1 = NULL;
-    static ImFont* markdown_H2 = NULL;
-    static ImFont* markdown_H3 = NULL;
+    static const char* text_editor_fonts_name[] = { FontNameZhengHei, FontNameHeiTi ,FontNameXiaoXing };
+    static const char* markdown_fonts_heading_name[] = { FontNameHeiTi };
+    static const char* markdown_fonts_content_name[] = { FontNameZhengHei,FontNameHeiTi ,FontNameXiaoXing };
+
     // 主题参数
     static ThemeColor theme_color = Moui::ThemeColor_Light;                 // 页面默认色
     const static int theme_color_num = 3;                             // 主题颜色的数量
@@ -31,6 +31,160 @@ namespace Moui {
     // moui格式参数
     //static MoObject::MouiPopupStyle popup_base_style;
 
+    static std::string set_fonts_name[2] = { u8"文本编辑器",u8"Markdown" };
+    static std::string sub_set_fonts_name_markdown[2] = { u8"标题",u8"内容" };
+
+    void SetFontsPopup(bool* open_popup)
+    {
+        static std::string current_choice = { 0 };
+        static bool ones_open_popup = true;
+        ImGui::SetNextWindowSize(ImVec2(430, 450), ImGuiCond_FirstUseEver);
+        if (ones_open_popup)
+        {
+            ImGui::OpenPopup(u8"字体设置"); // 建立弹窗
+            ones_open_popup = false;
+        }
+
+        if (ImGui::BeginPopupModal(u8"字体设置", open_popup, ImGuiWindowFlags_NoCollapse))   // 打开弹窗
+        {
+
+            // 选项部分
+            ImGui::BeginChild(u8"选项", ImVec2(200, 0), ImGuiChildFlags_Border | ImGuiChildFlags_ResizeX);
+            for (int first_uid = 0; first_uid < 2; first_uid++)
+            {
+                bool node_open = ImGui::TreeNode(set_fonts_name[first_uid].c_str());
+                if (ImGui::IsItemClicked(ImGuiMouseButton_Left))current_choice = set_fonts_name[first_uid];
+                if (node_open)
+                {
+
+                    switch (first_uid)
+                    {
+                    case 0:
+                        break;
+                    case 1:
+                        for (int second_uid = 0; second_uid < 2; second_uid++)
+                        {
+                            ImGui::TreeNodeEx(sub_set_fonts_name_markdown[second_uid].c_str(), ImGuiTreeNodeFlags_Leaf | ImGuiTreeNodeFlags_NoTreePushOnOpen | ImGuiTreeNodeFlags_Bullet);
+                            if (ImGui::IsItemClicked(ImGuiMouseButton_Left))current_choice = sub_set_fonts_name_markdown[second_uid];
+                        }
+                        break;
+                    }
+                    ImGui::TreePop();
+                }
+            }
+
+            ImGui::EndChild();
+            ImGui::SameLine();
+
+            // 内容部分
+            ImGui::BeginChild(u8"内容",ImVec2(-FLT_MIN, -FLT_MIN), ImGuiChildFlags_Border);
+
+            if (current_choice == set_fonts_name[0])
+            {
+                static int item_current = 0;
+                ImGui::TextWrapped(u8"字体");
+                ImGui::Combo("##文本编辑器字体", &item_current, text_editor_fonts_name, IM_ARRAYSIZE(text_editor_fonts_name));
+
+                if(item_current==0)
+                    Fonts::SetTextEditorFont(Fonts::AllFonts_BaseChinese);
+                else if (item_current == 1)
+                    Fonts::SetTextEditorFont(Fonts::AllFonts_SimHei);
+                else if (item_current == 2)
+                    Fonts::SetTextEditorFont(Fonts::AllFonts_XiaoXing);
+            }
+            else if (current_choice == sub_set_fonts_name_markdown[0])
+            {
+                static int item_current = 0;
+                ImGui::TextWrapped(u8"标题字体");
+                ImGui::Combo("##Markdown标题字体", &item_current, markdown_fonts_heading_name, IM_ARRAYSIZE(markdown_fonts_heading_name));
+
+                if (item_current == 0)
+                    Fonts::SetMarkdownHeadingFonts(Fonts::AllFonts_SimHei);
+                //else if (item_current == 1)
+                //    Fonts::SetMarkdownHeadingFonts(Fonts::AllFonts_XiaoXing);
+            }
+            else if (current_choice == sub_set_fonts_name_markdown[1])
+            {
+                static int item_current = 0;
+                ImGui::TextWrapped(u8"内容字体");
+                ImGui::Combo("##Markdown内容字体", &item_current, markdown_fonts_content_name, IM_ARRAYSIZE(markdown_fonts_content_name));
+
+                if (item_current == 0)
+                    Fonts::SetMarkdownContentFonts(Fonts::AllFonts_BaseChinese);
+                else if (item_current == 1)
+                    Fonts::SetMarkdownContentFonts(Fonts::AllFonts_SimHei);
+                else if (item_current == 2)
+                    Fonts::SetMarkdownContentFonts(Fonts::AllFonts_XiaoXing);
+            }
+
+            ImGui::EndChild();
+
+            ImGui::EndPopup();
+        }
+
+        // 直接关闭弹窗后记得清空数组和还原标志位
+        if (*open_popup == false)
+        {
+            ones_open_popup = true;
+            current_choice = "";
+        }
+    }
+
+    static void SubSetFonts_TextEditorFonts_Content()
+    {
+
+    }
+    static void SubSetFonts_MarkdownFonts_Content()
+    {
+
+
+    }
+    static void ShowPlaceholderObject(const char* prefix, int uid)
+    {
+        // Use object uid as identifier. Most commonly you could also use the object pointer as a base ID.
+        ImGui::PushID(uid);
+
+        // Text and Tree nodes are less high than framed widgets, using AlignTextToFramePadding() we add vertical spacing to make the tree lines equal high.
+        ImGui::TableNextRow();
+        ImGui::TableSetColumnIndex(0);
+        ImGui::AlignTextToFramePadding();
+        bool node_open = ImGui::TreeNode("Object", "%s_%u", prefix, uid);
+        ImGui::TableSetColumnIndex(1);
+        ImGui::Text("my sailor is rich");
+
+        if (node_open)
+        {
+            static float placeholder_members[8] = { 0.0f, 0.0f, 1.0f, 3.1416f, 100.0f, 999.0f };
+            for (int i = 0; i < 8; i++)
+            {
+                ImGui::PushID(i); // Use field index as identifier.
+                if (i < 2)
+                {
+                    ShowPlaceholderObject("Child", 424242);
+                }
+                else
+                {
+                    // Here we use a TreeNode to highlight on hover (we could use e.g. Selectable as well)
+                    ImGui::TableNextRow();
+                    ImGui::TableSetColumnIndex(0);
+                    ImGui::AlignTextToFramePadding();
+                    ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_Leaf | ImGuiTreeNodeFlags_NoTreePushOnOpen | ImGuiTreeNodeFlags_Bullet;
+                    ImGui::TreeNodeEx("Field", flags, "Field_%d", i);
+
+                    ImGui::TableSetColumnIndex(1);
+                    ImGui::SetNextItemWidth(-FLT_MIN);
+                    if (i >= 5)
+                        ImGui::InputFloat("##value", &placeholder_members[i], 1.0f);
+                    else
+                        ImGui::DragFloat("##value", &placeholder_members[i], 0.01f);
+                    ImGui::NextColumn();
+                }
+                ImGui::PopID();
+            }
+            ImGui::TreePop();
+        }
+        ImGui::PopID();
+    }
     
 //-----------------------------------------------------------------------------
 //                                  输入函数

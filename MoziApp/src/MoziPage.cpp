@@ -86,6 +86,9 @@ namespace MoziPage{
         ImGui::End();
     }
 
+
+
+
     // MoZIApp初始化
     void MoziAppInit()
     {
@@ -149,11 +152,9 @@ namespace MoziPage{
     // 设置栏
     static void HomePageMainMenuBarSettings()
     {
-        static bool show_soursepage = true;
-        static bool show_filepage = true;
+        static bool show_set_fonts_popup = false;
         if (ImGui::BeginMenu(HONEPAGENAME_SETTINGS))
         {
-
             // 主题
             if (ImGui::BeginMenu(HONEPAGENAME_SUBSETTINGS_THEME))
             {
@@ -171,8 +172,13 @@ namespace MoziPage{
 
                 ImGui::EndMenu();
             }
+            // 字体
+            if (ImGui::MenuItem(HONEPAGENAME_SUBSETTINGS_FONTS, NULL, &show_set_fonts_popup));
             ImGui::EndMenu();
         }
+
+
+        if (show_set_fonts_popup) Moui::SetFontsPopup(&show_set_fonts_popup);
     }
 
     // 窗口栏
@@ -266,7 +272,6 @@ namespace MoziPage{
         // 主页主栏设置
         if (ImGui::BeginMainMenuBar())
         {
-            //HomePageMainMenuBarFile();
             HomePageMainMenuBarSettings();
             HomePageMainMenuBarWindows();
             HomePageMainMenuBarHelp();
@@ -616,7 +621,7 @@ namespace MoziPage{
         {
             //if (ignore_extension.count(file_path[i].extension().generic_string()))continue;// 跳过mozi后缀信息文件
             // 建立树节点
-            ImGui::TreeNodeEx(file_path[i].c_str(), ImGuiTreeNodeFlags_Leaf, FileOperate::TreeFileIconConnect(file_path[i]).c_str());
+            ImGui::TreeNodeEx(file_path[i].c_str(), ImGuiTreeNodeFlags_Leaf| ImGuiTreeNodeFlags_Bullet, FileOperate::TreeFileIconConnect(file_path[i]).c_str());
             // 双击文件操作
             DoubleClickedFile(file_path[i], double_click_get_path);
             ImGui::TreePop();

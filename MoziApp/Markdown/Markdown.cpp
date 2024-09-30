@@ -115,6 +115,7 @@ namespace Markdown
         }
 
     }
+
     void LoadFonts(ImFont* H1, ImFont* H2, ImFont* H3)
     {
         mdConfig.headingFormats[0] = { H1, true };
@@ -123,12 +124,12 @@ namespace Markdown
     }
     void LoadFonts()
     {
-        std::vector<ImFont*>* markdown_fonts = Fonts::GetMarkdownFonts();
-        if (!(*markdown_fonts).empty())
+        ImFont* markdown_heading_fonts = Fonts::GetMarkdownHeadingFonts();
+        if (markdown_heading_fonts)
         {
-            mdConfig.headingFormats[0] = { (*markdown_fonts)[Fonts::MarkdownFonts_SimHei], true };
-            mdConfig.headingFormats[1] = { (*markdown_fonts)[Fonts::MarkdownFonts_SimHei], true };
-            mdConfig.headingFormats[2] = { (*markdown_fonts)[Fonts::MarkdownFonts_SimHei], true };
+            mdConfig.headingFormats[0] = { markdown_heading_fonts, true };
+            mdConfig.headingFormats[1] = { markdown_heading_fonts, true };
+            mdConfig.headingFormats[2] = { markdown_heading_fonts, true };
         }
     }
 
@@ -183,6 +184,7 @@ namespace Markdown
         mdConfig.linkIcon = ICON_FA_LINK;
         mdConfig.userData = NULL;
         //mdConfig.formatCallback = NULL;
+
         ImGui::Markdown(markdown_.c_str(), markdown_.length(), mdConfig);
 
         // 查看image_old_down = image_new_down二者内容代码

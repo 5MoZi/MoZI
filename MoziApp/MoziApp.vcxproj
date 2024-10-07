@@ -96,10 +96,10 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;BETA_VERSION;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>$(SolutionDir)lib\fonts;$(SolutionDir)lib\GLFW\include;$(SolutionDir)MoziApp\imgui;$(SolutionDir)MoziApp\mzlib;$(SolutionDir)lib\MySQL\include;$(SolutionDir)MoziApp\TextEditor;$(SolutionDir)MoziApp\Markdown;$(SolutionDir)MoziApp;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)lib\spdlog\include;$(SolutionDir)lib\fonts;$(SolutionDir)lib\GLFW\include;$(SolutionDir)MoziApp\imgui;$(SolutionDir)MoziApp\mzlib;$(SolutionDir)lib\MySQL\include;$(SolutionDir)MoziApp\TextEditor;$(SolutionDir)MoziApp\Markdown;$(SolutionDir)MoziApp\fonts;$(SolutionDir)MoziApp\MysqlOperate;$(SolutionDir)MoziApp\FileOperate;$(SolutionDir)MoziApp;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>mzpch.h</PrecompiledHeaderFile>
     </ClCompile>
@@ -162,7 +162,7 @@
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;PUBLIC_VERSION;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>$(SolutionDir)lib\fonts;$(SolutionDir)lib\GLFW\include;$(SolutionDir)MoziApp\imgui;$(SolutionDir)MoziApp\mzlib;$(SolutionDir)lib\MySQL\include;$(SolutionDir)MoziApp\TextEditor;$(SolutionDir)MoziApp\Markdown;$(SolutionDir)MoziApp\MysqlOperate;$(SolutionDir)MoziApp\FileOperate;$(SolutionDir)MoziApp;$(SolutionDir)lib\fonts;$(SolutionDir)lib\GLFW\include;$(SolutionDir)MoziApp\imgui;$(SolutionDir)MoziApp\mzlib;$(SolutionDir)lib\MySQL\include;$(SolutionDir)MoziApp;$(SolutionDir)lib\spdlog\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)MoziApp\fonts;$(SolutionDir)lib\fonts;$(SolutionDir)lib\GLFW\include;$(SolutionDir)MoziApp\imgui;$(SolutionDir)MoziApp\mzlib;$(SolutionDir)lib\MySQL\include;$(SolutionDir)MoziApp\TextEditor;$(SolutionDir)MoziApp\Markdown;$(SolutionDir)MoziApp\MysqlOperate;$(SolutionDir)MoziApp\FileOperate;$(SolutionDir)MoziApp;$(SolutionDir)lib\spdlog\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
     </ClCompile>
     <Link>
@@ -261,11 +261,18 @@
     <ClInclude Include="mzlib\IconsFontAwesome6.h" />
     <ClInclude Include="mzlib\MoIcon.h" />
     <ClInclude Include="mopch.h" />
+    <ClInclude Include="resource1.h" />
     <ClInclude Include="src\FileManage.h" />
     <ClInclude Include="src\Moui.h" />
     <ClInclude Include="src\MoziPage.h" />
     <ClInclude Include="mzlib\stb_image.h" />
     <ClInclude Include="TextEditor\TextEditor.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="MoziApp1.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="..\lib\AppLogo\mozi_logo.ico" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

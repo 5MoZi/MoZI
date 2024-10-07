@@ -17,7 +17,7 @@
 
 
 #ifdef PUBLIC_VERSION
-#define SOLUTION_PATH           std::filesystem::current_path().parent_path().parent_path()			// 解决方案路径
+#define SOLUTION_PATH           std::filesystem::current_path()		// 解决方案路径
 
 #define STORAGE_PATH			(SOLUTION_PATH/"storage").generic_u8string().c_str()			// 存储文件路径
 #define MOZI_RECYCLE_BIN_PATH	(SOLUTION_PATH/"RecyleBin").generic_u8string().c_str()			// 回收站路径

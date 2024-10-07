@@ -74,7 +74,7 @@ int main()
     ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
 
     MoziPage::MoziAppInit();
-
+    //m_hICON=AfxGetApp()
     //int my_image_width = 0;
     //int my_image_height = 0;
     //GLuint my_image_texture = 0;

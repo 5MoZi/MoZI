@@ -34,6 +34,8 @@ namespace Moui {
     static std::string set_fonts_name[2] = { u8"文本编辑器",u8"Markdown" };
     static std::string sub_set_fonts_name_markdown[2] = { u8"标题",u8"内容" };
 
+
+    // 字体设置页面
     void SetFontsPopup(bool* open_popup)
     {
         static std::string current_choice = { 0 };

@@ -10,6 +10,9 @@
 #include "Markdown.h"
 
 #include "fonts.h"
+#include "EnumSet.h"
+
+#include "MoziInit.h"
 
 namespace Moui {
 
@@ -24,7 +27,7 @@ namespace Moui {
     static const char* markdown_fonts_content_name[] = { FontNameZhengHei,FontNameHeiTi ,FontNameXiaoXing };
 
     // 主题参数
-    static ThemeColor theme_color = Moui::ThemeColor_Light;                 // 页面默认色
+    //static ThemeColor theme_color = Moui::ThemeColor_Light;                 // 页面默认色
     const static int theme_color_num = 3;                             // 主题颜色的数量
     static bool* theme_color_register = new bool[theme_color_num]();  // 主题颜色变换器：当启用某个颜色主题时，该颜色下标置为1其余为0;
 
@@ -38,6 +41,7 @@ namespace Moui {
     // 字体设置页面
     void SetFontsPopup(bool* open_popup)
     {
+        MoziInit* mozi_init = GetMoziInitIo();
         static std::string current_choice = { 0 };
         static bool ones_open_popup = true;
         ImGui::SetNextWindowSize(ImVec2(430, 450), ImGuiCond_FirstUseEver);
@@ -87,12 +91,23 @@ namespace Moui {
                 ImGui::TextWrapped(u8"字体");
                 ImGui::Combo("##文本编辑器字体", &item_current, text_editor_fonts_name, IM_ARRAYSIZE(text_editor_fonts_name));
 
-                if(item_current==0)
+                if (item_current == 0)
+                {
                     Fonts::SetTextEditorFont(Fonts::AllFonts_BaseChinese);
+                    mozi_init->SetMoziInitMarkdownEditorFonts(TextEditorFonts_ZhoneHei);
+                }
                 else if (item_current == 1)
+                {
                     Fonts::SetTextEditorFont(Fonts::AllFonts_SimHei);
+                    mozi_init->SetMoziInitMarkdownEditorFonts(TextEditorFonts_SimHei);
+                }
+
                 else if (item_current == 2)
+                {
                     Fonts::SetTextEditorFont(Fonts::AllFonts_XiaoXing);
+                    mozi_init->SetMoziInitMarkdownEditorFonts(TextEditorFonts_XiaoXing);
+                }
+
             }
             else if (current_choice == sub_set_fonts_name_markdown[0])
             {
@@ -722,20 +737,22 @@ namespace Moui {
     }
 
     // 主题颜色初始化
-    static void ThemeColorInit(const ThemeColor& theme_color)
+    static void ThemeColorInit()
     {
+        MoziInit* mozi_init = GetMoziInitIo();
+        EnumSet::ThemeColor theme_color = mozi_init->GetMoziInitAppTheme();
         switch (theme_color)
         {
-        case ThemeColor_Light:
-            theme_color_register[ThemeColor_Light] = true;
+        case EnumSet::ThemeColor_Light:
+            theme_color_register[EnumSet::ThemeColor_Light] = true;
             ImGui::StyleColorsLight();
             break;
-        case ThemeColor_Dark:
-            theme_color_register[ThemeColor_Dark] = true;
+        case EnumSet::ThemeColor_Dark:
+            theme_color_register[EnumSet::ThemeColor_Dark] = true;
             ImGui::StyleColorsDark();
             break;
-        case ThemeColor_Classic:
-            theme_color_register[ThemeColor_Classic] = true;
+        case EnumSet::ThemeColor_Classic:
+            theme_color_register[EnumSet::ThemeColor_Classic] = true;
             ImGui::StyleColorsClassic();
             break;
         }
@@ -760,7 +777,7 @@ namespace Moui {
         // UI初始化
         Moui::StyleInit();
         LOG_INFO("Moui格式初始化完成");
-        Moui::ThemeColorInit(theme_color);
+        Moui::ThemeColorInit();
         LOG_INFO("Moui主题初始化完成");
         //Moui::MouiPopupStyleInit();
         //LOG_INFO("Moui弹窗初始化完成");
@@ -831,23 +848,27 @@ namespace Moui {
     // 改变主题颜色
     void ChangeThemeColor()
     {
-        if (ImGui::MenuItem(HONEPAGENAME_SUBSETTINGS_LIGHT, NULL, &theme_color_register[ThemeColor_Light]))
+        MoziInit* mozi_init = GetMoziInitIo();
+        if (ImGui::MenuItem(HONEPAGENAME_SUBSETTINGS_LIGHT, NULL, &theme_color_register[EnumSet::ThemeColor_Light]))
         {
             memset(theme_color_register, 0, theme_color_num);
             ImGui::StyleColorsLight();
-            theme_color_register[ThemeColor_Light] = true;
+            theme_color_register[EnumSet::ThemeColor_Light] = true;
+            mozi_init->SetMoziInitAppTheme(EnumSet::ThemeColor_Light);
         }
-        if (ImGui::MenuItem(HONEPAGENAME_SUBSETTINGS_DARK, NULL, &theme_color_register[ThemeColor_Dark]))
+        if (ImGui::MenuItem(HONEPAGENAME_SUBSETTINGS_DARK, NULL, &theme_color_register[EnumSet::ThemeColor_Dark]))
         {
             memset(theme_color_register, 0, theme_color_num);
             ImGui::StyleColorsDark();
-            theme_color_register[ThemeColor_Dark] = true;
+            theme_color_register[EnumSet::ThemeColor_Dark] = true;
+            mozi_init->SetMoziInitAppTheme(EnumSet::ThemeColor_Dark);
         }
-        if (ImGui::MenuItem(HONEPAGENAME_SUBSETTINGS_CLASSIC, NULL, &theme_color_register[ThemeColor_Classic]))
+        if (ImGui::MenuItem(HONEPAGENAME_SUBSETTINGS_CLASSIC, NULL, &theme_color_register[EnumSet::ThemeColor_Classic]))
         {
             memset(theme_color_register, 0, theme_color_num);
             ImGui::StyleColorsClassic();
-            theme_color_register[ThemeColor_Classic] = true;
+            theme_color_register[EnumSet::ThemeColor_Classic] = true;
+            mozi_init->SetMoziInitAppTheme(EnumSet::ThemeColor_Classic);
         }
     }
 

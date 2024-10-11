@@ -935,7 +935,7 @@ namespace ImGui
             {
                 ImFont* markdown_content_fonts = Fonts::GetMarkdownContentFonts();
                 ImGui::PushFont(markdown_content_fonts);
-                ImGui::SetWindowFontScale(0.75f);
+                ImGui::SetWindowFontScale(1.5f);
             }
             else
             {
@@ -969,7 +969,7 @@ namespace ImGui
 				    if( fmt.font )
 				    {
 					    ImGui::PushFont( fmt.font );
-                        ImGui::SetWindowFontScale(0.75f);
+                        ImGui::SetWindowFontScale(1.5f);
 				    }
 			    }
                 else
@@ -999,11 +999,11 @@ namespace ImGui
                 {
                     ImGui::PushFont( fmt.font );
                     if(markdownFormatInfo_.level==1)
-                        ImGui::SetWindowFontScale(1.25f);
+                        ImGui::SetWindowFontScale(2.0f);
                     else if(markdownFormatInfo_.level == 2)
-                        ImGui::SetWindowFontScale(1.0f);
+                        ImGui::SetWindowFontScale(1.5f);
                     else if (markdownFormatInfo_.level == 3)
-                        ImGui::SetWindowFontScale(0.8f);
+                        ImGui::SetWindowFontScale(1.0f);
                 }
                 ImGui::NewLine();
             }

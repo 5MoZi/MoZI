@@ -35,10 +35,6 @@ namespace MoziPage{
     static std::filesystem::path last_click_get_path   = STORAGE_PATH;       // 保持上一次点击的路径，该文件夹的路径
 
 
-    // 用于建立文件树的FolerMap
-    //static FileOperate::FolderMap folder_maper;
-
-
     // 文件相关操作标志位
     // 包含：新建、复制、粘贴、剪切、重命名、完全删除、删除至回收站
     static FileOperate::FileFormat add_new_file_fileformat;     // 新建文件类型
@@ -72,13 +68,11 @@ namespace MoziPage{
 
     static void MarkdownDisplayPage()
     {
-
         ImGui::SetNextWindowSize(ImVec2(700, 500), ImGuiCond_FirstUseEver);
         if (markdown_display_open)
             ImGui::Begin(MARKDOWN_DISPLAY_PAGE_NAME, &markdown_display_open, 
                 ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_HorizontalScrollbar);
         else return;
-
         // 如果文件是空的则不进行显示，并且文件需要问md后缀的文件才能使用
         if (!text_editor.GetContent().empty() && (text_editor.file_extension_flag == TextEditor::TextExtensionFlag_Markdown))
             Markdown::MarkdownBegin(text_editor.GetContent(), text_editor.file_path);
@@ -95,10 +89,7 @@ namespace MoziPage{
         // 日志初始化
         MoLog::Log::LogInit();
         LOG_INFO("日志初始化设置完成");
-        // 初始化设置
-        LOG_INFO("MOUI初始化设置中...");
-        Moui::MouiInit();              // UI初始化
-        LOG_INFO("MOUI初始化完成");
+
         // 数据库连接
         //LOG_INFO("Mysql数据库初始设置中...");
         //MysqlOperate::ConnectDatabase();
@@ -255,6 +246,7 @@ namespace MoziPage{
 
 
         ImGui::Begin("MoziApp DockSpace", 0, window_flags);
+
 
         if (!opt_padding)
             ImGui::PopStyleVar();

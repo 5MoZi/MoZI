@@ -174,9 +174,7 @@ namespace Markdown
             image_old_down.clear();
         }
 
-
         current_markdown_path = current_open_path;
-
         LoadFonts();        // 加载字体
         mdConfig.linkCallback = MarkdownLinkCallback;
         mdConfig.tooltipCallback = NULL;
@@ -186,22 +184,6 @@ namespace Markdown
         //mdConfig.formatCallback = NULL;
 
         ImGui::Markdown(markdown_.c_str(), markdown_.length(), mdConfig);
-
-        // 查看image_old_down = image_new_down二者内容代码
-        //if (ImGui::IsKeyPressed(ImGuiKey_Keypad0))
-        //{
-        //    std::cout << "image_old_down" << std::endl;
-        //    for (auto iter = image_new_down.begin(); iter != image_new_down.end(); ++iter)
-        //    {
-        //        std::cout << iter->first << " => " << iter->second.image_num << '\n';
-        //    }
-
-        //    std::cout << "image_new_down" << std::endl;
-        //    for (auto iter = image_new_down.begin(); iter != image_new_down.end(); ++iter)
-        //    {
-        //        std::cout << iter->first << " => " << iter->second.image_num << '\n';
-        //    }
-        //}
 
         image_old_down = image_new_down;
         image_new_down.clear();

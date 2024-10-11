@@ -1,28 +1,26 @@
 #include "mopch.h"
+
+#include "PathSet.h"
+#include "EnumSet.h"
 #include "fonts.h"
 
 
-
-
-
-
-
+#include "MoziInit.h"
 namespace Fonts {
 
 
+    // 保存所有字体
     static std::vector<ImFont*> all_fonts;
 
-    static SetFonts reset_fonts;
     static SetFonts all_fonts_set;
 
-    static ImFont* text_editor_fonts;
-    static ImFont* markdown_heading_fonts;
-    static ImFont* markdown_content_fonts;
-
     static float current_scale = 0;
+
+
     void InitLoadFonts(const float& scale, ImGuiIO& io)
     {
-        float fonts_size = scale * 20.0f;
+        all_fonts.clear();
+        float fonts_size = 20.0f;
         for (int i = 0; i < FontsNumbers; i++)
         {
             switch (i)
@@ -42,9 +40,12 @@ namespace Fonts {
             }
         }
     }
+
     void InitSetFonts()
     {
-        all_fonts_set.SetTextEditorFont(all_fonts[AllFonts_XiaoXing]);
+        MoziInit* mozi_init = GetMoziInitIo();
+        TextEditorFonts text_editor_fonts = mozi_init->GetMoziInitMarkdownEditorFonts();
+        all_fonts_set.SetTextEditorFont(all_fonts[text_editor_fonts]);
         all_fonts_set.SetMarkdownHeadFont(all_fonts[AllFonts_SimHei]);
         all_fonts_set.SetMarkdownContentFont(all_fonts[AllFonts_BaseChinese]);
     }
@@ -73,7 +74,8 @@ namespace Fonts {
             io.Fonts->Clear();                      // 清楚所有字体
             current_scale = xscale;
             /*************************** 初始字体 *****************************/
-            float base_pixels = xscale * 15.0f;
+            //float base_pixels = xscale * 10.0f;
+            float base_pixels = 20.0f;
             // 合成字体参数设置
             ImFontConfig config;
             config.MergeMode = true;    // 开启字体合成
@@ -84,18 +86,44 @@ namespace Fonts {
             config.GlyphMinAdvanceX = base_pixels * 2.0f / 2.3f;
 
             // 初始字体
-            io.Fonts->AddFontFromFileTTF(FONT_ENGLISH_BASE_PATH, base_pixels, 0, io.Fonts->GetGlyphRangesDefault());
+            ImFont* a1 = io.Fonts->AddFontFromFileTTF(FONT_ENGLISH_BASE_PATH, base_pixels, 0, io.Fonts->GetGlyphRangesDefault());
             // 汉字字体
-            io.Fonts->AddFontFromFileTTF(FONT_CHINESE_BASE_PATH, base_pixels, &config, io.Fonts->GetGlyphRangesChineseFull());
+            ImFont* a2 = io.Fonts->AddFontFromFileTTF(FONT_CHINESE_BASE_PATH, base_pixels, &config, io.Fonts->GetGlyphRangesChineseFull());
             // 图标字体
-            io.Fonts->AddFontFromFileTTF(ICON_BASE_FILE_PATH, base_pixels * 2.0f / 2.3f, &config, icons_ranges);
+            ImFont* a3 = io.Fonts->AddFontFromFileTTF(ICON_BASE_FILE_PATH, base_pixels * 2.0f / 2.3f, &config, icons_ranges);
 
             io.Fonts->Build();              // 建立字体
 
-            //InitMarkdownFonts(xscale, io);          // 加载markdown字体
-            //InitTextEditorFonts(xscale, io);        // 加载文本编辑器字体
-            InitLoadFonts(xscale, io);
-            InitSetFonts();
+            // 不要用base_pixels来调节字体的大小，base_pixels用与调节字体的精细程度（dpi），
+            // 用io.FontGlobalScale来调节字体的大小
+            io.FontGlobalScale = xscale*0.75f;
+
+            // 为了保证不重复加载字体
+            all_fonts.clear();
+            float fonts_size = 20.0f;
+            for (int i = 0; i < FontsNumbers; i++)
+            {
+                switch (i)
+                {
+                case AllFonts_Arial:
+                    all_fonts.push_back(a1);
+                    break;
+                case AllFonts_BaseChinese:
+                    all_fonts.push_back(a2);
+                    break;
+                case AllFonts_SimHei:
+                    all_fonts.push_back(io.Fonts->AddFontFromFileTTF(FONT_CHINESE_SIMHEI_PATH, fonts_size, 0, io.Fonts->GetGlyphRangesChineseFull()));
+                    break;
+                case AllFonts_XiaoXing:
+                    all_fonts.push_back(io.Fonts->AddFontFromFileTTF(FONT_CHINESE_XIAOXING_PATH, fonts_size, 0, io.Fonts->GetGlyphRangesChineseFull()));
+                    break;
+                }
+            }
+
+            //InitLoadFonts(xscale, io);                // 加载其他类型字体
+            InitSetFonts();                           // 保存字体
+
+            // 在检测内存过大时，下面这两行是一定要的，如果去除则会在切换不同分辨率屏幕时，直接黑屏
             ImGui_ImplOpenGL3_DestroyFontsTexture();
             ImGui_ImplOpenGL3_CreateFontsTexture();
         }

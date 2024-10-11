@@ -78,6 +78,9 @@
     <ClCompile Include="Fonts\fonts.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="MoziInit\MoziInit.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="mzlib\IconsFontAwesome6.h">
@@ -162,6 +165,15 @@
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="resource1.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="MoziInit\MoziInit.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="BaseLevel\PathSet.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="BaseLevel\EnumSet.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>

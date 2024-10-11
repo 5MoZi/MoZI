@@ -4,13 +4,13 @@
 namespace Moui {
 
 
-    // UI主题颜色
-    enum ThemeColor
-    {
-        ThemeColor_Light = 0,		// 白色
-        ThemeColor_Dark = 1,		// 黑色
-        ThemeColor_Classic = 2	    // 经典紫色
-    };
+    //// UI主题颜色
+    //enum ThemeColor
+    //{
+    //    ThemeColor_Light = 0,		// 白色
+    //    ThemeColor_Dark = 1,		// 黑色
+    //    ThemeColor_Classic = 2	    // 经典紫色
+    //};
 
     void MouiInit();
 

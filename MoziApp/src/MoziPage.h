@@ -8,6 +8,8 @@
 #define MARKDOWN_DISPLAY_PAGE_NAME				u8"Markdownœ‘ æ“≥√Ê"
 
 
+#define WindowsFontScale 1.5f
+
 //extern int my_image_width;
 //extern int my_image_height;
 //extern GLuint my_image_texture;

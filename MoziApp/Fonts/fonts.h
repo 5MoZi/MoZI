@@ -9,14 +9,10 @@
 #define FontNameZhengHei	u8"宋体"
 #define FontNameXiaoXing	u8"小新字体"
 
+#include "EnumSet.h"
+
 namespace Fonts {
-	enum AllFonts
-	{
-		AllFonts_Arial = 0,
-		AllFonts_BaseChinese = 1,
-		AllFonts_SimHei = 2,
-		AllFonts_XiaoXing = 3
-	};
+
 
 	//enum  TextEditorFonts
 	//{
@@ -60,8 +56,8 @@ namespace Fonts {
 	ImFont* GetMarkdownHeadingFonts();
 	ImFont* GetMarkdownContentFonts();
 
-	void SetMarkdownHeadingFonts(const AllFonts& choice_font);
-	void SetMarkdownContentFonts(const AllFonts& choice_font);
-	void SetTextEditorFont(const AllFonts& choice_font);
+	void SetMarkdownHeadingFonts(const EnumSet::AllFonts& choice_font);
+	void SetMarkdownContentFonts(const EnumSet::AllFonts& choice_font);
+	void SetTextEditorFont(const EnumSet::AllFonts& choice_font);
 
 }

@@ -4,7 +4,7 @@
 #include "FileOperate.h"
 #include "MoObject.h"
 #include "MysqlOperate.h"
-#include "Moui.h"
+
 #include "FileManage.h"
 
 #include "Markdown.h"
@@ -14,6 +14,7 @@
 
 #include "MoziInit.h"
 
+#include "Moui.h"
 namespace Moui {
 
 //-----------------------------------------------------------------------------
@@ -93,19 +94,19 @@ namespace Moui {
 
                 if (item_current == 0)
                 {
-                    Fonts::SetTextEditorFont(Fonts::AllFonts_BaseChinese);
-                    mozi_init->SetMoziInitMarkdownEditorFonts(TextEditorFonts_ZhoneHei);
+                    Fonts::SetTextEditorFont(EnumSet::AllFonts_Song);
+                    mozi_init->SetMoziInitTextEditorFonts(EnumSet::AllFonts_Song);
                 }
                 else if (item_current == 1)
                 {
-                    Fonts::SetTextEditorFont(Fonts::AllFonts_SimHei);
-                    mozi_init->SetMoziInitMarkdownEditorFonts(TextEditorFonts_SimHei);
+                    Fonts::SetTextEditorFont(EnumSet::AllFonts_SimHei);
+                    mozi_init->SetMoziInitTextEditorFonts(EnumSet::AllFonts_SimHei);
                 }
 
                 else if (item_current == 2)
                 {
-                    Fonts::SetTextEditorFont(Fonts::AllFonts_XiaoXing);
-                    mozi_init->SetMoziInitMarkdownEditorFonts(TextEditorFonts_XiaoXing);
+                    Fonts::SetTextEditorFont(EnumSet::AllFonts_XiaoXing);
+                    mozi_init->SetMoziInitTextEditorFonts(EnumSet::AllFonts_XiaoXing);
                 }
 
             }
@@ -116,7 +117,11 @@ namespace Moui {
                 ImGui::Combo("##Markdown标题字体", &item_current, markdown_fonts_heading_name, IM_ARRAYSIZE(markdown_fonts_heading_name));
 
                 if (item_current == 0)
-                    Fonts::SetMarkdownHeadingFonts(Fonts::AllFonts_SimHei);
+                {
+                    Fonts::SetMarkdownHeadingFonts(EnumSet::AllFonts_SimHei);
+                    mozi_init->SetMoziInitMarkdownHeadFonts(EnumSet::AllFonts_SimHei);
+                }
+
                 //else if (item_current == 1)
                 //    Fonts::SetMarkdownHeadingFonts(Fonts::AllFonts_XiaoXing);
             }
@@ -127,11 +132,20 @@ namespace Moui {
                 ImGui::Combo("##Markdown内容字体", &item_current, markdown_fonts_content_name, IM_ARRAYSIZE(markdown_fonts_content_name));
 
                 if (item_current == 0)
-                    Fonts::SetMarkdownContentFonts(Fonts::AllFonts_BaseChinese);
+                {
+                    Fonts::SetMarkdownContentFonts(EnumSet::AllFonts_Song);
+                    mozi_init->SetMoziInitMarkdownContentFonts(EnumSet::AllFonts_Song);
+                }
                 else if (item_current == 1)
-                    Fonts::SetMarkdownContentFonts(Fonts::AllFonts_SimHei);
+                {
+                    Fonts::SetMarkdownContentFonts(EnumSet::AllFonts_SimHei);
+                    mozi_init->SetMoziInitMarkdownContentFonts(EnumSet::AllFonts_SimHei);
+                }
                 else if (item_current == 2)
-                    Fonts::SetMarkdownContentFonts(Fonts::AllFonts_XiaoXing);
+                {
+                    Fonts::SetMarkdownContentFonts(EnumSet::AllFonts_XiaoXing);
+                    mozi_init->SetMoziInitMarkdownContentFonts(EnumSet::AllFonts_XiaoXing);
+                }
             }
 
             ImGui::EndChild();

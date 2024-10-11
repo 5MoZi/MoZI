@@ -1,8 +1,7 @@
 #include "mopch.h"
 #include "Log.h"
 #include "PathSet.h"
-
-
+#include "EnumSet.h"
 
 #include "MoziInit.h"
 
@@ -91,8 +90,9 @@ MoziInit::MoziInit()
 
 		LOG_INFO("初始化设置中......");
 		setting_map.insert({ MoziInitAppTheme ,EnumSet::ThemeColor_Light });
-		setting_map.insert({ MoziInitSetMarkdownEditorFonts ,TextEditorFonts_XiaoXing });
-		setting_map.insert({ MoziInitSetMarkdownContentFonts ,MarkdownFonts_XiaoXing });
+		setting_map.insert({ MoziInitSetTextEditorFonts ,EnumSet::AllFonts_XiaoXing });
+		setting_map.insert({ MoziInitSetMarkdownContentFonts ,EnumSet::AllFonts_XiaoXing });
+		setting_map.insert({ MoziInitSetMarkdownHeadFonts ,EnumSet::AllFonts_SimHei });
 		LOG_INFO("初始化设置成功");
 	}
 
@@ -114,12 +114,12 @@ void MoziInit::WriteMzInitFile()
 	mzfile << MoziInitSettingLevel << "\n";
 	for (auto iter = setting_map.begin(); iter != setting_map.end(); ++iter)
 	{
-		if (iter->second == 0)
-			mzfile << iter->first << "\n";
-		else
-		{
+		//if (iter->second == 0)
+		//	mzfile << iter->first << "\n";
+		//else
+		//{
 			mzfile << iter->first << "\n" << iter->second << "\n";
-		}
+		//}
 	}
 	LOG_INFO("设置初始化内容写入完成");
 
@@ -137,36 +137,37 @@ void MoziInit::SetMoziInitAppTheme(const int& app_theme)
 	setting_map[MoziInitAppTheme] = app_theme;
 }
 
+void MoziInit::SetMoziInitTextEditorFonts(const int& editor_fonts)
+{
+	setting_map[MoziInitSetTextEditorFonts] = editor_fonts;
+}
+
+void MoziInit::SetMoziInitMarkdownContentFonts(const int& markdown_content_fonts)
+{
+	setting_map[MoziInitSetMarkdownContentFonts] = markdown_content_fonts;
+}
+
+void MoziInit::SetMoziInitMarkdownHeadFonts(const int& markdown_head_fonts)
+{
+	setting_map[MoziInitSetMarkdownHeadFonts] = markdown_head_fonts;
+}
+
 EnumSet::ThemeColor MoziInit::GetMoziInitAppTheme()
 {
-	int i = setting_map[MoziInitAppTheme];
-	switch (i)
-	{
-	case 0:
-		return EnumSet::ThemeColor_Light;
-	case 1:
-		return EnumSet::ThemeColor_Dark;
-	case 2:
-		return EnumSet::ThemeColor_Classic;
-	}
+	return EnumSet::ThemeColor(setting_map[MoziInitAppTheme]);
 }
 
-
-void MoziInit::SetMoziInitMarkdownEditorFonts(const int& editor_fonts)
+EnumSet::AllFonts MoziInit::GetMoziInitTextEditorFonts()
 {
-	setting_map[MoziInitSetMarkdownEditorFonts] = editor_fonts;
-}
-
-TextEditorFonts MoziInit::GetMoziInitMarkdownEditorFonts()
-{
-	int i = setting_map[MoziInitSetMarkdownEditorFonts];
-	switch (i)
-	{
-	case 0:
-		return TextEditorFonts_ZhoneHei;
-	case 1:
-		return TextEditorFonts_SimHei;
-	case 2:
-		return TextEditorFonts_XiaoXing;
-	}
+	return EnumSet::AllFonts(setting_map[MoziInitSetTextEditorFonts]);
 }	
+
+EnumSet::AllFonts MoziInit::GetMoziInitMarkdownContentFonts()
+{
+	return EnumSet::AllFonts(setting_map[MoziInitSetMarkdownContentFonts]);
+}
+
+EnumSet::AllFonts MoziInit::GetMoziInitMarkdownHeadFonts()
+{
+	return EnumSet::AllFonts(setting_map[MoziInitSetMarkdownHeadFonts]);
+}

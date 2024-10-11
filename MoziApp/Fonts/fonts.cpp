@@ -25,16 +25,16 @@ namespace Fonts {
         {
             switch (i)
             {
-            case AllFonts_Arial:
+            case EnumSet::AllFonts_Arial:
                 all_fonts.push_back(io.Fonts->AddFontFromFileTTF(FONT_ENGLISH_BASE_PATH, fonts_size, 0, io.Fonts->GetGlyphRangesChineseFull()));
                 break;
-            case AllFonts_BaseChinese:
+            case EnumSet::AllFonts_Song:
                 all_fonts.push_back(io.Fonts->AddFontFromFileTTF(FONT_CHINESE_BASE_PATH, fonts_size, 0, io.Fonts->GetGlyphRangesChineseFull()));
                 break;
-            case AllFonts_SimHei:
+            case EnumSet::AllFonts_SimHei:
                 all_fonts.push_back(io.Fonts->AddFontFromFileTTF(FONT_CHINESE_SIMHEI_PATH, fonts_size, 0, io.Fonts->GetGlyphRangesChineseFull()));
                 break;
-            case AllFonts_XiaoXing:
+            case EnumSet::AllFonts_XiaoXing:
                 all_fonts.push_back(io.Fonts->AddFontFromFileTTF(FONT_CHINESE_XIAOXING_PATH, fonts_size, 0, io.Fonts->GetGlyphRangesChineseFull()));
                 break;
             }
@@ -44,10 +44,13 @@ namespace Fonts {
     void InitSetFonts()
     {
         MoziInit* mozi_init = GetMoziInitIo();
-        TextEditorFonts text_editor_fonts = mozi_init->GetMoziInitMarkdownEditorFonts();
+        EnumSet::AllFonts text_editor_fonts = mozi_init->GetMoziInitTextEditorFonts();
+        EnumSet::AllFonts markdown_content_fonts = mozi_init->GetMoziInitMarkdownContentFonts();
+        EnumSet::AllFonts markdown_head_fonts = mozi_init->GetMoziInitMarkdownHeadFonts();
+
         all_fonts_set.SetTextEditorFont(all_fonts[text_editor_fonts]);
-        all_fonts_set.SetMarkdownHeadFont(all_fonts[AllFonts_SimHei]);
-        all_fonts_set.SetMarkdownContentFont(all_fonts[AllFonts_BaseChinese]);
+        all_fonts_set.SetMarkdownContentFont(all_fonts[markdown_content_fonts]);
+        all_fonts_set.SetMarkdownHeadFont(all_fonts[markdown_head_fonts]);
     }
 
     float* ReturnCurrentScale() { return &current_scale; }
@@ -56,9 +59,9 @@ namespace Fonts {
     ImFont* GetMarkdownHeadingFonts() { return all_fonts_set.GetMarkdownHeadFont(); }
     ImFont* GetMarkdownContentFonts() { return all_fonts_set.GetMarkdownContentFont(); }
 
-    void SetTextEditorFont(const AllFonts& choice_font) { all_fonts_set.SetTextEditorFont(all_fonts[choice_font]); }
-    void SetMarkdownHeadingFonts(const AllFonts& choice_font) { all_fonts_set.SetMarkdownHeadFont(all_fonts[choice_font]); }
-    void SetMarkdownContentFonts(const AllFonts& choice_font) { all_fonts_set.SetMarkdownContentFont(all_fonts[choice_font]); }
+    void SetTextEditorFont(const EnumSet::AllFonts& choice_font) { all_fonts_set.SetTextEditorFont(all_fonts[choice_font]); }
+    void SetMarkdownHeadingFonts(const EnumSet::AllFonts& choice_font) { all_fonts_set.SetMarkdownHeadFont(all_fonts[choice_font]); }
+    void SetMarkdownContentFonts(const EnumSet::AllFonts& choice_font) { all_fonts_set.SetMarkdownContentFont(all_fonts[choice_font]); }
 
     // 动态DPI
     void DynamicDPI(GLFWwindow* window, ImGuiIO& io)
@@ -100,22 +103,21 @@ namespace Fonts {
 
             // 为了保证不重复加载字体
             all_fonts.clear();
-            float fonts_size = 20.0f;
             for (int i = 0; i < FontsNumbers; i++)
             {
                 switch (i)
                 {
-                case AllFonts_Arial:
+                case EnumSet::AllFonts_Arial:
                     all_fonts.push_back(a1);
                     break;
-                case AllFonts_BaseChinese:
+                case EnumSet::AllFonts_Song:
                     all_fonts.push_back(a2);
                     break;
-                case AllFonts_SimHei:
-                    all_fonts.push_back(io.Fonts->AddFontFromFileTTF(FONT_CHINESE_SIMHEI_PATH, fonts_size, 0, io.Fonts->GetGlyphRangesChineseFull()));
+                case EnumSet::AllFonts_SimHei:
+                    all_fonts.push_back(io.Fonts->AddFontFromFileTTF(FONT_CHINESE_SIMHEI_PATH, base_pixels, 0, io.Fonts->GetGlyphRangesChineseFull()));
                     break;
-                case AllFonts_XiaoXing:
-                    all_fonts.push_back(io.Fonts->AddFontFromFileTTF(FONT_CHINESE_XIAOXING_PATH, fonts_size, 0, io.Fonts->GetGlyphRangesChineseFull()));
+                case EnumSet::AllFonts_XiaoXing:
+                    all_fonts.push_back(io.Fonts->AddFontFromFileTTF(FONT_CHINESE_XIAOXING_PATH, base_pixels, 0, io.Fonts->GetGlyphRangesChineseFull()));
                     break;
                 }
             }

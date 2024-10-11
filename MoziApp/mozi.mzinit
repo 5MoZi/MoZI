@@ -1,6 +1,11 @@
 *[A****]Setting
 *[BV***]AppTheme
-*[CV***]MarkdownEditorFonts
-2
+0
 *[CV***]MarkdownContentFonts
 1
+*[CV***]MarkdownEditorFonts
+0
+*[CV***]MarkdownHeadFonts
+2
+*[CV***]TextEditorFonts
+2

@@ -42,7 +42,7 @@
     <ClCompile Include="src\MoziPage.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="mopch.cpp">
+    <ClCompile Include="PhysicalLayer\mopch.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="src\Moui.cpp">
@@ -51,7 +51,7 @@
     <ClCompile Include="src\FileManage.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="mzlib\Log.cpp">
+    <ClCompile Include="PhysicalLayer\Log\Log.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="FileOperate\FileOperate.cpp">
@@ -78,7 +78,10 @@
     <ClCompile Include="Fonts\fonts.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="MoziInit\MoziInit.cpp">
+    <ClCompile Include="LinkLayer\InitFile\InitFile.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="MoziAppInit\MoziAppInit.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>
@@ -119,7 +122,7 @@
     <ClInclude Include="mzlib\MoIcon.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="mopch.h">
+    <ClInclude Include="PhysicalLayer\mopch.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="src\Moui.h">
@@ -128,7 +131,7 @@
     <ClInclude Include="src\FileManage.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="mzlib\Log.h">
+    <ClInclude Include="PhysicalLayer\Log\Log.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="FileOperate\FileOperate.h">
@@ -164,27 +167,17 @@
     <ClInclude Include="Fonts\fonts.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="resource1.h">
+    <ClInclude Include="LinkLayer\InitFile\InitFile.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="MoziInit\MoziInit.h">
+    <ClInclude Include="PhysicalLayer\EnumSet.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="BaseLevel\PathSet.h">
+    <ClInclude Include="PhysicalLayer\PathSet.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="BaseLevel\EnumSet.h">
+    <ClInclude Include="MoziAppInit\MoziAppInit.h">
       <Filter>头文件</Filter>
     </ClInclude>
-  </ItemGroup>
-  <ItemGroup>
-    <ResourceCompile Include="MoziApp1.rc">
-      <Filter>资源文件</Filter>
-    </ResourceCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <Image Include="..\lib\AppLogo\mozi_logo.ico">
-      <Filter>资源文件</Filter>
-    </Image>
   </ItemGroup>
 </Project>

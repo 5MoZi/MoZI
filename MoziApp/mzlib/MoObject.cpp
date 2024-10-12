@@ -1,6 +1,6 @@
 #include "mopch.h"
 #include "MoObject.h"
-#include "Log.h"
+#include "Log/Log.h"
 
 namespace MoObject
 {

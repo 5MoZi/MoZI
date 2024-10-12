@@ -1,20 +1,22 @@
 #include "mopch.h"
-#include "Log.h"
-#include "FileOperate.h"
-#include "MysqlOperate.h"
-#include "MoObject.h"
 
-#include "Moui.h"
+
+//#include "Log/Log.h"
+#include "MoziAppInit/MoziAppInit.h"
+#include "InitFile/InitFile.h"
+
+//#include "FileOperate.h"
+//#include "MysqlOperate.h"
+//#include "MoObject.h"
+
+//#include "Moui.h"
 #include "MoziPage.h"
-
-#include "Log.h"
-
-#include "MoImage.h"
-
-#include "markdown.h"
+//#include "MoImage.h"
+//
+//#include "markdown.h"
 #include "fonts.h"
 
-#include "MoziInit.h"
+
 
 #define APP_NAME u8"MoZI"
 
@@ -76,29 +78,28 @@ int main()
     bool show_demo_window = true;
     ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
 
-    MoziPage::MoziAppInit();
+    // App初始化
+    //MoLog::Log::LogInit();						                // 日志初始化
+    //InitFile mozi_file_init;									// 建立初始化文件对象，获取初始化文件内的内容
+    MoziAppInit mozi_app_init;                                  // 建立初始化对象，执行初始化程序
+    
 
-    MoziInit MoziInit;          // 建立初始化对象
-
-    // 初始化设置
-    LOG_INFO("MOUI初始化设置中...");
-    Moui::MouiInit();              // UI初始化
-    LOG_INFO("MOUI初始化完成");
     //-----------------------------------------------------------------------------
     //                               循环主体
     //-----------------------------------------------------------------------------
     while (!glfwWindowShouldClose(window))
     {
         glfwPollEvents();
-        // 动态DIP，依据屏幕的DIP来设定字体
-        Fonts::DynamicDPI(window, io);
+
+        //Fonts::DynamicFontsSize(window, io);
+
         ImGui_ImplOpenGL3_NewFrame();
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
 
-        //// 前面都是初始化操作与设定，下面才是程序运行部分
+        // 前面都是初始化操作与设定，下面才是程序运行部分
         ///*******************UI运行与程序部分***********************/
-        MoziPage::HomePage();
+        MoziPage::HomePage(window);
         if (show_demo_window)
             ImGui::ShowDemoWindow(&show_demo_window);
  
@@ -108,7 +109,7 @@ int main()
         //ImGui::Text("size = %d x %d", my_image_width, my_image_height);
         //ImGui::Image((void*)(intptr_t)my_image_texture, ImVec2(my_image_width, my_image_height));
         //ImGui::End();
-        ///********************************************************/
+        /********************************************************/
 
         // Rendering
         ImGui::Render();
@@ -130,7 +131,8 @@ int main()
     }
 
     // Cleanup
-    mysql_close(MysqlOperate::GetMysqlIo());		//关闭数据库
+    // mysql_close(MysqlOperate::GetMysqlIo());		// 关闭数据库
+    delete GetInitFileIO();                         // 删除initFile所new的空间，并调用析构函数
 
     ImGui_ImplOpenGL3_Shutdown();
     ImGui_ImplGlfw_Shutdown();
@@ -138,6 +140,5 @@ int main()
 
     glfwDestroyWindow(window);
     glfwTerminate();
-
     return 0;
 }

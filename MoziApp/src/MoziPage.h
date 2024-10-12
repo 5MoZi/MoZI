@@ -15,9 +15,9 @@
 //extern GLuint my_image_texture;
 
 namespace MoziPage {
-
+	void DynamicFontsSize(GLFWwindow* window);
 	void MoziAppInit();
-	void HomePage();
+	void HomePage(GLFWwindow* window);
 	// ÄÚÖÃº¯Êý
 	static void SoursePage();
 	static void DebugDisplayPage();

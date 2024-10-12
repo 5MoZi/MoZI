@@ -1,6 +1,6 @@
 #include "mopch.h"
 
-#include "Log.h"
+#include "Log/Log.h"
 #include "FileOperate.h"
 #include "MysqlOperate.h"
 #include "MoObject.h"
@@ -13,6 +13,7 @@
 
 #include "Markdown.h"
 #include "TextEditor.h"
+#include "Fonts/fonts.h"
 //int my_image_width = 0;
 //int my_image_height = 0;
 //GLuint my_image_texture = 0;
@@ -81,14 +82,22 @@ namespace MoziPage{
     }
 
 
-
-
+    static void DynamicFontsSize(GLFWwindow* window)
+    {
+        static float current_scale = 0.f;
+        float xscale, yscale;
+        glfwGetWindowContentScale(window, &xscale, &yscale);
+        if (current_scale != xscale)
+        {
+            ImGuiIO& io = ImGui::GetIO();
+            io.FontGlobalScale = xscale * 0.75f;
+            current_scale = xscale;
+        }
+    }
     // MoZIApp初始化
     void MoziAppInit()
     {
-        // 日志初始化
-        MoLog::Log::LogInit();
-        LOG_INFO("日志初始化设置完成");
+
 
         // 数据库连接
         //LOG_INFO("Mysql数据库初始设置中...");
@@ -215,8 +224,10 @@ namespace MoziPage{
     }
 
     // 主页
-	void HomePage()
+	void HomePage(GLFWwindow* glfw_window)
 	{
+        // 动态DIP，依据屏幕的DIP来设定字体大小
+        DynamicFontsSize(glfw_window);
         static bool opt_fullscreen = true;
         static bool opt_padding = false;
         static ImGuiDockNodeFlags dockspace_flags = ImGuiDockNodeFlags_None;
@@ -246,7 +257,6 @@ namespace MoziPage{
 
 
         ImGui::Begin("MoziApp DockSpace", 0, window_flags);
-
 
         if (!opt_padding)
             ImGui::PopStyleVar();

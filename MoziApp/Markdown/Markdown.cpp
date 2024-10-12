@@ -2,7 +2,7 @@
 #include "Markdown.h"
 #include "imgui_markdown.h" 
 #include "MoImage.h"
-#include "Log.h"
+#include "Log/Log.h"
 #include "fonts.h"
 // Following includes for Windows LinkCallback
 
@@ -29,27 +29,7 @@ namespace Markdown
     static std::map<std::filesystem::path, ImageInformation>image_old_down;
     static std::map<std::filesystem::path, ImageInformation>image_new_down;
   
-    // 下载网络上图片用到
-    //#include <tchar.h>
-    //#include <Urlmon.h>
-    //#pragma comment(lib,"urlmon.lib")
-    //void GetUrlImage(const char* url, int& len)
-    //{
-    //    static std::string later_url = { 0 };
-    //    std::string new_url(url, len);
-    //    if (later_url != new_url)
-    //    {
-    //        GLuint my_image_texture = 0;
-    //        int nmlen = MultiByteToWideChar(CP_ACP, 0, new_url.c_str(), len + 1, NULL, 0);//如果函数运行成功，并且cchWideChar为零，
-    //        //返回值是接收到待转换字符串的缓冲区所需求的宽字符数大小。
-    //        wchar_t* buffer = new wchar_t[nmlen]; 
-    //        MultiByteToWideChar(CP_ACP, 0, new_url.c_str(), len + 1, buffer, nmlen);
-    //        HRESULT hr = URLDownloadToFile(NULL, buffer, _T("C:\\Users\\Chen\\Desktop\\test\\name.png"), 0, NULL);
-    //        bool ret = MoImage::LoadTextureFromFile("C:\\Users\\Chen\\Desktop\\test\\name.png", &my_image_texture,
-    //            &my_image_width, &my_image_height);
-    //        later_url = new_url;
-    //    }
-    //}
+
 
     void GetPathImage(const std::filesystem::path& image_path)
     {
@@ -124,7 +104,7 @@ namespace Markdown
     }
     void LoadFonts()
     {
-        ImFont* markdown_heading_fonts = Fonts::GetMarkdownHeadingFonts();
+        ImFont* markdown_heading_fonts = Fonts::GetMarkdownHeadFonts();
         if (markdown_heading_fonts)
         {
             mdConfig.headingFormats[0] = { markdown_heading_fonts, true };
@@ -188,4 +168,36 @@ namespace Markdown
         image_old_down = image_new_down;
         image_new_down.clear();
     }
+
+
+
+
+
+
+
+
+
+
+
+    // 下载网络上图片用到
+//#include <tchar.h>
+//#include <Urlmon.h>
+//#pragma comment(lib,"urlmon.lib")
+//void GetUrlImage(const char* url, int& len)
+//{
+//    static std::string later_url = { 0 };
+//    std::string new_url(url, len);
+//    if (later_url != new_url)
+//    {
+//        GLuint my_image_texture = 0;
+//        int nmlen = MultiByteToWideChar(CP_ACP, 0, new_url.c_str(), len + 1, NULL, 0);//如果函数运行成功，并且cchWideChar为零，
+//        //返回值是接收到待转换字符串的缓冲区所需求的宽字符数大小。
+//        wchar_t* buffer = new wchar_t[nmlen]; 
+//        MultiByteToWideChar(CP_ACP, 0, new_url.c_str(), len + 1, buffer, nmlen);
+//        HRESULT hr = URLDownloadToFile(NULL, buffer, _T("C:\\Users\\Chen\\Desktop\\test\\name.png"), 0, NULL);
+//        bool ret = MoImage::LoadTextureFromFile("C:\\Users\\Chen\\Desktop\\test\\name.png", &my_image_texture,
+//            &my_image_width, &my_image_height);
+//        later_url = new_url;
+//    }
+//}
 }

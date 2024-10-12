@@ -2,7 +2,7 @@
 #include "FileOperate.h"
 #include "FileManage.h"
 #include "MoIcon.h"
-#include "Log.h"
+#include "Log/Log.h"
 
 
 #include "MysqlOperate.h"

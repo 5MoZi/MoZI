@@ -139,7 +139,7 @@
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;BETA_VERSION;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>$(SolutionDir)MoziApp\BaseLevel;$(SolutionDir)lib\fonts;$(SolutionDir)lib\GLFW\include;$(SolutionDir)MoziApp\imgui;$(SolutionDir)MoziApp\mzlib;$(SolutionDir)lib\MySQL\include;$(SolutionDir)MoziApp\TextEditor;$(SolutionDir)MoziApp\Markdown;$(SolutionDir)MoziApp\MysqlOperate;$(SolutionDir)MoziApp\Fonts;$(SolutionDir)MoziApp\MoziInit;$(SolutionDir)MoziApp\FileOperate;$(SolutionDir)MoziApp;$(SolutionDir)lib\spdlog\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)MoziApp\LinkLayer;$(SolutionDir)MoziApp\PhysicalLayer;$(SolutionDir)lib\fonts;$(SolutionDir)lib\GLFW\include;$(SolutionDir)MoziApp\imgui;$(SolutionDir)MoziApp\mzlib;$(SolutionDir)lib\MySQL\include;$(SolutionDir)MoziApp\TextEditor;$(SolutionDir)MoziApp\Markdown;$(SolutionDir)MoziApp\MysqlOperate;$(SolutionDir)MoziApp\Fonts;$(SolutionDir)MoziApp\MoziInit;$(SolutionDir)MoziApp\FileOperate;$(SolutionDir)MoziApp;$(SolutionDir)lib\spdlog\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>mopch.h</PrecompiledHeaderFile>
     </ClCompile>
@@ -162,7 +162,7 @@
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;PUBLIC_VERSION;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>$(SolutionDir)MoziApp\BaseLevel;$(SolutionDir)MoziApp\fonts;$(SolutionDir)lib\fonts;$(SolutionDir)lib\GLFW\include;$(SolutionDir)MoziApp\imgui;$(SolutionDir)MoziApp\mzlib;$(SolutionDir)lib\MySQL\include;$(SolutionDir)MoziApp\TextEditor;$(SolutionDir)MoziApp\Markdown;$(SolutionDir)MoziApp\MysqlOperate;$(SolutionDir)MoziApp\MoziInit;$(SolutionDir)MoziApp\FileOperate;$(SolutionDir)MoziApp;$(SolutionDir)lib\spdlog\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)MoziApp\LinkLayer;$(SolutionDir)MoziApp\PhysicalLayer;$(SolutionDir)MoziApp\fonts;$(SolutionDir)lib\fonts;$(SolutionDir)lib\GLFW\include;$(SolutionDir)MoziApp\imgui;$(SolutionDir)MoziApp\mzlib;$(SolutionDir)lib\MySQL\include;$(SolutionDir)MoziApp\TextEditor;$(SolutionDir)MoziApp\Markdown;$(SolutionDir)MoziApp\MysqlOperate;$(SolutionDir)MoziApp\MoziInit;$(SolutionDir)MoziApp\FileOperate;$(SolutionDir)MoziApp;$(SolutionDir)lib\spdlog\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
     </ClCompile>
     <Link>
@@ -178,6 +178,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="MoziAppInit\MoziAppInit.cpp" />
     <ClCompile Include="Fonts\fonts.cpp" />
     <ClCompile Include="Markdown\Markdown.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
@@ -188,7 +189,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">mopch.h</PrecompiledHeaderFile>
     </ClCompile>
-    <ClCompile Include="MoziInit\MoziInit.cpp" />
+    <ClCompile Include="LinkLayer\InitFile\InitFile.cpp" />
     <ClCompile Include="mzlib\MoImage.cpp" />
     <ClCompile Include="mzlib\MoDubug.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Use</PrecompiledHeader>
@@ -203,8 +204,8 @@
     <ClCompile Include="imgui\imgui_impl_opengl3.cpp" />
     <ClCompile Include="imgui\imgui_tables.cpp" />
     <ClCompile Include="imgui\imgui_widgets.cpp" />
-    <ClCompile Include="mzlib\Log.cpp" />
-    <ClCompile Include="mopch.cpp">
+    <ClCompile Include="PhysicalLayer\Log\Log.cpp" />
+    <ClCompile Include="PhysicalLayer\mopch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">mopch.h</PrecompiledHeaderFile>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
@@ -240,12 +241,12 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="BaseLevel\EnumSet.h" />
+    <ClInclude Include="MoziAppInit\MoziAppInit.h" />
     <ClInclude Include="FileMacro.h" />
     <ClInclude Include="Fonts\fonts.h" />
     <ClInclude Include="Markdown\imgui_markdown.h" />
     <ClInclude Include="Markdown\Markdown.h" />
-    <ClInclude Include="MoziInit\MoziInit.h" />
+    <ClInclude Include="LinkLayer\InitFile\InitFile.h" />
     <ClInclude Include="mzlib\MoImage.h" />
     <ClInclude Include="mzlib\MoDubug.h" />
     <ClInclude Include="mzlib\MoObject.h" />
@@ -260,23 +261,17 @@
     <ClInclude Include="imgui\imstb_rectpack.h" />
     <ClInclude Include="imgui\imstb_textedit.h" />
     <ClInclude Include="imgui\imstb_truetype.h" />
-    <ClInclude Include="mzlib\Log.h" />
+    <ClInclude Include="PhysicalLayer\Log\Log.h" />
     <ClInclude Include="mzlib\IconsFontAwesome6.h" />
     <ClInclude Include="mzlib\MoIcon.h" />
-    <ClInclude Include="mopch.h" />
-    <ClInclude Include="BaseLevel\PathSet.h" />
-    <ClInclude Include="resource1.h" />
+    <ClInclude Include="PhysicalLayer\EnumSet.h" />
+    <ClInclude Include="PhysicalLayer\mopch.h" />
+    <ClInclude Include="PhysicalLayer\PathSet.h" />
     <ClInclude Include="src\FileManage.h" />
     <ClInclude Include="src\Moui.h" />
     <ClInclude Include="src\MoziPage.h" />
     <ClInclude Include="mzlib\stb_image.h" />
     <ClInclude Include="TextEditor\TextEditor.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <ResourceCompile Include="MoziApp1.rc" />
-  </ItemGroup>
-  <ItemGroup>
-    <Image Include="..\lib\AppLogo\mozi_logo.ico" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

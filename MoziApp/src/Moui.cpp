@@ -1,6 +1,7 @@
 #include "mopch.h"
 #include "MoIcon.h"
-#include "Log.h"
+#include "PhysicalLayer/Log/Log.h"
+
 #include "FileOperate.h"
 #include "MoObject.h"
 #include "MysqlOperate.h"
@@ -12,8 +13,8 @@
 #include "fonts.h"
 #include "EnumSet.h"
 
-#include "MoziInit.h"
-
+#include "InitFile/InitFile.h"
+#include "MoziAppInit/MoziAppInit.h"
 #include "Moui.h"
 namespace Moui {
 
@@ -29,8 +30,7 @@ namespace Moui {
 
     // 主题参数
     //static ThemeColor theme_color = Moui::ThemeColor_Light;                 // 页面默认色
-    const static int theme_color_num = 3;                             // 主题颜色的数量
-    static bool* theme_color_register = new bool[theme_color_num]();  // 主题颜色变换器：当启用某个颜色主题时，该颜色下标置为1其余为0;
+
 
     // moui格式参数
     //static MoObject::MouiPopupStyle popup_base_style;
@@ -42,7 +42,7 @@ namespace Moui {
     // 字体设置页面
     void SetFontsPopup(bool* open_popup)
     {
-        MoziInit* mozi_init = GetMoziInitIo();
+        InitFile* Init_file = GetInitFileIO();
         static std::string current_choice = { 0 };
         static bool ones_open_popup = true;
         ImGui::SetNextWindowSize(ImVec2(430, 450), ImGuiCond_FirstUseEver);
@@ -95,18 +95,18 @@ namespace Moui {
                 if (item_current == 0)
                 {
                     Fonts::SetTextEditorFont(EnumSet::AllFonts_Song);
-                    mozi_init->SetMoziInitTextEditorFonts(EnumSet::AllFonts_Song);
+                    Init_file->SetInitFileTextEditorFonts(EnumSet::AllFonts_Song);
                 }
                 else if (item_current == 1)
                 {
                     Fonts::SetTextEditorFont(EnumSet::AllFonts_SimHei);
-                    mozi_init->SetMoziInitTextEditorFonts(EnumSet::AllFonts_SimHei);
+                    Init_file->SetInitFileTextEditorFonts(EnumSet::AllFonts_SimHei);
                 }
 
                 else if (item_current == 2)
                 {
                     Fonts::SetTextEditorFont(EnumSet::AllFonts_XiaoXing);
-                    mozi_init->SetMoziInitTextEditorFonts(EnumSet::AllFonts_XiaoXing);
+                    Init_file->SetInitFileTextEditorFonts(EnumSet::AllFonts_XiaoXing);
                 }
 
             }
@@ -118,8 +118,8 @@ namespace Moui {
 
                 if (item_current == 0)
                 {
-                    Fonts::SetMarkdownHeadingFonts(EnumSet::AllFonts_SimHei);
-                    mozi_init->SetMoziInitMarkdownHeadFonts(EnumSet::AllFonts_SimHei);
+                    Fonts::SetMarkdownHeadFonts(EnumSet::AllFonts_SimHei);
+                    Init_file->SetInitFileMarkdownHeadFonts(EnumSet::AllFonts_SimHei);
                 }
 
                 //else if (item_current == 1)
@@ -134,17 +134,17 @@ namespace Moui {
                 if (item_current == 0)
                 {
                     Fonts::SetMarkdownContentFonts(EnumSet::AllFonts_Song);
-                    mozi_init->SetMoziInitMarkdownContentFonts(EnumSet::AllFonts_Song);
+                    Init_file->SetInitFileMarkdownContentFonts(EnumSet::AllFonts_Song);
                 }
                 else if (item_current == 1)
                 {
                     Fonts::SetMarkdownContentFonts(EnumSet::AllFonts_SimHei);
-                    mozi_init->SetMoziInitMarkdownContentFonts(EnumSet::AllFonts_SimHei);
+                    Init_file->SetInitFileMarkdownContentFonts(EnumSet::AllFonts_SimHei);
                 }
                 else if (item_current == 2)
                 {
                     Fonts::SetMarkdownContentFonts(EnumSet::AllFonts_XiaoXing);
-                    mozi_init->SetMoziInitMarkdownContentFonts(EnumSet::AllFonts_XiaoXing);
+                    Init_file->SetInitFileMarkdownContentFonts(EnumSet::AllFonts_XiaoXing);
                 }
             }
 
@@ -750,27 +750,7 @@ namespace Moui {
         style.WindowMenuButtonPosition = ImGuiDir_None;
     }
 
-    // 主题颜色初始化
-    static void ThemeColorInit()
-    {
-        MoziInit* mozi_init = GetMoziInitIo();
-        EnumSet::ThemeColor theme_color = mozi_init->GetMoziInitAppTheme();
-        switch (theme_color)
-        {
-        case EnumSet::ThemeColor_Light:
-            theme_color_register[EnumSet::ThemeColor_Light] = true;
-            ImGui::StyleColorsLight();
-            break;
-        case EnumSet::ThemeColor_Dark:
-            theme_color_register[EnumSet::ThemeColor_Dark] = true;
-            ImGui::StyleColorsDark();
-            break;
-        case EnumSet::ThemeColor_Classic:
-            theme_color_register[EnumSet::ThemeColor_Classic] = true;
-            ImGui::StyleColorsClassic();
-            break;
-        }
-    }
+
 
     //// MouiPopup格式初始化
     //static void MouiPopupStyleInit()
@@ -784,18 +764,6 @@ namespace Moui {
     //    popup_base_style.bar_size = ImVec2(800.0f, 30.0f);
     //    popup_base_style.button_size = ImVec2(150, 0);
     //}
-
-    // MouiApp初始化程序
-    void MouiInit()
-    {
-        // UI初始化
-        Moui::StyleInit();
-        LOG_INFO("Moui格式初始化完成");
-        Moui::ThemeColorInit();
-        LOG_INFO("Moui主题初始化完成");
-        //Moui::MouiPopupStyleInit();
-        //LOG_INFO("Moui弹窗初始化完成");
-    }
 
     // 动态DPI
     //void DynamicDPI(GLFWwindow* window, ImGuiIO& io)
@@ -862,27 +830,29 @@ namespace Moui {
     // 改变主题颜色
     void ChangeThemeColor()
     {
-        MoziInit* mozi_init = GetMoziInitIo();
+        InitFile* init_file = GetInitFileIO();
+        MoziAppInit* mozi_app_init = GetMoziAppInitIO();
+        bool* theme_color_register = mozi_app_init->GetThemeColorChanger();
         if (ImGui::MenuItem(HONEPAGENAME_SUBSETTINGS_LIGHT, NULL, &theme_color_register[EnumSet::ThemeColor_Light]))
         {
-            memset(theme_color_register, 0, theme_color_num);
+            memset(theme_color_register, 0, ThemeColorNum);
             ImGui::StyleColorsLight();
             theme_color_register[EnumSet::ThemeColor_Light] = true;
-            mozi_init->SetMoziInitAppTheme(EnumSet::ThemeColor_Light);
+            init_file->SetInitFileAppTheme(EnumSet::ThemeColor_Light);
         }
         if (ImGui::MenuItem(HONEPAGENAME_SUBSETTINGS_DARK, NULL, &theme_color_register[EnumSet::ThemeColor_Dark]))
         {
-            memset(theme_color_register, 0, theme_color_num);
+            memset(theme_color_register, 0, ThemeColorNum);
             ImGui::StyleColorsDark();
             theme_color_register[EnumSet::ThemeColor_Dark] = true;
-            mozi_init->SetMoziInitAppTheme(EnumSet::ThemeColor_Dark);
+            init_file->SetInitFileAppTheme(EnumSet::ThemeColor_Dark);
         }
         if (ImGui::MenuItem(HONEPAGENAME_SUBSETTINGS_CLASSIC, NULL, &theme_color_register[EnumSet::ThemeColor_Classic]))
         {
-            memset(theme_color_register, 0, theme_color_num);
+            memset(theme_color_register, 0, ThemeColorNum);
             ImGui::StyleColorsClassic();
             theme_color_register[EnumSet::ThemeColor_Classic] = true;
-            mozi_init->SetMoziInitAppTheme(EnumSet::ThemeColor_Classic);
+            init_file->SetInitFileAppTheme(EnumSet::ThemeColor_Classic);
         }
     }
 
